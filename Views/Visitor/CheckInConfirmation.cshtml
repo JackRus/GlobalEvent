@@ -1,0 +1,27 @@
+@{ 
+    Layout = "_NoBody";
+}
+
+
+<div class="confirmation c-c">
+	<div class="bgBase text-center" style="color: #fff; height: 70px; line-height: 70px;">
+		Dear Guest!
+	</div>
+	<div style="padding: 15px;" class="text-center">
+		In order to check in, you have to be regestered first.
+		<br /><br />
+		<span style="font-weight: 400;"> Are You Regestered? </span>
+	</div>
+	<div>
+		
+		<div class="col-xs-6 nopad">
+			<a asp-action="PreCheckIn" asp-route-EID="@ViewBag.EID" class="btn mybtn bgBase" style="width: 100%;">
+			Yes
+		</a>
+		</div>
+		<div class="col-xs-6 nopad">
+			<a asp-action="PreRegister" asp-route-EID="@ViewBag.EID" class="btn mybtn bgBro" style="width: 100%;">
+			No
+		</a>
+	</div>
+</div>

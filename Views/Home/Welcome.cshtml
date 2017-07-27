@@ -1,0 +1,36 @@
+@model Event
+@{ 
+    Layout = "_NoBody";
+}
+
+<div class="row text-center">
+    <h2>Please select your Event</h2>
+</div>
+
+<div class="row" style="padding-top: 60px;">
+    
+    <div class="col-sm-12">
+        <div class="welcome-number-container" style="border-bottom: 1px solid var(--colBase);">
+            <span class="welcome-number bgBase">ACTIVE</span>
+        </div>
+        <a asp-action="Menu" asp-route-EID="@Model.ID" class="btn btn-home">
+            @Model.Name <br />
+            <span style="font-size: 0.5em;"> @Model.DateStart - @Model.DateEnd </span>
+        </a>
+    </div>
+    <br />
+    <br />
+
+    <div class="col-sm-12">
+        <div class="welcome-number-container" style="border-bottom: 1px solid var(--colBro);">
+            <span class="welcome-number bgBro">FUTURE</span>
+        </div>
+
+        @foreach (Event e in ViewBag.Future)
+        {
+            <div asp-action="Menu" asp-route-EID="@e.ID" class="event-future">
+            @e.Name <br />
+            <span style="font-size: 0.5em;"> @e.DateStart - @e.DateEnd </span></div>
+        }
+    </div>
+</div>

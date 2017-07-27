@@ -1,0 +1,34 @@
+@{ 
+    Layout = "_NoBody";
+}
+
+<div class="row text-center c-c" style="width: 400px;">
+
+	@if(ViewBag.Message != null)
+	{
+		<br />
+		<div class="f-attention">
+			<span>@ViewBag.Message </span>
+		</div>
+	}
+
+	<a asp-action="CheckInConfirmation" asp-controller="Visitor" asp-route-EID="@ViewBag.EID" class="btn i-block bgBase" style="">
+		Check-In
+	</a>
+	<br />
+
+	<a asp-action="PreRegister" asp-controller="Visitor" asp-route-EID="@ViewBag.EID" class="btn i-block bgBase">	
+		Register
+	</a>
+	<br />
+
+	<a href="https://www.eventbrite.com/e/global-event-opening-test-tickets-35326692087" class="btn i-block bgBase">
+		Buy Ticket
+	</a>
+	<br />
+
+	<a asp-action="Welcome" class="btn i-block bgBro">
+		Back
+	</a>
+
+</div>

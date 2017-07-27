@@ -1,0 +1,46 @@
+@model Visitor
+@{
+	Layout = "_NoBody";
+}
+
+<div class="row c-c nomar text-center" style="width: 600px;">
+
+	<h2>
+		This is a preview of your name tag.<br />
+		Please check the information below carefully and print it, when you are ready.
+	</h2>
+	<br /> 
+	<div id="checkin">
+		<h5> @ViewBag.Event </h5>
+
+		<div style="font-size: 3.5em;">
+			@Model.Name
+		</div>
+		<div style="font-size: 2.5em; font-weight: 300">
+			@Model.Last
+		</div>
+		<br />
+
+		<div class="row nomar" style="height: 105px;">
+			<div class="col-xs-8 text-center nopad">
+				<h4 style="margin-top: 10px;">@Model.Occupation </h4>	
+				<h4 style="margin-top: 5px;">@Model.Company </h4>	
+				<h6>ID:@Model.ID </h6>
+			</div>
+			<div class="col-xs-4 text-center nopad">
+				<!-- QR Code Container -->
+				<div id="qr" class="table-responsive"></div>
+			</div>	
+		</div>
+	</div>
+
+
+	<div class="row text-center m20-0-20-0">
+		<a asp-action="Menu" asp-controller="Home" asp-route-EID="@Model.EID" class="btn mybtn bgRed">Cancel</a>
+		<a asp-action="Edit" asp-route-number="@Model.RegistrationNumber" class="btn mybtn bgBro">Edit</a>
+		<a asp-action="CheckInOk" asp-route-number="@Model.RegistrationNumber" asp-route-EID="@Model.EID" class="btn mybtn bgBase">Print</a>
+	</div>
+	<div id="regnum" style="display: none;">
+		@Model.RegistrationNumber
+	</div>
+</div>

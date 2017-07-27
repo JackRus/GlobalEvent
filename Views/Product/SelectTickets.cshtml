@@ -1,0 +1,77 @@
+<h2>ADD Tickets</h2>
+<h4>Product ID: @ViewBag.ID </h4>
+
+<div style="width: 100%">
+    <div style="max-width: 700px; margin: 0 auto;">
+        <a id="addall" class="btn mybtn-sm-base" style="display: inline-block; width: 80px;">ADD ALL</a>
+        <a id="all" class="btn mybtn-sm-red" style="display: inline-block; width: 80px;">REMOVE ALL</a>
+    </div>
+@if (ViewBag.Tickets.Count != 0)
+{
+	<table class="table table-hover" style="max-width: 700px; margin: 0 auto;">
+		<thead>
+			<tr>
+				<th>Type</th>
+				<th>Price</th>
+				<th>Amount</th>
+				<th>Description</th>
+				<th></th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<tr style="height: 4px;">
+					<td colspan="20" style="padding: 0px; background-color: gainsboro"></td>
+			</tr>
+			@foreach(Ticket t in ViewBag.Tickets)
+			{
+				<tr>
+					<td>@t.Type</td>
+					<td>$@t.Price</td>
+					<td>@t.Limit</td>
+					<td>@t.Description </td>
+					<td>
+						@{
+							var check = false;
+							if (ViewBag.Types != null && ViewBag.Types != "")
+							{
+								string types = @ViewBag.Types;
+								var i = types.Split('|').ToList();
+								foreach(string s in i){
+									if (@t.Type == s){
+										check = true;
+									}
+								}
+							}
+							if (check){
+								<input class="btn mybtn-sm remove" type="button" value="REMOVE" data-type="@t.Type">
+							}
+							else {
+								<input class="btn mybtn-sm add" type="button" value="ADD" data-type="@t.Type">
+							}
+						}
+					</td>
+				</tr>
+				<tr style="height: 4px;">
+					<td colspan="20" style="padding: 0px; background-color: gainsboro"></td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+else
+{
+	<div class="text-center f-info Accent" style="max-width: 700px; margin: 0 auto;">This Event has no Tickets yet.</div>
+}
+	<br />
+	<div class="table table-hover" style="max-width: 700px; margin: 0 auto;">
+		
+        <form asp-action="SaveTickets" autocomplete="off">
+            <input id="save" name="result" value="@ViewBag.Types" style="display: none;" />
+            <input name="ID" value="@ViewBag.ID" style="display: none;" />
+            <button type="submit" class="btn mybtn bgBro">SAVE</button>
+            <a asp-action="Index" asp-controller="Product" asp-route-id="@ViewBag.EID" class="btn mybtn bgBase">BACK</a>
+        </form>
+	</div>
+</div>
+

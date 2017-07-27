@@ -1,0 +1,53 @@
+@model VType
+
+<h2>EDIT Visitor Type</h2>
+<h4>Event ID: @Model.EID </h4>
+<form asp-action="Edit" autocomplete="off">
+
+    <div class="form-group">
+        <label asp-for="Name" class="control-label"></label>
+        <div>
+            <input asp-for="Name" class="form-control"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Limited" class="control-label"></label>
+        <div>
+            <input asp-for="Limited" />
+        </div>
+    </div>
+  
+    <div class="form-group">
+        <label asp-for="MaxLimit" class="control-label"></label>
+        <div>
+            <input asp-for="MaxLimit" class="form-control" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Free" class="control-label"></label>
+        <div>
+            <input asp-for="Free" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description" class="control-label"></label>
+        <div>
+            <textarea asp-for="Description" class="form-control" rows="5" wrap="soft"></textarea>
+        </div>
+    </div>
+
+	<div style="display: none;">
+		<input asp-for="ID" value="@Model.ID" class="form-control" />
+		<input asp-for="EID" value="@Model.EID" class="form-control" />
+	</div>
+
+    <div class="form-group">
+        <button type="submit" style="width: 80px;" class="btn mybtn bgBase">SAVE</button>
+        <button type="reset" style="width: 80px;" class="btn mybtn bgBro">RESET</button>
+        <a asp-action="Index" asp-route-ID="@Model.EID" class="btn mybtn bgRed">CANCEL</a>
+    </div>
+    
+</form>

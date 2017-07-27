@@ -1,0 +1,62 @@
+@model Visitor
+@{
+	Layout = "_NoBody";
+}
+
+<div class="row c-c pad10" style="width: 400px;">
+	<div class="text-center">
+		<h2>Please provide your <br /> Order Number:</h2>
+	</div>
+
+	@if(ViewBag.Message != null)
+	{
+		<br />
+		<div class="f-attention">
+			<span>@ViewBag.Message </span>
+		</div>
+	}
+
+	<br />
+
+	<div class="text-center">
+		<form asp-action="Register" autocomplete="off">
+
+			<div class="form-group">
+				<input asp-for="OrderNumber" class="form-control input-large" />
+			</div>
+
+			<div style="display: none;">
+				<input asp-for="EID" value="@ViewBag.EID"/>
+			</div>
+			<br />
+			<a asp-action="Menu" asp-controller="Home" asp-route-EID="@ViewBag.EID" class="btn mybtn bgRed">CANCEL</a>
+			<button type="submit" class="btn mybtn bgBase">REGISTER</button>
+		</form>	
+	</div>
+	
+	<br /><br />
+
+	<div class="row">
+		<div class="text-center">
+			<a data-id="div1" class="questions">What is Order Number?</a>
+			<div id="div1" class="answer">
+				Order Number is a Number you get when you buy a ticket through Eventbrite.
+				This number is unique for each purchase. 
+			</div>
+
+			<a data-id="div2" class="questions">I forgot or don't know my Order Number.</a>
+			<div id="div2" class="answer">
+				You have a few possible solutions:<br/>
+				1. If you purchased a ticket, please check your email. <br/>
+				2. If you are part of a group, and somebody else has purchased tickets for the entire group, please ask that person for an Order Number.<br />
+				3. Please, refer to one of the Event's representatives.
+			</div>
+
+			<a data-id="div3" class="questions">I didn't buy a ticket yet.</a>
+			<div id="div3" class="answer">
+				You can purchase a ticket on <a href="https://www.eventbrite.com/e/global-event-opening-test-tickets-35326692087">Eventbrite</a>.
+			</div>
+
+		</div>
+	</div>
+</div>

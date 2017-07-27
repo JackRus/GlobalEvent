@@ -1,0 +1,44 @@
+@model Visitor
+
+@{
+	Layout = "_NoBody";
+}
+
+<div id="understood" class="eye confirmation c-c">
+	<div class="bgBase text-center" style="color: #fff; height: 70px; line-height: 70px;">
+		Dear, @Model.Name @Model.Last!
+	</div>
+	<div style="padding: 15px;" class="text-center">
+		Changes were saved.
+		<br />
+		Your registration number is:<br />
+		<span class="m5-0-5-0 reg-number">@Model.RegistrationNumber</span>
+		<span> Would you like to check-in? </span>
+	</div>
+		
+	<div class="col-xs-6 nopad">
+		<form asp-action="CheckIn" autocomplete="off">
+			<input style="display: none;" asp-for="RegistrationNumber" value="@Model.RegistrationNumber" />
+			<input style="display: none;" asp-for="EID" value="@Model.EID" />
+			<button type="submit" class="btn mybtn bgBase" style="width: 100%;">
+			Yes</button>
+		</form>
+	</div>
+	<div class="col-xs-6 nopad">
+		<a asp-action="Index" asp-controller="Home" class="btn mybtn bgBro" style="width: 100%;">
+		No</a>
+	</div>
+</div>
+
+<div id="understand" class="confirmation c-c" style="border: 1px solid var(--colBro);">
+	<div class="bgBro text-center" style="color: #fff; height:70px;line-height: 70px;">
+		Please read!
+	</div>
+	<div style="padding: 15px;" class="text-center">
+		1. When you click button "I understand"<br />
+		your Registration Number will be displayed.<br />
+		2. Please save this number, as you will need it later for Check In. You can simply take a picture with your phone.<br/>
+		3. Don't share it with anybody, this number is unique for EACH visitor.<br />
+	</div>			
+	<a id="ok" class="btn mybtn bgBro" style="width: 100%;">I understand.</a>
+</div>

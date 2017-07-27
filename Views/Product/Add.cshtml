@@ -1,0 +1,72 @@
+@model Product
+
+<h2>ADD Product</h2>
+<h4>Event ID: @Model.EID </h4>
+<form asp-action="Add" autocomplete="off">
+
+    <div class="form-group">
+        <label asp-for="Name" class="control-label"></label>
+        <div>
+            <input asp-for="Name" class="form-control"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Free" class="control-label"></label>
+        <div>
+            <input asp-for="Free" />
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label asp-for="DateStart" class="control-label"></label>
+        <div>
+            <input asp-for="DateStart" type="date" class="form-control" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="TimeStart" class="control-label"></label>
+        <div>
+            <input asp-for="TimeStart" class="form-control" type="time"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DateEnd" class="control-label"></label>
+        <div>
+            <input asp-for="DateEnd" class="form-control" type="date"/>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="TimeEnd" class="control-label"></label>
+        <div>
+            <input asp-for="TimeEnd" class="form-control" type="time" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Capacity" class="control-label"></label>
+        <div>
+            <input asp-for="Capacity" class="form-control" />
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label asp-for="Description" class="control-label"></label>
+        <div>
+            <textarea asp-for="Description" class="form-control" rows="5" wrap="soft"></textarea>
+        </div>
+    </div>
+
+	<div style="display: none;">
+		<input asp-for="EID" value="@Model.EID" class="form-control" />
+	</div>
+
+    <div class="form-group">
+        <button type="submit" style="width: 80px;" class="btn mybtn bgBase">ADD</button>
+        <button type="reset" style="width: 80px;" class="btn mybtn bgBro">RESET</button>
+        <a asp-action="Index" asp-controller="Ticket" asp-route-ID="@Model.EID" class="btn mybtn bgRed">CANCEL</a>
+    </div>
+</form>
