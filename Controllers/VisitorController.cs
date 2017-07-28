@@ -11,7 +11,6 @@ using GlobalEvent.Models.AdminViewModels;
 
 namespace GlobalEvent.Controllers
 {
-	[AllowAnonymous]
 	public class VisitorController : Controller
 	{
 		private readonly ApplicationDbContext _db;
@@ -32,9 +31,7 @@ namespace GlobalEvent.Controllers
 		public IActionResult PreCheckIn(int? EID)
 		{
 			if (EID == null) return RedirectToAction("Welcome", "Home");
-			Visitor v = new Visitor();
-			v.EID = (int)EID;
-			return View(v);
+			return View(new Visitor(){EID = (int)EID});
 		}
 
 		[HttpPost]
@@ -71,7 +68,7 @@ namespace GlobalEvent.Controllers
 			if (v == null || v.CheckIned)
 			{
 				ViewBag.Message = "Something went wrong. Please try again.";
-				return RedirectToAction("Menu", "Home", new { EID = EID});
+				return RedirectToAction("Menu", "Home", new { EID = EID });
 			}
 
 			v.CheckIned = true;
@@ -83,10 +80,9 @@ namespace GlobalEvent.Controllers
 		[HttpGet]
 		public async Task<IActionResult> Edit (string number)
 		{
-			if (number == null) 
-				return RedirectToAction("Welcome", "Home");
+			if (number == null) return RedirectToAction("Welcome", "Home");
 			
-			var v = await _db.Visitors.FirstOrDefaultAsync(x => x.RegistrationNumber == number); 
+			Visitor v = await _db.Visitors.FirstOrDefaultAsync(x => x.RegistrationNumber == number); 
 
 			if (v == null || v.CheckIned)
 				return RedirectToAction("Welcome", "Home");
@@ -113,28 +109,17 @@ namespace GlobalEvent.Controllers
 
 			// update visitor
 			_db.Visitors.Update(oldV);
-			try
-			{
-				await _db.SaveChangesAsync();
-			}
-            catch (ArgumentNullException e)
-            {
-                ViewBag.Message = e.Message;
-                return View("About");
-            }
+			await _db.SaveChangesAsync();
 			return View(oldV);
 		}
 
-
-
 		[HttpGet]
-		[AutoValidateAntiforgeryToken]
 		public async Task<IActionResult> PreRegister(int? EID)
 		{
 			if (EID == null) return RedirectToAction("Welcome", "Home");
+
 			// update orders, sync Eventbrite & DB
 			var url = (await _db.Events.FirstOrDefaultAsync(x => x.ID == EID)).HttpBase;
-
 			await Order.OrderUpdate(_db, url, (int)EID);
 
             ViewBag.EID = (int)EID;
@@ -143,12 +128,12 @@ namespace GlobalEvent.Controllers
 
 		[HttpPost]
 		[AutoValidateAntiforgeryToken]
-		public IActionResult Register(Visitor v)
+		public async Task <IActionResult> Register(Visitor v)
 		{
 			if (v.OrderNumber == null || v.EID == 0) 
 				return RedirectToAction("Menu", "Home", new { EID = v.EID});
 
-			var orders = _db.Orders.ToList();
+			var orders = await _db.Orders.ToListAsync();
 			foreach (Order o in orders)
             {
                 if (o.Number.ToString() == v.OrderNumber)
@@ -190,7 +175,6 @@ namespace GlobalEvent.Controllers
 			// update order
 			await Order.Increment(v.OrderNumber, _db);
 			await _db.SaveChangesAsync();
-
 			return View(v);
 		}
 

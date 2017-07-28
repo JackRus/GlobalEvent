@@ -25,9 +25,8 @@ namespace GlobalEvent.Controllers
 
         public async Task<IActionResult> Welcome()
         {
-            var e = await _db.Events.FirstOrDefaultAsync(x => x.Status == true);
-            ViewBag.Future = _db.Events.Where(x => x.Status == false);
-            return View(e);
+            ViewBag.Future = _db.Events.Where(x => !x.Status && !x.Archived);
+            return View(await _db.Events.FirstOrDefaultAsync(x => x.Status));
         }
 
         public IActionResult Menu (int? EID)
@@ -42,9 +41,9 @@ namespace GlobalEvent.Controllers
             return View();
         }
 
-        // public IActionResult Error()
-        // {
-        //     return View();
-        // }
+        public IActionResult Error()
+        {
+            return View();
+        }
     }
 }

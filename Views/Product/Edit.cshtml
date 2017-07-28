@@ -2,7 +2,7 @@
 
 <h2>EDIT Product</h2>
 <h4>Event ID: @Model.EID </h4>
-<form asp-action="Edit" asp-controller="Product" method="POST" autocomplete="off">
+<form asp-action="Edit" autocomplete="off">
 
     <div class="form-group">
         <label asp-for="Name" class="control-label"></label>
@@ -75,7 +75,7 @@
     <div class="form-group">
         <button type="submit" style="width: 80px;" class="btn mybtn bgBase">SAVE</button>
         <button type="reset" style="width: 80px;" class="btn mybtn bgBro">RESET</button>
-        <a asp-action="Index" asp-controller="Product" asp-route-ID="@Model.EID" class="btn mybtn bgRed">CANCEL</a>
+        <a asp-action="Index" asp-route-ID="@Model.EID" class="btn mybtn bgRed">CANCEL</a>
     </div>
     
 </form>

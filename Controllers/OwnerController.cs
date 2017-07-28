@@ -32,8 +32,6 @@ namespace GlobalEvent.Controllers
         {
             return View(await _db.Events.ToListAsync());
         }
-        
-        // CREATE EVENT 
 
         [HttpGet]
         public IActionResult CreateEvent ()
@@ -42,60 +40,58 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateEvent (Event newEvent)
+        [AutoValidateAntiforgeryToken]
+        public async Task<IActionResult> CreateEvent (Event e)
         {
             if (ModelState.IsValid)
             {
-                _db.Events.Add(newEvent);
-                _db.SaveChanges();
-                var x = _db.Events.FirstOrDefault();
-                return View("ViewEvent", x);
+                _db.Events.Add(e);
+                await _db.SaveChangesAsync();
+                ViewBag.Message = "The Event was successfully created.";
+                return RedirectToAction("Events");
             }
-            return View();
+            ViewBag.Message = "Something went wrong. Please try again.";
+            return RedirectToAction("Events");
         }
-
-
-        // EDIT EVENT
 
         [HttpGet]
         public async Task<IActionResult> EditEvent (int? ID)
         {
-            // redirects if no event ID provided || direct access
             if (ID == null) return RedirectToAction("Events");
             return View(await _db.Events.FirstOrDefaultAsync(x => x.ID == ID));
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditEvent (Event newEvent)
+        [AutoValidateAntiforgeryToken]
+        public async Task<IActionResult> EditEvent (Event e)
         {
             if (ModelState.IsValid)
             {
                 // extracting the event by ID
-                Event eUpdate = await _db.Events.FirstOrDefaultAsync(e => e.ID == newEvent.ID);
+                Event eOld = await _db.Events.FirstOrDefaultAsync(x => x.ID == e.ID);
                 // TODO cut hte extra lines
                 // updating the event's data
-                eUpdate.Name = newEvent.Name;
-                eUpdate.DateStart = newEvent.DateStart;
-                eUpdate.DateEnd = newEvent.DateEnd;
-                eUpdate.TimeStart = newEvent.TimeStart;
-                eUpdate.TimeEnd = newEvent.TimeEnd;
-                eUpdate.Free = newEvent.Free;
-                eUpdate.RevPlan = newEvent.RevPlan;
-                eUpdate.Status = newEvent.Status;
+                eOld.Name = e.Name;
+                eOld.DateStart = e.DateStart;
+                eOld.DateEnd = e.DateEnd;
+                eOld.TimeStart = e.TimeStart;
+                eOld.TimeEnd = e.TimeEnd;
+                eOld.Free = e.Free;
+                eOld.RevPlan = e.RevPlan;
+                eOld.Status = e.Status;
                 // saving changes
-                _db.Events.Update(eUpdate);
-                // saving changes to a DB
+                _db.Events.Update(eOld);
                 await _db.SaveChangesAsync();
-                return RedirectToAction("ViewEvent", new { ID = eUpdate.ID });
+                return RedirectToAction("ViewEvent", new { ID = eOld.ID });
             }
-            return View("Events");
+            ViewBag.Message = "Something went wrong. Please try again.";
+            return RedirectToAction("Events");
         }
 
+        [HttpGet]
 		public async Task<IActionResult> ViewEvent(int? ID)
 		{
-			// redirects if no event ID provided || direct access
-			if (ID == null)
-				return RedirectToAction("Events");
+			if (ID == null) return RedirectToAction("Events");
 
 			// extrats event with the matching ID
 			Event e = await _db.Events
@@ -109,21 +105,14 @@ namespace GlobalEvent.Controllers
         [HttpGet]
         public async Task<IActionResult> DeleteEvent (int? ID)
         {
-            // redirects if no event ID provided || direct access
-            if (ID == null)
-                return RedirectToAction("Events");
-
-            // extrats event with the matching ID
-            Event e = await _db.Events.Where(x => x.ID == ID).FirstOrDefaultAsync();
-            return View(e);
+            if (ID == null) return RedirectToAction("Events");
+            return View(await _db.Events.FirstOrDefaultAsync(x => x.ID == ID));
         }
 
         [HttpGet]
         public async Task<IActionResult> DeleteEventOk (int? ID)
         {
-            // redirects if no event ID provided || direct access
-            if (ID == null)
-                return RedirectToAction("Events");
+            if (ID == null) return RedirectToAction("Events");
 
             // extrats event with the matching ID
             Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == ID);

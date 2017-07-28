@@ -24,7 +24,7 @@ namespace GlobalEvent.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(int? ID) //displays all Products
         {
-            if (ID == null) return RedirectToAction("Events");
+            if (ID == null) return RedirectToAction("Events", "Owner");
             ViewBag.VTypes = await _db.Types
                 .Where(x => x.EID == ID)
                 .ToListAsync();
@@ -35,11 +35,8 @@ namespace GlobalEvent.Controllers
         [HttpGet]
         public IActionResult Add(int? ID)
         {
-            if (ID == null) return RedirectToAction("Events");
-
-            VType v = new VType();
-            v.EID = (int)ID;
-            return View(v);
+            if (ID == null) return RedirectToAction("Events", "Owner");
+            return View(new VType(){EID = (int)ID});
         }
 
         [HttpPost]
@@ -50,12 +47,9 @@ namespace GlobalEvent.Controllers
             v.ID = 0;
             if (ModelState.IsValid)
             {
-                // extracting the event by ID
                 Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == v.EID);
                 e.Types.Add(v);
-                // saving changes
                 _db.Events.Update(e);
-                // saving changes to a DB
                 await _db.SaveChangesAsync();
                 return RedirectToAction("Index", new { ID = v.EID });
             }
@@ -65,13 +59,8 @@ namespace GlobalEvent.Controllers
         [HttpGet]
         public async Task<IActionResult> Copy (int? ID)
         {
-            if (ID == null) return RedirectToAction("Events");
-
-            // extrats event with the matching ID
-            VType v = await _db.Types
-                .Where(x => x.ID == ID)
-                .FirstOrDefaultAsync();
-            return View(v);
+            if (ID == null) return RedirectToAction("Events", "Owner");
+            return View(await _db.Types.FirstOrDefaultAsync(x => x.ID == ID));
         }
 
         [HttpPost]
@@ -82,12 +71,9 @@ namespace GlobalEvent.Controllers
             v.ID = 0;
             if (ModelState.IsValid)
             {
-                // extracting the event by ID
                 Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == v.EID);
                 e.Types.Add(v);
-                // saving changes
                 _db.Events.Update(e);
-                // saving changes to a DB
                 await _db.SaveChangesAsync();
                 return RedirectToAction("Index", new { ID = v.EID });
             }
@@ -107,9 +93,7 @@ namespace GlobalEvent.Controllers
         {
             if (ModelState.IsValid)
             {
-                // updating the product
                 _db.Types.Update(v);
-                // saving changes to a DB
                 await _db.SaveChangesAsync();
                 return RedirectToAction("Index", new { ID = v.EID });
             }
@@ -126,7 +110,7 @@ namespace GlobalEvent.Controllers
         [HttpGet]
         public async Task<IActionResult> DeleteOk(int? ID)
         {
-            if (ID == null)return RedirectToAction("Events");
+            if (ID == null) return RedirectToAction("Events", "Owner");
 
             // extrats event with the matching ID
             VType v = await _db.Types.FirstOrDefaultAsync(x => x.ID == ID);
@@ -138,7 +122,7 @@ namespace GlobalEvent.Controllers
         [HttpGet]
         public async Task<IActionResult> DeleteAll(int? ID)
         {
-            if (ID == null) return RedirectToAction("Events");
+            if (ID == null) return RedirectToAction("Events", "Owner");
 
             // confirmation page
             Event e = await _db.Events
@@ -151,7 +135,7 @@ namespace GlobalEvent.Controllers
         public async Task<IActionResult> DeleteAllOk(int? ID)
         {
             // redirects if no event ID provided || direct access
-            if (ID == null) return RedirectToAction("Events");
+            if (ID == null) return RedirectToAction("Events", "Owner");
 
             // delete all Products for a specific event
             _db.Types.RemoveRange(_db.Types.Where(x => x.EID == ID));
