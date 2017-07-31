@@ -1,8 +1,7 @@
-# Welcome to ASP.NET Core
+# Global Event 
+Event Management Application
 
-We've made some big updates in this release, so it’s **important** that you spend a few minutes to learn what’s new.
-
-You've created a new ASP.NET Core project. [Learn what's new](https://go.microsoft.com/fwlink/?LinkId=518016)
+You can test the app [here](https://ge.jackrus.us)
 
 ## This application consists of:
 
