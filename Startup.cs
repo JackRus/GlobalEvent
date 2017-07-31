@@ -78,7 +78,9 @@ namespace GlobalEvent
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseDeveloperExceptionPage();
+                app.UseDatabaseErrorPage();
+                //app.UseExceptionHandler("/Home/Error");
             }
 
             app.UseStaticFiles();

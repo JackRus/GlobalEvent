@@ -649,3 +649,10 @@ label {
     cursor: pointer;
     padding: 5px;
 }
+
+.no-event
+{
+    text-align: center;
+    margin: 20px 10px;
+    font-size: 1.5em;
+}

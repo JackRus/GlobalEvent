@@ -5,7 +5,8 @@
 
 <div class="row c-c pad10" style="width: 400px;">
 	<div class="text-center">
-		<h2>Please provide your Registration Number:</h2>
+		<h1>Check In</h1>
+		<h4>Please provide your Registration Number:</h4>
 	</div>
 
 	@if(ViewBag.Message != null)
@@ -40,14 +41,23 @@
 	
 	<br /><br />
 
-	<div class="row">
-		<div class="text-center">
-			<div class="questions">
-				<a href=""><br />I forgot my registration number.</a>
-			</div>
-			<div class="questions">
-				<a href="/Visitor/Register">I'm not registered.</a>
-			</div>
+	<div class="row text-center">
+		<a data-id="div1" class="questions">I forgot my registration number.</a>
+		<div id="div1" class="answer">
+			...
+		</div>
+
+		<a data-id="div2" class="questions">I forgot or don't know my Order Number.</a>
+		<div id="div2" class="answer">
+			You have a few possible solutions:<br/>
+			1. ... <br />
+			2. ... <br />
+			3. ...
+		</div>
+
+		<a data-id="div3" class="questions">I'm not registered.</a>
+		<div id="div3" class="answer">
+			You can purchase a ticket on Eventbrite.com.
 		</div>
 	</div>
 </div>

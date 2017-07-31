@@ -22,13 +22,35 @@
 	</a>
 	<br />
 
-	<a href="https://www.eventbrite.com/e/global-event-opening-test-tickets-35326692087" class="btn i-block bgBase">
+	<!-- <a href="https://www.eventbrite.com/e/global-event-opening-test-tickets-35326692087" class="btn i-block bgBase">
 		Buy Ticket
 	</a>
-	<br />
+	<br /> -->
 
 	<a asp-action="Welcome" class="btn i-block bgBro">
 		Back
 	</a>
 
+	<div class="row text-center" style="margin-top: 50px;">
+		<a data-id="div1" class="questions">Should I Register or Check in? </a>
+		<div id="div1" class="answer">
+			1. I you purchased a ticket, but never completed registration process in this app, please click "Register". <br />
+			2. If you are Registered, you suppose to have a Registration Number. If you have it, please click Check In.<br />
+			3. If you have registered, but don't remeber your Registration number, please refer to one of the event's representative.<br />
+			4. If somebody else purchased a ticket for you, please ask this person to provide you an Order Number, required for the Registration.
+		</div>
+
+		<a data-id="div2" class="questions">I forgot or don't know my Order Number.</a>
+		<div id="div2" class="answer">
+			You have a few possible solutions:<br/>
+			1. If you purchased a ticket, please check your email. <br/>
+			2. If you are part of a group, and somebody else has purchased tickets for the entire group, please ask that person for an Order Number.<br />
+			3. Please, refer to one of the Event's representatives.
+		</div>
+
+		<a data-id="div3" class="questions">I didn't buy/have a ticket yet. How can I do it?</a>
+		<div id="div3" class="answer">
+			You can purchase a ticket on Eventbrite.com. If you need any assistance/help, please refer to one of the event's representative.
+		</div>
+	</div>
 </div>
