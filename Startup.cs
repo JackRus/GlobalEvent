@@ -77,7 +77,9 @@ namespace GlobalEvent
                 app.UseBrowserLink();
             }
             else
+            {
                 app.UseExceptionHandler("/Home/Error");
+            }
 
             app.UseStaticFiles();
             app.UseMvc(routes =>
