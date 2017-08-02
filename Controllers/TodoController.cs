@@ -1,10 +1,7 @@
-using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using GlobalEvent.Data;
-using GlobalEvent.Models.OwnerViewModels;
-using GlobalEvent.Models.VisitorViewModels;
-using Microsoft.EntityFrameworkCore;
+using GlobalEvent.Models.AdminViewModels;
 using System.Threading.Tasks;
 
 namespace GlobalEvent.Controllers
@@ -21,6 +18,19 @@ namespace GlobalEvent.Controllers
         public IActionResult Index()
         {
             return View();
+        }
+
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public async Task<IActionResult> Add (ToDo t)
+        {
+            if (ModelState.IsValid)
+            {
+                _db.ToDos.Add(t);
+                await _db.SaveChangesAsync();
+                return RedirectToAction("Index", "Owner");
+            }
+            return RedirectToAction("Index", "Owner", new { message = "Couldn't create ToDo item. Please try again."});
         }
 	}
 }

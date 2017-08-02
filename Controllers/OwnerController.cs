@@ -18,9 +18,10 @@ namespace GlobalEvent.Controllers
         {
             _db = context;
         }
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string message = null)
         {
             ViewBag.Todos = await _db.ToDos.Where(x => !x.Done).ToListAsync();
+            ViewBag.Message = message;
             return View();
         }
 
