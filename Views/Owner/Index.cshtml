@@ -17,7 +17,7 @@
 	<div class="col-sm-6">
 		<div>
 			<h4 style="display: inline-block;">TODO List &nbsp &nbsp</h4>
-			<a href="#" class="btn mybtn-sm-base px60 inline tog" data-id="todo-add">ADD</a>
+			<a href="#" class="btn mybtn-sm-bro px60 inline tog" data-id="todo-add">ADD</a>
 			<a asp-action="" asp-controller="Todo" class="btn mybtn-sm-bro px60 inline">Show 10</a>
 			<a asp-action="" asp-controller="Todo" class="btn mybtn-sm-bro px60 inline">Show All</a>
 		</div>
@@ -38,7 +38,7 @@
 				</div>
 				<div class="text-center">
 					<button type="submit" class="btn mybtn bgBase">Add</button>
-					<a href="#" class="btn mybtn bgRed tog" data-id="todo-add">Cancel</a>
+					<button type="reset" class="btn mybtn bgRed tog" data-id="todo-add">Cancel</a>
 				</div>
 			</form>
 		</div>
@@ -54,7 +54,7 @@
 
 						@if (!string.IsNullOrEmpty(t.Comments))
 						{
-							<div class="todo-com"> <strong>Comments:</strong> @t.Comments </div>
+							<div class="todo-com">@t.Comments</div>
 						}
 					</li>
 			}
