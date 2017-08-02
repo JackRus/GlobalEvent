@@ -9,5 +9,6 @@ namespace GlobalEvent.Models.AdminViewModels
         public string Deadline { get; set; }
         public bool Done { get; set; }  
         public string Comments { get; set; }
+        public int EID { get; set; }
     }
 }

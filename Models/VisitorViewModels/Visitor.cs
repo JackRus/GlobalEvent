@@ -15,38 +15,44 @@ namespace GlobalEvent.Models.VisitorViewModels
 
 		[Required]
 		[Display(Name = "First Name")]
-		[RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Contains non Alphabetic characters.")]
+		[RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "Contains non Alphabetic characters.")]
 		public string Name { get; set; }
 
 		[Required]
 		[Display(Name = "Last Name")]
-		[RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Contains non Alphabetic characters.")]
+		[RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "Contains non Alphabetic characters.")]
 		public string Last { get; set; }
 
+		[Required]
+		[RegularExpression(@"^[0-9]+$", ErrorMessage = "Only digits are allowed.")]
 		[Display(Name = "Order Number")]
 		public string OrderNumber { get; set; }
+
+		[Required]
+		[RegularExpression(@"^[0-9]+$", ErrorMessage = "Only digits are allowed.")]
 		[Display(Name = "Registration Number")]
 		public string RegistrationNumber { get; set; }
 
 		[Required]
-		[EmailAddress]
-		[Display(Name = "Work Email")]
+		[RegularExpression(@"^[0-9a-zA-z]+@[0-9a-zA-z].[a-zA-z]+$", ErrorMessage = "Not a valid email.")]
+		[Display(Name = "Email")]
 		public string Email { get; set; }
 
 		[Required(ErrorMessage = "Phone number is required.")]
-		[Phone]
-		[RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid Phone number")]
+		[RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid Phone number.")]
 		[Display(Name = "Work/Cell Phone")]
 		public string Phone { get; set; }
 
-		[DataType(DataType.PhoneNumber)]
 		[Display(Name = "Ext. (optional)")]
+		[RegularExpression(@"^[0-9]+$", ErrorMessage = "Only digits are allowed in Extention.")]
 		public string Extention { get; set; }
 
 		[Required]
+		[RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Contains non Alphabetic characters.")]
 		public string Occupation { get; set; }
 
 		[Required]
+		[RegularExpression(@"^[0-9a-zA-Z ]+$", ErrorMessage = "Contains non Alphanumeric characters.")]
 		public string Company { get; set; }
 		public int EID { get; set; }
 		public string TicketType { get; set; }

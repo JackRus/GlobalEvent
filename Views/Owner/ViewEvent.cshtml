@@ -24,6 +24,9 @@
     <li>Revenue Plan: @Model.RevPlan </li>
     <li>Revenue Fact: @Model.RevFact </li>
     <li>Orders #: @Model.Orders.Count() </li>
+    <li>Eventbrite's Token: @Model.HttpBase </li>
+    <li>Event's Page: @Model.TicketLink </li>
+    <li>Description: @Model.Description </li>
     <li>Visitors, Registered: @Model.Visitors.Count() </li>
     <li>Visitors, Checked In: @Model.Visitors.Where(v => v.CheckIned == true).Count() </li>
     <li>

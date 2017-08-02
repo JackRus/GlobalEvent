@@ -51,6 +51,9 @@ $("#addall").on('click', function () {
 	});
 });
 
+/////////////////////
+//    QR Code
+/////////////////////
 
 // generate QR code for name tag
 $(document).ready(function() {
@@ -64,8 +67,15 @@ $(document).ready(function() {
 	});
 });
 
-// toggles
+/////////////////////
+//    Q&A
+/////////////////////
+
 $('.questions').click(function(){
+   $('#'+$(this).data('id')).toggle(); 
+});
+
+$('.tog').click(function(){
    $('#'+$(this).data('id')).toggle(); 
 });
 

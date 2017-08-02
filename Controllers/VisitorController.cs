@@ -117,11 +117,12 @@ namespace GlobalEvent.Controllers
 		public async Task<IActionResult> PreRegister(int? EID)
 		{
 			if (EID == null) return RedirectToAction("Welcome", "Home");
-
+		
+			Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == EID);
 			// update orders, sync Eventbrite & DB
-			var url = (await _db.Events.FirstOrDefaultAsync(x => x.ID == EID)).HttpBase;
-			await Order.OrderUpdate(_db, url, (int)EID);
+			var url = "https://www.eventbriteapi.com/v3/events/" + e.EventbriteID + "/attendees/?token=" + e.HttpBase;
 
+			await Order.OrderUpdate(_db, url, (int)EID);
             ViewBag.EID = (int)EID;
 			return View();
 		}

@@ -9,26 +9,20 @@
 		<h4>Please provide your Order Number:</h4>
 	</div>
 
-	@if(ViewBag.Message != null)
-	{
-		<br />
-		<div class="f-attention">
-			<span>@ViewBag.Message </span>
-		</div>
-	}
-
-	<br />
-
 	<div class="text-center">
 		<form asp-action="Register" autocomplete="off">
-
+			@if(ViewBag.Message != null)
+			{
+				<div class="f-attention m20-0-20-0">
+					<span>@ViewBag.Message </span>
+				</div>
+			}
 			<div class="form-group">
-				<input asp-for="OrderNumber" class="form-control input-large" />
+				<span asp-validation-for="OrderNumber" class="Red"></span>
+				<input asp-for="OrderNumber" class="form-control input-large m20-0-20-0" />
 			</div>
 
-			<div style="display: none;">
-				<input asp-for="EID" value="@ViewBag.EID"/>
-			</div>
+			<input asp-for="EID" value="@ViewBag.EID" class="eye"/>
 			<br />
 			<a asp-action="Menu" asp-controller="Home" asp-route-EID="@ViewBag.EID" class="btn mybtn bgRed">CANCEL</a>
 			<button type="submit" class="btn mybtn bgBase">REGISTER</button>
@@ -61,3 +55,7 @@
 		</div>
 	</div>
 </div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

@@ -1,3 +1,5 @@
+@model ToDo
+
 <h2>MAIN MENU</h2>
 
 <div class="row m20-0-20-0">
@@ -13,20 +15,50 @@
 	</div>
 
 	<div class="col-sm-6">
-		<h4>TODO List</h4>
-		<ul class="list-group">
-			<li class="list-group-item">
-				<span class="badge">07/10/2017</span>
-				Create a new event for hospitality then add additional lines to see how it looks!
-			</li>
-			<li class="list-group-item">
-				<span class="badge">08/10/2017</span>
-				Something else todo. ASAP no delays. Call Suzi.
-			</li>
-			<li class="list-group-item">
-				<span class="badge">15</span>
-				Item 3
-			</li>
-		</ul>
+		<div>
+			<h4 style="display: inline-block;">TODO List &nbsp &nbsp</h4>
+			<a href="#" class="btn mybtn-sm-base px60 inline tog" data-id="todo-add">ADD</a>
+			<a asp-action="" asp-controller="Todo" class="btn mybtn-sm-bro px60 inline">Show 10</a>
+			<a asp-action="" asp-controller="Todo" class="btn mybtn-sm-bro px60 inline">Show All</a>
+		</div>
+
+		<div id="todo-add" class="eye m20-0-20-0">
+			<form asp-action="Add" asp-controller="Todo" autocomplete="off">
+				<div class="form-group-sm">
+					<label asp-for="Task" class="control-label"></label>
+					<input asp-for="Task" class="form-control" />
+				</div>
+				<div class="form-group-sm">
+					<label asp-for="Deadline" class="control-label"></label>
+					<input asp-for="Deadline" type="date" class="form-control"/>
+				</div>
+				<div class="form-group-sm">
+					<label asp-for="Comments" class="control-label"></label>
+					<textarea asp-for="Comments" class="form-control" rows="5" wrap="soft" style="font-size: 1em;"/></textarea>
+				</div>
+				<div class="text-center">
+					<button type="submit" class="btn mybtn bgBase">Add</button>
+					<a href="#" class="btn mybtn bgRed tog" data-id="todo-add">Cancel</a>
+				</div>
+			</form>
+		</div>
+
+		@if (ViewBag.Todos != null)
+		{
+			<ul class="list-group">
+			@foreach (ToDo t in ViewBag.Todos)
+			{
+					<li class="list-group-item">
+						<span class="badge-todo">@t.Deadline</span>
+						<span class="todo">@t.Task</span>
+
+						@if (!string.IsNullOrEmpty(t.Comments))
+						{
+							<div class="todo-com"> <strong>Comments:</strong> @t.Comments </div>
+						}
+					</li>
+			}
+			</ul>
+		}
 	</div>
 </div>

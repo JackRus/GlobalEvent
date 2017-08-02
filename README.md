@@ -3,10 +3,15 @@ Event Management Application. You can try the app [here](https://ge.jackrus.us)
 
 ## Features:
 
-### Event Admins:
+### => Event Admins:
 *   Create and set up multiple events.
 *   Edit, Copy, Delete events.
 *   ...
+
+### => Event Visitors:
+*   
+*   
+*   
 
 ## Technologies used:
 
@@ -14,6 +19,7 @@ Event Management Application. You can try the app [here](https://ge.jackrus.us)
 *   C#
 *   Entity Framework, SQLite
 *	Identity Framework
+*   CSS and JS minimizer [?] () 
 *   Eventbrite API
 *   JavaScript, jQuery, AJAX
 *   Linux Ubuntu 16.04
@@ -21,13 +27,13 @@ Event Management Application. You can try the app [here](https://ge.jackrus.us)
 *   Nginx as reverse proxy
 *   QR Core [Libruary] () (for qr code generation) 
 
-## How to
+## How to:
 
 *   Create Event
 *   Create Ticket
 *   Create Owner of the App
 *   Create and Manage Admins
 
-## Run & Deploy
+## Run & Deploy:
 *   SQLite schema
 

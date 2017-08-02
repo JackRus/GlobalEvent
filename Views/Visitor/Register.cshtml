@@ -14,7 +14,7 @@
 		</div>
 	}
 	<br />
-	<div class="row"></a> 
+	<div class="row">
 		<div class="col-sm-6">
 			<div class="form-number-container">
 				<span class="form-number">1</span> Personal info
@@ -33,11 +33,13 @@
 			<div class="form-group">
 				<label asp-for="Name" class="control-label"></label>
 				<input asp-for="Name" class="form-control"/>
+				<span asp-validation-for="Name" class="Red"></span>
 			</div>
 
 			<div class="form-group">
 				<label asp-for="Last" class="control-label"></label>
 				<input asp-for="Last" class="form-control"/>
+				<span asp-validation-for="Last" class="Red"></span>
 			</div>	
 		</div>
 		
@@ -49,16 +51,19 @@
 			<div class="form-group">
 				<label asp-for="Company" class="control-label"></label>
 				<input asp-for="Company" class="form-control"/>
+				<span asp-validation-for="Company" class="Red"></span>
 			</div>
 
 			<div class="form-group">
 				<label asp-for="Occupation" class="control-label"></label>
 				<input asp-for="Occupation" class="form-control"/>
+				<span asp-validation-for="Occupation" class="Red"></span>
 			</div>
 
 			<div class="form-group">
 				<label asp-for="Email" class="control-label"></label>
 				<input asp-for="Email" class="form-control"/>
+				<span asp-validation-for="Email" class="Red"></span>
 			</div>
 
 			<!--Phone-->
@@ -66,13 +71,15 @@
 				<div class="row" style="margin: 0px;">
 					<div class="col-xs-8 nopad nomar">
 						<label asp-for="Phone" class="control-label"></label>
-						<input asp-for="Phone" type="number" class="form-control" />
+						<input asp-for="Phone" class="form-control" />
 					</div>
 					<!-- extentition -->
 					<div class="col-xs-4 nomar" style="padding: 0px 0px 0px 5px;">
 						<label asp-for="Extention" class="control-label"></label>
-						<input asp-for="Extention" type="number" class="form-control" />
-					</div>	
+						<input asp-for="Extention" class="form-control" />
+					</div>
+					<span asp-validation-for="Phone" class="Red"></span>
+					<span asp-validation-for="Extention" class="Red"></span>	
 				</div>
 			</div>
 			<!---->
@@ -89,3 +96,7 @@
 		</div>
 	</div>
 </form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

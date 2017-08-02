@@ -8,7 +8,7 @@ using GlobalEvent.Data;
 namespace GlobalEvent.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170727042020_1")]
+    [Migration("20170802023436_1")]
     partial class _1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -261,31 +261,43 @@ namespace GlobalEvent.Data.Migrations
 
                     b.Property<bool>("Archived");
 
-                    b.Property<string>("DateEnd");
+                    b.Property<string>("DateEnd")
+                        .IsRequired();
 
-                    b.Property<string>("DateStart");
+                    b.Property<string>("DateStart")
+                        .IsRequired();
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasMaxLength(1000);
+
+                    b.Property<string>("EventbriteID")
+                        .IsRequired();
 
                     b.Property<bool>("Free");
 
-                    b.Property<string>("HttpBase");
+                    b.Property<string>("HttpBase")
+                        .IsRequired();
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .IsRequired();
 
                     b.Property<int>("RevFact");
 
-                    b.Property<int>("RevPlan");
+                    b.Property<decimal>("RevPlan");
 
                     b.Property<bool>("Status");
 
-                    b.Property<string>("TicketLink");
+                    b.Property<string>("TicketLink")
+                        .IsRequired();
 
                     b.Property<int>("TicketsSold");
 
-                    b.Property<string>("TimeEnd");
+                    b.Property<string>("TimeEnd")
+                        .IsRequired();
 
-                    b.Property<string>("TimeStart");
+                    b.Property<string>("TimeStart")
+                        .IsRequired();
 
                     b.HasKey("ID");
 
@@ -460,7 +472,8 @@ namespace GlobalEvent.Data.Migrations
                     b.Property<string>("Occupation")
                         .IsRequired();
 
-                    b.Property<string>("OrderNumber");
+                    b.Property<string>("OrderNumber")
+                        .IsRequired();
 
                     b.Property<string>("Phone")
                         .IsRequired();
@@ -471,7 +484,8 @@ namespace GlobalEvent.Data.Migrations
 
                     b.Property<bool>("Registered");
 
-                    b.Property<string>("RegistrationNumber");
+                    b.Property<string>("RegistrationNumber")
+                        .IsRequired();
 
                     b.Property<string>("TicketType");
 

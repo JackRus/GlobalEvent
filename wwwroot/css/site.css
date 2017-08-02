@@ -3,12 +3,14 @@ body {
     padding-bottom: 20px;
 }
 
+
 /* Set some basic padding to keep content from hitting the edges */
 
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
 }
+
 
 /* buttons and links extension to use brackets: [ click me ] */
 
@@ -24,6 +26,7 @@ body {
     padding-left: 0.5em;
 }
 
+
 /* Hide/rearrange for smaller screens */
 
 @media screen and (max-width: 767px) {
@@ -33,9 +36,11 @@ body {
     }
 }
 
+
 /*	--------------------------------------------------
 	---------------------MY STYLE---------------------
 	-------------------------------------------------- */
+
 
 /******************          
         VARS
@@ -54,6 +59,7 @@ body {
     --radSmall: 2px;
     --radButton: 0px;
 }
+
 
 /* BACKGROUND COLORS */
 
@@ -174,14 +180,23 @@ h6 {
     width: auto;
 }
 
-.reg-number
-{
+.f-success {
+    font-size: 1em;
+    border: 1px solid var(--colBase);
+    width: auto;
+    text-align: center;
+    color: var(--colBase);
+    padding: 5px;
+}
+
+.reg-number {
     font-weight: 400;
     font-size: 1.5em;
     margin: 10px;
     display: block;
     letter-spacing: 2px;
 }
+
 
 /* END OF FONTS */
 
@@ -235,6 +250,10 @@ h6 {
 
 /* FORMS */
 
+input[type="checkbox"] {
+    font-size: xx-large;
+}
+
 .form-control {
     /* center form controls */
     display: block;
@@ -266,12 +285,18 @@ select:-webkit-autofill {
     max-width: 400px;
 }
 
+.form-group-sm {
+    margin: 10px auto;
+    max-width: 400px;
+}
+
 
 /* Align Center Content */
 
 #form-conteiner {
     text-align: center;
 }
+
 
 /* Padding for forms */
 
@@ -284,7 +309,6 @@ fieldset {
 /* Select Border radius O */
 
 select {
-    
     -webkit-appearance: none;
     -webkit-border-radius: var(--radButton);
     border-radius: var(--radButton);
@@ -295,8 +319,7 @@ label {
     font-size: 1em;
 }
 
-.form-number
-{
+.form-number {
     display: inline-block;
     background-color: var(--colBro);
     width: 50px;
@@ -307,8 +330,7 @@ label {
     margin-right: 15px;
 }
 
-.form-number-container
-{
+.form-number-container {
     border-bottom: 1px solid var(--colBro);
     text-align: left;
     width: 100%;
@@ -318,8 +340,7 @@ label {
     margin: 20px auto 10px auto;
 }
 
-.welcome-number
-{
+.welcome-number {
     display: inline-block;
     width: auto;
     padding-left: 20px;
@@ -332,8 +353,7 @@ label {
     letter-spacing: 1px;
 }
 
-.welcome-number-container
-{
+.welcome-number-container {
     border-bottom: 1px solid var(--colBro);
     text-align: left;
     width: 100%;
@@ -346,11 +366,13 @@ label {
 
 /* END OF FORMS */
 
+
 /************BUTTONS**************/
 
+
 /* BUTTONS FOR TABLES*/
-.mybtn-sm-base
-{
+
+.mybtn-sm-base {
     padding: 2px;
     display: block;
     color: var(--colBase);
@@ -362,14 +384,12 @@ label {
     margin-bottom: 5px;
 }
 
-.mybtn-sm-base:hover
-{
+.mybtn-sm-base:hover {
     color: #fff;
     background-color: var(--colBase);
 }
 
-.mybtn-sm-bro
-{
+.mybtn-sm-bro {
     padding: 2px;
     display: block;
     transition: all .5s ease;
@@ -381,14 +401,12 @@ label {
     background-color: #fff;
 }
 
-.mybtn-sm-bro:hover
-{
+.mybtn-sm-bro:hover {
     color: #fff;
     background-color: var(--colBro);
 }
 
-.mybtn-sm-red
-{
+.mybtn-sm-red {
     padding: 2px;
     display: block;
     transition: all .5s ease;
@@ -400,8 +418,7 @@ label {
     margin-bottom: 5px;
 }
 
-.mybtn-sm-red:hover
-{
+.mybtn-sm-red:hover {
     background-color: var(--colRed);
     color: #fff;
 }
@@ -503,8 +520,7 @@ label {
     width: 100px;
 }
 
-.mybtn-sm
-{
+.mybtn-sm {
     padding: 2px;
     display: block;
     transition: all .5s ease;
@@ -514,56 +530,60 @@ label {
     max-width: 80px;
 }
 
+
 /* BTN GLOW */
+
 .btn:focus {
     outline: none;
     outline-offset: 0px;
     color: #fff;
 }
 
+
 /* menu page buttons */
+
 .i-block {
-	width: 300px;
-	height: 100px;
-	display: block;
-	border: none;
-	box-sizing: border-box;
-	font-size: 2em;
-	font-weight: 300;
-	color: #fff;
-	text-align: center;
-	line-height: 100px;
-	outline: none;
-	border-radius: 0px;
+    width: 300px;
+    height: 100px;
+    display: block;
+    border: none;
+    box-sizing: border-box;
+    font-size: 2em;
+    font-weight: 300;
+    color: #fff;
+    text-align: center;
+    line-height: 100px;
+    outline: none;
+    border-radius: 0px;
     transition: all .8s ease;
     margin: 0 auto;
     padding: 0px;
 }
 
 .i-block:hover {
-	filter: brightness(120%);
-	-moz-box-shadow: 0 0 14px #666;
-	-webkit-box-shadow: 0 0 14px #666;
+    filter: brightness(120%);
+    -moz-box-shadow: 0 0 14px #666;
+    -webkit-box-shadow: 0 0 14px #666;
     box-shadow: 0 0 14px #666;
     color: #fff;
 }
 
 
 /* info toggles */
-.questions
-{
+
+.questions {
     cursor: pointer;
     display: block;
 }
 
-.answer
-{
+.answer {
     display: none;
     background-color: lightyellow;
     text-align: justify;
     padding: 4px 8px;
     margin: 10px 0px;
 }
+
 
 /*         END BUTTONS        */
 
@@ -576,70 +596,78 @@ label {
 }
 
 .confirmation {
-    width: 400px; 
+    width: 400px;
     border: 1px solid var(--colBase);
     font-size: 1.5em;
     font-weight: 300;
 }
 
+
 /**************/
+
+
 /*  PRINTING  */
+
+
 /**************/
 
 @media print {
-	body * {
-		visibility: hidden;
-	}
-	#checkin, #checkin * {
-		visibility: visible;
-	}
-	#checkin {
-		border: none;
-		position: absolute;
-		left: 30px;
-		top: -40px;
-	}
+    body * {
+        visibility: hidden;
+    }
+    #checkin,
+    #checkin * {
+        visibility: visible;
+    }
+    #checkin {
+        border: none;
+        position: absolute;
+        left: 30px;
+        top: -40px;
+    }
 }
 
 @page {
-	size: auto 3in 5in landscape;
+    size: auto 3in 5in landscape;
     margin: 0mm;
 }
 
 #qr {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-direction: column;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
 }
 
 #checkin {
-	width: 540px;
-	height: 325px;
-	color: #000;
-	border: 1px solid gray;
-	font-family: Arial, Helvetica, sans-serif;
-	font-weight: bold;
-	display: inline-block;
-	box-sizing: border-box;
-	font-size: 1em;
-	text-align: center;
+    width: 540px;
+    height: 325px;
+    color: #000;
+    border: 1px solid gray;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+    display: inline-block;
+    box-sizing: border-box;
+    font-size: 1em;
+    text-align: center;
     padding: 20px;
 }
 
+
 /*   END OF PRINTING   */
 
-.eye
-{
+.eye {
     display: none;
 }
-.border
-{
-     border: 1px solid var(--colContrast);
+
+.border {
+    border: 1px solid var(--colContrast);
 }
 
+
 /*  PICS  */
-.logo{
+
+.logo {
     position: fixed;
     top: 20px;
     left: 30px;
@@ -650,9 +678,42 @@ label {
     padding: 5px;
 }
 
-.no-event
-{
+.no-event {
     text-align: center;
     margin: 20px 10px;
     font-size: 1.5em;
 }
+
+.todo-com {
+    color: var(--colGray);
+}
+
+.todo {
+    color: var(--colRed);
+}
+
+.badge-todo {
+    display: inline-block;
+    min-width: 10px;
+    padding: 3px 7px;
+    font-size: 0.8em;
+    line-height: 1;
+    color: #fff;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    background-color: #777;
+    border-radius: 2px;
+    float: right;
+}
+
+.px60 {
+    width: 60px;
+}
+
+.inline {
+    display: inline-block;
+}
+
+/* DO NOT USE THIS NAMES*/
+/*      .tog {}         */

@@ -9,33 +9,26 @@
 		<h4>Please provide your Registration Number:</h4>
 	</div>
 
-	@if(ViewBag.Message != null)
-	{
-		<br />
-		<div class="f-attention">
-			<span>@ViewBag.Message </span>
-		</div>
-	}
-
-	<br />
-
 	<div class="text-center">
 
 		<form asp-action="CheckIn" autocomplete="off">
-
+			@if(ViewBag.Message != null)
+			{
+				<div class="f-attention m20-0-20-0">
+					<span>@ViewBag.Message </span>
+				</div>
+			}
 			<div class="form-group">
-				<input asp-for="RegistrationNumber" class="form-control input-large" />
+				<span asp-validation-for="RegistrationNumber" class="Red"></span>
+				<input asp-for="RegistrationNumber" required type="number" class="form-control input-large" />
 			</div>
 
-			<div style="display: none;">
-				<input asp-for="EID" value="@Model.EID"/>
-			</div>
+			<input asp-for="EID" value="@Model.EID" class="eye"/>
 			<br />
 
 			<a asp-action="Menu" asp-controller="Home" asp-route-EID="@Model.EID" class="btn mybtn bgRed">Cancel</a>
 
-			<button type="submit" class="btn mybtn bgBase" style="width: 80px;">Check In</button>
-
+			<button type="submit" class="btn mybtn bgBase">Check In</button>
 		</form>	
 	</div>
 	
@@ -61,3 +54,7 @@
 		</div>
 	</div>
 </div>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

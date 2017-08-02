@@ -18,8 +18,9 @@ namespace GlobalEvent.Controllers
         {
             _db = context;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            ViewBag.Todos = await _db.ToDos.Where(x => !x.Done).ToListAsync();
             return View();
         }
 
@@ -47,11 +48,11 @@ namespace GlobalEvent.Controllers
             {
                 _db.Events.Add(e);
                 await _db.SaveChangesAsync();
-                ViewBag.Message = "The Event was successfully created.";
-                return RedirectToAction("Events");
+                ViewBag.Message2 = "The Event was successfully created.";
+                return View("Events", await _db.Events.ToListAsync());
             }
-            ViewBag.Message = "Something went wrong. Please try again.";
-            return RedirectToAction("Events");
+            ViewBag.Message = "Event wasn't created. Something went wrong. Please try again.";
+            return View("Events", await _db.Events.ToListAsync());
         }
 
         [HttpGet]
@@ -67,9 +68,7 @@ namespace GlobalEvent.Controllers
         {
             if (ModelState.IsValid)
             {
-                // extracting the event by ID
                 Event eOld = await _db.Events.FirstOrDefaultAsync(x => x.ID == e.ID);
-                // TODO cut hte extra lines
                 // updating the event's data
                 eOld.Name = e.Name;
                 eOld.DateStart = e.DateStart;
@@ -79,6 +78,11 @@ namespace GlobalEvent.Controllers
                 eOld.Free = e.Free;
                 eOld.RevPlan = e.RevPlan;
                 eOld.Status = e.Status;
+                eOld.Archived = e.Archived;
+                eOld.HttpBase = e.HttpBase;
+                eOld.EventbriteID = e.EventbriteID;
+                eOld.TicketLink = e.TicketLink;
+                eOld.Description = e.Description; 
                 // saving changes
                 _db.Events.Update(eOld);
                 await _db.SaveChangesAsync();
@@ -114,7 +118,6 @@ namespace GlobalEvent.Controllers
         {
             if (ID == null) return RedirectToAction("Events");
 
-            // extrats event with the matching ID
             Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == ID);
             _db.Events.Remove(e);
             await _db.SaveChangesAsync();
