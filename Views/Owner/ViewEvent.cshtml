@@ -1,34 +1,71 @@
 @model Event
 
 <h2> @Model.Name </h2>
+<br />
 
-<h5>Status: 
-    @if (Model.Status)
-    {
-        <span style="color: var(--colBase);">ACTIVE</span>
-    }
-    else
-    {
-        <span style="color: var(--colRed);">INACTIVE</span>
-    }
-</h5>
+<div class="row">
+    <div class="col-md-6">
+        <div class="stat-name" style="background-color: @(Model.Status ? "var(--colBase)" : "")">Status: <span class="stat">@(Model.Status ? "ACTIVE" : "INACTIVE")</span></div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="stat-name">Event ID: <span class="stat">@Model.ID</span></div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="stat-name">Starts: <span class="stat">@Model.TimeStart on @Model.DateStart </span></div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="stat-name">Ends: <span class="stat">@Model.TimeEnd on @Model.DateEnd </span></div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="stat-name">Tickets Sold/Orders #: <span class="stat">@Model.TicketsSold / @Model.Orders.Count() </span></div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="stat-name">Free tickets: <span class="stat">@(Model.Free == true ? "Yes" : "No") </span></div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="stat-name">Visitors Registered / CheckIned: <span class="stat">@Model.Visitors.Count() / @Model.Visitors.Where(v => v.CheckIned == true).Count() </span></div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="stat-name">Revenue Fact / Plan: <span class="stat">$@Model.RevFact / $@Model.RevPlan </span></div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="stat-name">Eventbrite's Token: <span class="stat">@Model.HttpBase </span></div>
+    </div>
+
+    <div class="col-md-6">
+        <div class="stat-name">Eventbrite's Event ID: <span class="stat">@Model.EventbriteID </span></div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="stat-name">Event's Page: <span class="stat">@Model.TicketLink </span> </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="stat-name">Description: <span class="stat">@Model.Description </span> </div>
+    </div>
+</div>
 
 <ul>
-    <li>ID: @Model.ID </li>
-    <li>Starts On: @Model.DateStart </li>
-    <li>Starts At: @Model.TimeStart </li>
-    <li>Ends On: @Model.DateEnd </li>
-    <li>Ends At: @Model.TimeEnd </li>
-    <li>Free tickets: @(Model.Free == true ? "Yes" : "No")</li>
-    <li>Tickets Sold: @Model.TicketsSold </li>
-    <li>Revenue Plan: @Model.RevPlan </li>
-    <li>Revenue Fact: @Model.RevFact </li>
-    <li>Orders #: @Model.Orders.Count() </li>
-    <li>Eventbrite's Token: @Model.HttpBase </li>
-    <li>Event's Page: @Model.TicketLink </li>
-    <li>Description: @Model.Description </li>
-    <li>Visitors, Registered: @Model.Visitors.Count() </li>
-    <li>Visitors, Checked In: @Model.Visitors.Where(v => v.CheckIned == true).Count() </li>
     <li>
         Ticket Types:
         @if (@Model.Tickets.Count() < 1)

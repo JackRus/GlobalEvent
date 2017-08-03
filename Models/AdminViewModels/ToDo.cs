@@ -11,15 +11,21 @@ namespace GlobalEvent.Models.AdminViewModels
         [Required]
         [StringLength(200, MinimumLength = 5)]
         public string Task { get; set; } //description
+
         [Required]
-        public string Deadline { get; set; }
-        public bool Done { get; set; }  
-        public string Comments { get; set; }
-        public int EID { get; set; }
+        public string Deadline { get; set; } //date
+
+        public bool Done { get; set; }  // if complited
+
+        public string Comments { get; set; } // any comments
+
+        [Display(Name = "Event ID. Default value is 0.")]
+        public int EID { get; set; } // can be assigned to a specific Event
 
         public ToDo ()
         {
-            this.Done = false;        
+            this.Done = false; 
+            this.EID = 0;       
         }
     }
 }

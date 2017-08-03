@@ -1,6 +1,9 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Threading.Tasks;
+using GlobalEvent.Data;
 using GlobalEvent.Models.VisitorViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace GlobalEvent.Models.OwnerViewModels
 {
@@ -80,6 +83,18 @@ namespace GlobalEvent.Models.OwnerViewModels
 			this.Free = false;
 			this.Types = new List<VType>();
 			this.Archived = false;
+		}
+
+		public static async Task Update (ApplicationDbContext _db, int ID)
+		{
+			Event e = await _db.Events
+				.Include(x => x.Tickets)
+				.Include(x => x.Types)
+				.Include(x => x.Products)
+                .Include(x => x.Orders)
+				.FirstOrDefaultAsync(x => x.ID == ID);
+
+			
 		}
 	}
 }

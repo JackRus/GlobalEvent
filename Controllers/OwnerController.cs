@@ -18,9 +18,12 @@ namespace GlobalEvent.Controllers
         {
             _db = context;
         }
-        public async Task<IActionResult> Index(string message = null)
+        public IActionResult Index(string message = null)
         {
-            ViewBag.Todos = await _db.ToDos.Where(x => !x.Done).ToListAsync();
+            ViewBag.Todos = _db.ToDos
+                .Where(x => !x.Done)
+                .OrderBy(x => x.Deadline)
+                .ToList();
             ViewBag.Message = message;
             return View();
         }
@@ -32,7 +35,10 @@ namespace GlobalEvent.Controllers
 
         public async Task<IActionResult> Events ()
         {
-            return View(await _db.Events.ToListAsync());
+            ViewBag.Active = await _db.Events.FirstOrDefaultAsync(x => x.Status);
+            ViewBag.Future = await _db.Events.Where(x => !x.Status && !x.Archived).ToListAsync(); 
+            ViewBag.Archived = await _db.Events.Where(x => x.Archived).ToListAsync();
+            return View();
         }
 
         [HttpGet]
@@ -78,12 +84,18 @@ namespace GlobalEvent.Controllers
                 eOld.TimeEnd = e.TimeEnd;
                 eOld.Free = e.Free;
                 eOld.RevPlan = e.RevPlan;
-                eOld.Status = e.Status;
                 eOld.Archived = e.Archived;
                 eOld.HttpBase = e.HttpBase;
                 eOld.EventbriteID = e.EventbriteID;
                 eOld.TicketLink = e.TicketLink;
                 eOld.Description = e.Description; 
+                if (e.Status && await _db.Events.AnyAsync(x => x.Status))
+                {
+                    eOld.Status = false;
+                    ViewBag.Message = "One of the Events is currently ACTIVE. And only 1 event can be ACTIVE at a time. You have to change it's status in order to make any other event ACTIVE.";
+                }
+                else eOld.Status = e.Status;
+
                 // saving changes
                 _db.Events.Update(eOld);
                 await _db.SaveChangesAsync();
@@ -103,6 +115,7 @@ namespace GlobalEvent.Controllers
 				.Include(x => x.Tickets)
 				.Include(x => x.Types)
 				.Include(x => x.Products)
+                .Include(x => x.Orders)
 				.FirstOrDefaultAsync(x => x.ID == ID);
 			return View(e);
 		}

@@ -363,6 +363,29 @@ label {
     margin: 20px auto 10px auto;
 }
 
+.events-number {
+    display: inline-block;
+    width: auto;
+    padding-left: 10px;
+    padding-right: 10px;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    color: #fff;
+    margin-right: 15px;
+    letter-spacing: 1px;
+}
+
+.events-number-container {
+    border-bottom: 1px solid var(--colBro);
+    text-align: left;
+    width: 100%;
+    font-size: 1em;
+    font-weight: 300;
+    width: 100%;
+    margin: 10px auto 5px auto;
+}
+
 
 /* END OF FORMS */
 
@@ -461,6 +484,27 @@ label {
 
 .btn-home:hover {
     box-shadow: 0 0 14px #666;
+}
+
+.btn-events {
+    padding: 10px;
+    display: block;
+    transition: all .5s ease;
+    border: 0px solid var(--colGray);
+    color: #fff;
+    border-radius: var(--radButton);
+    font-size: 1.5em;
+    font-weight: 300;
+    margin-bottom: 5px;
+    max-width: 100%;
+    word-wrap: normal;
+    height: auto;
+}
+
+.btn-events:hover {
+    /* border: 0px solid var(--colBase); */
+    box-shadow: 0 0 10px #666;
+    color: #fff;
 }
 
 .event-future {
@@ -717,3 +761,27 @@ label {
 
 /* DO NOT USE THIS NAMES*/
 /*      .tog {}         */
+
+
+/* ViewEvent PAGE */
+.stat-name
+{
+    padding: 5px 10px;
+    text-align: left;
+    background-color: gray;
+    color: #fff;
+    display: block;
+    margin-bottom: 10px;
+    font-size: 1.2em;
+    font-weight: 300;
+    color: #fff;
+}
+
+.stat
+{
+    text-align: right;
+    display: inline block;
+    float: right;
+    letter-spacing: 0.5px;
+    word-wrap: soft;
+}
