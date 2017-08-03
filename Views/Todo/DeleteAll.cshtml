@@ -1,10 +1,8 @@
-<h1 class="text-center">DELETE All ToDo Items</h2>
-<br />
+<h1>DELETE All ToDo Items</h1>
+
 @if (ViewBag.Todos.Count != 0)
 {
-	<div class="text-center Accent f-info m20-0-20-0">
-		You are going to delete ALL ToDo items<br />
-	</div>
+	<div class="f-info">You are going to delete ALL ToDo items.</div>
 	<div class="text-center">
 		<a asp-action="Index" class="btn mybtn bgBase">CANCEL</a>
 		<a asp-action="DeleteAllOk" asp-route-code="dltok" class="btn mybtn bgRed">DELETE</a>
@@ -12,9 +10,7 @@
 }
 else
 {
-	<div class="text-center Accent f-info m20-0-20-0">
-		You have no ToDo items yet.
-	</div>
+	<div class="f-info">You have no ToDo items yet.</div>
 	<div class="text-center">
 		<a asp-action="Index" class="btn mybtn bgBase">BACK</a>
 	</div>

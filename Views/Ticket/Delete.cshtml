@@ -1,11 +1,9 @@
 @model Ticket
 
-<h2>DELETE Ticket</h2>
+<h1>DELETE Ticket</h1>
 
-<div class="text-center Accent f-info m20-0-20-0">
-	You are going to delete the ticket:<br />
-	@Model.Type <br />
-</div>
+<div class="f-info">You are going to delete the ticket:<br />@Model.Type <br /></div>
+
 <div class="text-center">
 	<a asp-action="Index" asp-route-ID="@Model.EID" class="btn mybtn bgBase">CANCEL</a>
 	<a asp-action="DeleteOk" asp-route-id="@Model.ID" class="btn mybtn bgRed">DELETE</button>

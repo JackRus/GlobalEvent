@@ -1,13 +1,12 @@
 @model Event
 
-<h2>DELETE Ticket</h2>
+<h1>DELETE Ticket</h1>
 
 @if (Model.Tickets.Count() != 0)
 {
-	<div class="text-center Accent f-info m20-0-20-0">
-		You are going to delete ALL tickets for the event:<br />
-		@Model.Name <br />
+	<div class="f-info">You are going to delete ALL tickets for the event:<br />@Model.Name
 	</div>
+
 	<div class="text-center">
 		<a asp-action="Index" asp-route-ID="@Model.ID" class="btn mybtn bgBase">CANCEL</a>
 		<a asp-action="DeleteAllOk" asp-route-id="@Model.ID" class="btn mybtn bgRed">DELETE</a>
@@ -15,10 +14,7 @@
 }
 else
 {
-	<div class="text-center Accent f-info m20-0-20-0">
-		This Event doesn't have any tickets.
-	</div>
-	<div class="text-center">
+	<div class="f-info">This Event doesn't have any tickets yet.<br />
 		<a asp-action="Index" asp-route-ID="@Model.ID" class="btn mybtn bgBase">BACK</a>
 	</div>
 }

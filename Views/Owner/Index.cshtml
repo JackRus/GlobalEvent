@@ -1,23 +1,36 @@
 @model ToDo
 
-<h1 class="text-center">MAIN MENU</h1>
-<br />
+<h1>MAIN MENU</h1> 
+
+@if(ViewBag.Message != null)
+{
+	<div id="tog" class="f-attention">@ViewBag.Message <br/>
+        <a class="btn mybtn-sm-red tog inline m5-0-5-0" data-id="tog" >OK</a>
+    </div>
+}
+@if(ViewBag.Message2 != null)
+{
+	<div id="tog" class="f-success">@ViewBag.Message2 <br/>
+        <a class="btn mybtn-sm-base tog inline m5-0-5-0" data-id="tog" >OK</a>
+    </div>
+}
+
 <div class="row m20-0-20-0">
 	<div class="col-sm-6">
-		<a class="btn i-block bgBro">Dashboard</a>	
+		<a class="btn i-block-owner">Dashboard</a>	
 		<br />
-		<a asp-action="Events" class="btn i-block bgBro">Events</a>
+		<a asp-action="Events" class="btn i-block-owner">Events</a>
 		<br />	
-		<a asp-action="Admins" class="btn i-block bgBro">Admins</a>
+		<a asp-action="Admins" class="btn i-block-owner">Admins</a>
 		<br />
-		<a asp-action="Attention" class="btn i-block bgBro">Require Attention</a>	
+		<a asp-action="Attention" class="btn i-block-owner">Require Attention</a>	
 		<br />
 	</div>
 
 	<div class="col-sm-6"> 
 		<div>
-			<h4 style="display: inline-block;">TODO List &nbsp &nbsp</h4>
-			<a href="#" class="btn mybtn-sm-base px60 inline tog" data-id="todo-add">ADD</a>
+			<h4 class="inline">TODO List &nbsp &nbsp</h4>
+			<a class="btn mybtn-sm-base px60 inline tog" data-id="todo-add">ADD</a>
 			<a asp-action="Index" asp-controller="Todo" class="btn mybtn-sm-bro px60 inline">Show All</a>
 		</div>
 

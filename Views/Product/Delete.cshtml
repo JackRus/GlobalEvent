@@ -1,13 +1,10 @@
 @model Product
 
-<h2>DELETE Product</h2>
+<h1>DELETE Product</h1>
 
-<div class="text-center Accent f-info m20-0-20-0">
-	You are going to delete the Product:<br />
-	@Model.Name <br />
-</div>
+<div class="f-info">You are going to delete the Product:<br />@Model.Name </div>
+
 <div class="text-center">
-	<a asp-action="Index" asp-controller="Product" asp-route-ID="@Model.EID" class="btn mybtn bgBase">CANCEL</a>
-	<a asp-action="DeleteOk" asp-controller="Product" asp-route-id="@Model.ID" class="btn mybtn bgRed">DELETE</button>
-	</a>
+	<a asp-action="Index" asp-route-ID="@Model.EID" class="btn mybtn bgBase">CANCEL</a>
+	<a asp-action="DeleteOk" asp-route-id="@Model.ID" class="btn mybtn bgRed">DELETE</a>
 </div>

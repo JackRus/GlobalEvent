@@ -4,16 +4,14 @@
 	Layout = "_NoBody";
 }
 
+<h1>Registration form</h1>
+
 <form asp-action="RegisterOk" autocomplete="off">
-	<h1 class="text-center">Registration form</h1>
 	@if(ViewBag.Message != null)
 	{
-		<br /> 
-		<div class="f-attention">
-			<span>@ViewBag.Message </span>
-		</div>
+		<div class="f-attention">@ViewBag.Message </div>
 	}
-	<br />
+
 	<div class="row">
 		<div class="col-sm-6">
 			<div class="form-number-container">

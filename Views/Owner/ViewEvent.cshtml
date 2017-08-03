@@ -1,15 +1,21 @@
 @model Event
 
-<h2> @Model.Name </h2>
-<br />
+<h1> @Model.Name </h1>
+
+@if(ViewBag.Message != null)
+{
+	<div id="tog" class="f-attention">@ViewBag.Message <br/>
+        <a class="btn mybtn-sm-red tog inline m5-0-5-0" data-id="tog" >OK</a>
+    </div>
+}
 
 <div class="row">
     <div class="col-md-6">
-        <div class="stat-name" style="background-color: @(Model.Status ? "var(--colBase)" : "")">Status: <span class="stat">@(Model.Status ? "ACTIVE" : "INACTIVE")</span></div>
+        <div class="stat-name" style="background-color: @(Model.Status ? "var(--colBase)" : "grey"); color: #fff; border-bottom: none;">Status: <span class="stat">@(Model.Status ? "ACTIVE" : "INACTIVE")</span></div>
     </div>
 
     <div class="col-md-6">
-        <div class="stat-name">Event ID: <span class="stat">@Model.ID</span></div>
+        <div class="stat-name">ID:<span class="stat">@Model.ID</span></div>
     </div>
 </div>
 
@@ -55,78 +61,79 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div class="stat-name">Event's Page: <span class="stat">@Model.TicketLink </span> </div>
+        <div class="stat-name">Event's Page: <br /> <a href="@Model.TicketLink" @Model.TicketLink target="_new"><strong> @Model.TicketLink </strong> </a></div>
     </div>
 </div>
 
 <div class="row">
     <div class="col-md-12">
-        <div class="stat-name">Description: <span class="stat">@Model.Description </span> </div>
+        <div class="stat-name" style="text-align: justify;">Description: <br /> <strong> @Model.Description </strong>  </div>
     </div>
 </div>
 
-<ul>
-    <li>
-        Ticket Types:
-        @if (@Model.Tickets.Count() < 1)
-        {
-            <span>Not created yet</span>
-        }
-        else 
-        {  
-            <ul>
-            @foreach(Ticket t in Model.Tickets)
+<div class="row">
+    <div class="col-md-12">
+        <div class="stat-name" style="text-align: justify;">Ticket Types: <a asp-action="Index" asp-controller="Ticket" asp-route-id="@Model.ID" class="btn mybtn-sm-event" data-id="tog" >MANAGE TICKETS</a><br />
+            @if (@Model.Tickets.Count() < 1)
             {
-                <li>Type: @t.Type, Price: @t.Price</li>
-            }  
-            </ul> 
-        }
-    </li>
-    <li>
-        Events/Products:
-        @if (@Model.Products.Count() < 1)
-        {
-            <span>Not created yet</span>
-        }
-        else 
-        {  
-            <ul>
-            @foreach(Product p in Model.Products)
+                <span>Not created yet</span>
+            }
+            else 
+            {  
+                <ul style="margin: 0px auto;">
+                @foreach(Ticket t in Model.Tickets)
+                {
+                    <li class="inline">==> <strong> @t.Type, Price: $@t.Price </strong> </li>
+                }  
+                </ul> 
+            }      
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="stat-name" style="text-align: justify;"> Products/Events: <a asp-action="Index" asp-controller="Product" asp-route-id="@Model.ID" class="btn mybtn-sm-event" data-id="tog" >MANAGE PRODUCTS</a><br />
+            @if (@Model.Products.Count() < 1)
             {
-                <li> @p.Name: @p.Capacity </li>
-            }  
-            </ul> 
-        }
-    </li>
-    <li>
-        Visitors Types:
-        @if (@Model.Types.Count() < 1)
-        {
-            <span>Not created yet</span>
-        }
-        else 
-        {  
-            <ul>
-            @foreach(VType t in Model.Types)
+                <span>Not created yet</span>
+            }
+            else 
+            {  
+                <ul style="margin: 0px auto;">
+                @foreach(Product p in Model.Products)
+                {
+                    <li class="inline">==> <strong>@p.Name, Capacity: @p.Capacity</strong> </li>
+                }  
+                </ul> 
+            }       
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="stat-name" style="text-align: justify;"> Visitor Types: <a asp-action="Index" asp-controller="VTypes" asp-route-id="@Model.ID" class="btn mybtn-sm-event" data-id="tog" >MANAGE VISITOR TYPES</a><br />
+            @if (@Model.Types.Count() < 1)
             {
-                <li> @t.Name: @(t.Free == true ? "Free" : "Paid") </li>
-            }  
-            </ul> 
-        }
-    </li>
+                <span>Not created yet</span>
+            }
+            else 
+            {  
+                <ul style="margin: 0px auto;">
+                @foreach(VType t in Model.Types)
+                {
+                    <li class="inline">==> <strong>@t.Name: @(t.Free == true ? "Free" : "Paid")</strong> </li>
+                }  
+                </ul> 
+            }
+        </div>
+    </div>
+</div>
 
-</ul>
+<br />
 
-<a asp-action="Events" asp-controller="Owner" class="btn mybtn bgBase">BACK</a>
+<a asp-action="Events" class="btn mybtn bgBase">BACK</a>
+<a asp-action="EditEvent" asp-route-id="@Model.ID" class="btn mybtn bgBro">EDIT</a>
+<a asp-action="DeleteEvent" asp-route-id="@Model.ID" class="btn mybtn bgRed">DELETE</a>
 
-<a asp-action="EditEvent" asp-controller="Owner" asp-route-id="@Model.ID" class="btn mybtn bgBro">EDIT</a>
-
-<a asp-action="DeleteEvent" asp-controller="Owner" asp-route-id="@Model.ID" class="btn mybtn bgRed">DELETE</a>
-
-<br /><br />
-
-<a asp-action="Index" asp-controller="Ticket" asp-route-id="@Model.ID" class="btn mybtn bgBro">MANAGE TICKETS</a>
-
-<a asp-action="Index" asp-controller="Product" asp-route-id="@Model.ID" class="btn mybtn bgBro">MANAGE PRODUCTS</a>
-
-<a asp-action="Index" asp-controller="VType" asp-route-id="@Model.ID" class="btn mybtn bgBro">MANAGE Visitor Types</a>

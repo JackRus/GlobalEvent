@@ -1,26 +1,19 @@
 @model Event
 
-<h2>DELETE Event</h2>
+<h1>DELETE EVENT</h1>
 
 @if (Model.Status)
 {
-	<div class="text-center Red f-attention m20-0-20-0">
-		You can NOT delete Active event. 
-		<br />
-		Please, make it inactive first.
+	<div class="f-attention">You can NOT delete an Active event. Please, make it inactive first.
 	</div>
 	<div class="text-center">
-		<a asp-action="Events" asp-controller="Owner">
-			<button type="button" style="width: 80px;" class="btn mybtn bgBase">BACK</button>
-		</a>
+		<a asp-action="Events" asp-controller="Owner" class="btn mybtn bgBase">BACK</a>
 	</div>
 }
 else
 {
-	<div class="text-center Accent f-info m20-0-20-0">
-		You are going to delete the event:<br />
-		@Model.Name <br />
-	</div>
+	<div class="f-info">You are going to delete the event:<br /> @Model.Name</div>
+
 	<div class="text-center">
 		<a asp-action="Events" asp-controller="Owner">
 			<button type="button" style="width: 80px;" class="btn mybtn bgBase">CANCEL</button>

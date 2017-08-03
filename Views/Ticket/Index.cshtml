@@ -1,58 +1,57 @@
-<h2>ALL Tickets</h2>
-<h4>Event ID: @ViewBag.ID </h4>
-<br />
+<h1>ALL Tickets</h1>
+
 <div style="width: 100%">
-@if (ViewBag.Tickets.Count != 0)
-{
-	<table class="table table-hover" style="max-width: 700px; margin: 0 auto;">
-		<thead>
-			<tr>
-				<th>Type</th>
-				<th>Price</th>
-				<th>Amount</th>
-				<th>Description</th>
-				<th></th>
-			</tr>
-		</thead>
-
-		<tbody>
-			<tr style="height: 4px;">
-					<td colspan="20" style="padding: 0px; background-color: gainsboro"></td>
-			</tr>
-			@foreach(Ticket t in ViewBag.Tickets)
-			{
+	@if (ViewBag.Tickets.Count != 0)
+	{
+		<table class="table table-hover width700">
+			<thead>
 				<tr>
-					<td>@t.Type</td>
-					<td>$@t.Price</td>
-					<td>@t.Limit</td>
-					<td>@t.Description </td>
-					<td>
-						<a asp-action="Copy" asp-route-ID="@t.ID" class="btn mybtn-sm-base">Copy</a>
+					<th>Type</th>
+					<th>Price</th>
+					<th>Amount</th>
+					<th>Description</th>
+					<th></th>
+				</tr>
+			</thead>
 
-						<a asp-action="Edit" asp-route-ID="@t.ID" class="btn mybtn-sm-bro">Edit</a>
-					
-						<a asp-action="Delete" asp-route-ID="@t.ID" class="btn mybtn-sm-red">Delete</a>
-					</td>
-				</tr>
+			<tbody>
 				<tr style="height: 4px;">
-					<td colspan="20" style="padding: 0px; background-color: gainsboro"></td>
+						<td colspan="20" class="line-space"></td>
 				</tr>
-			}
-		</tbody>
-	</table>
-}
-else
-{
-	<div class="text-center f-info Accent" style="max-width: 700px; margin: 0 auto;">This Event has no Tickets yet.</div>
-}
+				@foreach(Ticket t in ViewBag.Tickets)
+				{
+					<tr>
+						<td>@t.Type</td>
+						<td>$@t.Price</td>
+						<td>@t.Limit</td>
+						<td>@t.Description </td>
+						<td>
+							<a asp-action="Copy" asp-route-ID="@t.ID" class="btn mybtn-sm-base">Copy</a>
+
+							<a asp-action="Edit" asp-route-ID="@t.ID" class="btn mybtn-sm-bro">Edit</a>
+						
+							<a asp-action="Delete" asp-route-ID="@t.ID" class="btn mybtn-sm-red">Delete</a>
+						</td>
+					</tr>
+					<tr style="height: 4px;">
+						<td colspan="20" class="line-space"></td>
+					</tr>
+				}
+			</tbody>
+		</table>
+	}
+	else
+	{
+		<div class="text-center f-info Accent width700">This Event has no Tickets yet.</div>
+	}
 	<br />
-	<div class="table table-hover" style="max-width: 700px; margin: 0 auto;">
+	<div class="table table-hover width700">
 		<a asp-action="Add" asp-route-id="@ViewBag.ID" class="btn mybtn bgBro">ADD</a>
 		<a asp-action="ViewEvent" asp-controller="Owner" asp-route-id="@ViewBag.ID" class="btn mybtn bgBase">BACK</a>
 
-	@if (ViewBag.Tickets.Count != 0) 
-	{
-		<a asp-action="DeleteAll" asp-route-id="@ViewBag.ID" class="btn mybtn bgRed">DELETE ALL</a>
-	}
+		@if (ViewBag.Tickets.Count != 0) 
+		{
+			<a asp-action="DeleteAll" asp-route-id="@ViewBag.ID" class="btn mybtn bgRed">DELETE ALL</a>
+		}
 	</div>
 </div>

@@ -1,81 +1,88 @@
 @model Product
 
-<h2>EDIT Product</h2>
-<h4>Event ID: @Model.EID </h4>
+<h1>EDIT Product</h1> 
+
 <form asp-action="Edit" autocomplete="off">
+    <div class="row"> 
+        <div class="col-sm-6">
+            <div class="form-number-container">
+                <span class="form-number">1</span> Basic info
+            </div>
 
-    <div class="form-group">
-        <label asp-for="Name" class="control-label"></label>
-        <div>
-            <input asp-for="Name" class="form-control"/>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control"/>
+                <span asp-validation-for="Name" class="Red"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Free" class="control-label"></label>&nbsp
+                <input asp-for="Free" /> &nbsp &nbsp
+                <label asp-for="Status" class="control-label"></label>&nbsp
+                <input asp-for="Status" />
+            </div>
+            
+            <div class="form-group">
+                <div class="row nomar">
+                    <div class="col-sm-8 nomar nopad">
+                        <label asp-for="DateStart" class="control-label"></label>
+                        <input asp-for="DateStart" type="date" class="form-control" />
+                    </div>
+                    <div class="col-sm-4 nomar nopad" style="padding-left: 5px;">
+                        <label asp-for="TimeStart" class="control-label"></label>
+                        <input asp-for="TimeStart" class="form-control" type="time"/>
+                    </div>
+                    <span asp-validation-for="DateStart" class="Red"></span>
+                    <span asp-validation-for="TimeStart" class="Red"></span>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="row nomar">
+                    <div class="col-sm-8 nomar nopad">
+                        <label asp-for="DateEnd" class="control-label"></label>
+                        <input asp-for="DateEnd" class="form-control" type="date"/>
+                    </div>
+                    <div class="col-sm-4 nomar nopad" style="padding-left: 5px;">
+                        <label asp-for="TimeEnd" class="control-label"></label>
+                        <input asp-for="TimeEnd" class="form-control" type="time" />
+                    </div>
+                    <span asp-validation-for="DateEnd" class="Red"></span>
+                    <span asp-validation-for="TimeEnd" class="Red"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-6">
+            <div class="form-number-container">
+                <span class="form-number">2</span> Additional info
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Capacity" class="control-label"></label>
+                <input asp-for="Capacity" class="form-control" />
+                <span asp-validation-for="Capacity" class="Red"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="Description" class="control-label"></label>
+                <textarea asp-for="Description" class="form-control" rows="5" wrap="soft"></textarea>
+            </div>
+
+            <div style="display: none;">
+                <input asp-for="ID" value="@Model.ID" class="form-control" />
+		        <input asp-for="EID" value="@Model.EID" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn mybtn bgBase">ADD</button>
+                <button type="reset" class="btn mybtn bgBro">RESET</button>
+                <a asp-action="Index" asp-route-ID="@Model.EID" class="btn mybtn bgRed">CANCEL</a>
+            </div>
         </div>
     </div>
-
-    <div class="form-group">
-        <label asp-for="Status" class="control-label"></label>
-        <div>
-            <input asp-for="Status" />
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Free" class="control-label"></label>
-        <div>
-            <input asp-for="Free" />
-        </div>
-    </div>
-    
-    <div class="form-group">
-        <label asp-for="DateStart" class="control-label"></label>
-        <div>
-            <input asp-for="DateStart" type="date" class="form-control" />
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="TimeStart" class="control-label"></label>
-        <div>
-            <input asp-for="TimeStart" class="form-control" type="time"/>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="DateEnd" class="control-label"></label>
-        <div>
-            <input asp-for="DateEnd" class="form-control" type="date"/>
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="TimeEnd" class="control-label"></label>
-        <div>
-            <input asp-for="TimeEnd" class="form-control" type="time" />
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Capacity" class="control-label"></label>
-        <div>
-            <input asp-for="Capacity" class="form-control" />
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Description" class="control-label"></label>
-        <div>
-            <textarea asp-for="Description" class="form-control" rows="5" wrap="soft"></textarea>
-        </div>
-    </div>
-
-	<div style="display: none;">
-		<input asp-for="ID" value="@Model.ID" class="form-control" />
-		<input asp-for="EID" value="@Model.EID" class="form-control" />
-	</div>
-
-    <div class="form-group">
-        <button type="submit" style="width: 80px;" class="btn mybtn bgBase">SAVE</button>
-        <button type="reset" style="width: 80px;" class="btn mybtn bgBro">RESET</button>
-        <a asp-action="Index" asp-route-ID="@Model.EID" class="btn mybtn bgRed">CANCEL</a>
-    </div>
-    
 </form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

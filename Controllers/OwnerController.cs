@@ -89,24 +89,24 @@ namespace GlobalEvent.Controllers
                 eOld.EventbriteID = e.EventbriteID;
                 eOld.TicketLink = e.TicketLink;
                 eOld.Description = e.Description; 
-                if (e.Status && await _db.Events.AnyAsync(x => x.Status))
+                if (!eOld.Status && e.Status && await _db.Events.AnyAsync(x => x.Status))
                 {
                     eOld.Status = false;
-                    ViewBag.Message = "One of the Events is currently ACTIVE. And only 1 event can be ACTIVE at a time. You have to change it's status in order to make any other event ACTIVE.";
+                    ViewBag.Message = "One of the Events is currently ACTIVE. And only 1 event can be ACTIVE at a time. You have to change it's status in order to make any other event ACTIVE. All other changes were saved.";
                 }
                 else eOld.Status = e.Status;
 
                 // saving changes
                 _db.Events.Update(eOld);
                 await _db.SaveChangesAsync();
-                return RedirectToAction("ViewEvent", new { ID = eOld.ID });
+                return RedirectToAction("ViewEvent", new { ID = eOld.ID, message = ViewBag.Message });
             }
             ViewBag.Message = "Something went wrong. Please try again.";
             return RedirectToAction("Events");
         }
 
         [HttpGet]
-		public async Task<IActionResult> ViewEvent(int? ID)
+		public async Task<IActionResult> ViewEvent(int? ID, string message = null)
 		{
 			if (ID == null) return RedirectToAction("Events");
 
@@ -117,6 +117,7 @@ namespace GlobalEvent.Controllers
 				.Include(x => x.Products)
                 .Include(x => x.Orders)
 				.FirstOrDefaultAsync(x => x.ID == ID);
+            ViewBag.Message = message;
 			return View(e);
 		}
 

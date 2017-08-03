@@ -1,27 +1,30 @@
-<h1 class="text-center">All Events</h1>
-<br />
+<h1>All Events</h1> 
 @{
 	var future = ViewBag.Future;
 	var archived = ViewBag.Archived;
 }
 @if(ViewBag.Message != null)
 {
-	<br /> <div class="f-attention"><span>@ViewBag.Message </span></div><br />
+	<div id="tog" class="f-attention">@ViewBag.Message <br/>
+        <a class="btn mybtn-sm-red tog inline m5-0-5-0" data-id="tog">OK</a>
+    </div>
 }
 @if(ViewBag.Message2 != null)
 {
-	<br /><div class="f-success"><span>@ViewBag.Message2 </span></div><br />
+	<div id="tog" class="f-success">@ViewBag.Message2 <br/>
+        <a class="btn mybtn-sm-base tog inline m5-0-5-0" data-id="tog">OK</a>
+    </div>
 }
 
 <div class="text-center">
-	<a asp-action="CreateEvent" asp-controller="Owner" class="btn mybtn bgBase">ADD</a>
-	<a asp-action="Index" asp-controller="Owner" class="btn mybtn bgBro">BACK</a>
+	<a asp-action="CreateEvent" class="btn mybtn bgBase">ADD</a>
+	<a asp-action="Index" class="btn mybtn bgBro">BACK</a>
 </div>
 <br />
 
 @if (ViewBag.Active == null && future.Count == 0 && archived.Count == 0)
 {
-	<div class="text-center f-info Accent">You don't have any Events yet.</div><br />
+	<div class="f-info">You don't have any Events yet.</div>
 }
 else
 {
