@@ -1,10 +1,9 @@
-<h2>ALL Visitor Types</h2>
-<h4>Event ID: @ViewBag.ID </h4>
-<br />
+<h1>ALL Visitor Types</h1>
+
 <div style="width: 100%">
 @if (ViewBag.VTypes.Count != 0)
 {
-	<table class="table table-hover" style="max-width: 800px; margin: 0 auto;">
+	<table class="table table-hover width700">
 		<thead>
 			<tr>
 				<th>Name</th>
@@ -18,7 +17,7 @@
 
 		<tbody>
 			<tr style="height: 4px;">
-					<td colspan="20" style="padding: 0px; background-color: gainsboro"></td>
+					<td colspan="20" class="line-space"></td>
 			</tr>
 			@foreach(VType v in ViewBag.VTypes)
 			{
@@ -37,7 +36,7 @@
 					</td>
 				</tr>
 				<tr style="height: 4px;">
-					<td colspan="20" style="padding: 0px; background-color: gainsboro"></td>
+					<td colspan="20" class="line-space"></td>
 				</tr>
 			}
 		</tbody>
@@ -45,15 +44,15 @@
 }
 else
 {
-	<div class="text-center f-info Accent" style="max-width: 800px; margin: 0 auto;">This Event has no Visitor Types yet.</div>
+	<div class="f-info">This Event has no Visitor Types yet.</div>
 }
 	<br />
-	<div class="table table-hover" style="max-width: 800px; margin: 0 auto;">
+	<div class="text-center width700">
 		<a asp-action="Add" asp-route-id="@ViewBag.ID" class="btn mybtn bgBro">ADD</a>
 		<a asp-action="ViewEvent" asp-controller="Owner" asp-route-id="@ViewBag.ID" class="btn mybtn bgBase">BACK</a>
-	@if (ViewBag.VTypes.Count != 0) 
-	{
-		<a asp-action="DeleteAll" asp-route-id="@ViewBag.ID" class="btn mybtn bgRed">DELETE ALL</a>
-	}
+		@if (ViewBag.VTypes.Count != 0) 
+		{
+			<a asp-action="DeleteAll" asp-route-id="@ViewBag.ID" class="btn mybtn bgRed">DELETE ALL</a>
+		}
 	</div>
 </div>

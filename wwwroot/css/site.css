@@ -499,6 +499,7 @@ label {
 
 .btn-home:hover {
     box-shadow: 0 0 14px #666;
+    color: #fff;
 }
 
 .btn-events {
@@ -811,8 +812,8 @@ label {
 {
     padding: 5px 10px;
     text-align: left;
-    border-bottom: 1px solid #000;
-    color: #000;
+    border-bottom: 1px solid #666;
+    color: #666;
     display: block;
     margin-bottom: 10px;
     font-size: 1.2em;
@@ -826,7 +827,7 @@ label {
     float: right;
     letter-spacing: 0.5px;
     word-wrap: break-word;
-    font-weight: 400;
+    font-weight: 500;
 }
 
 .mybtn-sm-event {

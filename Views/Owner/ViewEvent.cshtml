@@ -113,7 +113,7 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div class="stat-name" style="text-align: justify;"> Visitor Types: <a asp-action="Index" asp-controller="VTypes" asp-route-id="@Model.ID" class="btn mybtn-sm-event" data-id="tog" >MANAGE VISITOR TYPES</a><br />
+        <div class="stat-name" style="text-align: justify;"> Visitor Types: <a asp-action="Index" asp-controller="VType" asp-route-id="@Model.ID" class="btn mybtn-sm-event" data-id="tog" >MANAGE VISITOR TYPES</a><br />
             @if (@Model.Types.Count() < 1)
             {
                 <span>Not created yet</span>

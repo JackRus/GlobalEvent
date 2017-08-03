@@ -1,50 +1,44 @@
 @model VType
 
-<h2>ADD Visitor Type (COPY)</h2>
-<h4>Event ID: @Model.EID </h4>
+<h1>ADD Visitor Type (COPY)</h1>
+
 <form asp-action="Copy" autocomplete="off">
-     <div class="form-group">
+
+    <div class="form-group">
         <label asp-for="Name" class="control-label"></label>
-        <div>
-            <input asp-for="Name" class="form-control"/>
-        </div>
+        <input asp-for="Name" class="form-control"/>
+        <span asp-validation-for="Name" class="Red"></span>
     </div>
 
     <div class="form-group">
-        <label asp-for="Limited" class="control-label"></label>
-        <div>
-            <input asp-for="Limited" />
-        </div>
+        <label asp-for="Free" class="control-label"></label>&nbsp
+        <input asp-for="Free" /> &nbsp &nbsp
+        <label asp-for="Limited" class="control-label"></label>&nbsp
+        <input asp-for="Limited" />
     </div>
   
     <div class="form-group">
         <label asp-for="MaxLimit" class="control-label"></label>
-        <div>
-            <input asp-for="MaxLimit" class="form-control" />
-        </div>
-    </div>
-
-    <div class="form-group">
-        <label asp-for="Free" class="control-label"></label>
-        <div>
-            <input asp-for="Free" />
-        </div>
+        <input asp-for="MaxLimit" class="form-control" />
+        <span asp-validation-for="MaxLimit" class="Red"></span>
     </div>
 
     <div class="form-group">
         <label asp-for="Description" class="control-label"></label>
-        <div>
-            <textarea asp-for="Description" class="form-control" rows="5" wrap="soft"></textarea>
-        </div>
+        <textarea asp-for="Description" class="form-control" rows="5" wrap="soft"></textarea>
+        <span asp-validation-for="Description" class="Red"></span>
     </div>
 
-	<div style="display: none;">
-		<input asp-for="EID" value="@Model.EID" class="form-control" />
-	</div>
+    <input asp-for="EID" value="@Model.EID" class="form-control eye" />
 
     <div class="form-group">
-        <button type="submit" style="width: 80px;" class="btn mybtn bgBase">ADD</button>
-        <button type="reset" style="width: 80px;" class="btn mybtn bgBro">RESET</button>
+        <button type="submit" class="btn mybtn bgBase">ADD</button>
+        <button type="reset" class="btn mybtn bgBro">RESET</button>
         <a asp-action="Index" asp-route-ID="@Model.EID" class="btn mybtn bgRed">CANCEL</a>
     </div>
 </form>
+
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}
