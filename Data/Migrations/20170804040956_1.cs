@@ -82,9 +82,10 @@ namespace GlobalEvent.Data.Migrations
                     ID = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Comments = table.Column<string>(nullable: true),
-                    Deadline = table.Column<string>(nullable: true),
+                    Deadline = table.Column<string>(nullable: false),
                     Done = table.Column<bool>(nullable: false),
-                    Task = table.Column<string>(nullable: true)
+                    EID = table.Column<int>(nullable: false),
+                    Task = table.Column<string>(maxLength: 200, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -105,7 +106,7 @@ namespace GlobalEvent.Data.Migrations
                     Free = table.Column<bool>(nullable: false),
                     HttpBase = table.Column<string>(nullable: false),
                     Name = table.Column<string>(nullable: false),
-                    RevFact = table.Column<int>(nullable: false),
+                    RevFact = table.Column<decimal>(nullable: false),
                     RevPlan = table.Column<decimal>(nullable: false),
                     Status = table.Column<bool>(nullable: false),
                     TicketLink = table.Column<string>(nullable: false),
@@ -131,7 +132,7 @@ namespace GlobalEvent.Data.Migrations
                     EID = table.Column<int>(nullable: false),
                     EventID = table.Column<int>(nullable: true),
                     Free = table.Column<bool>(nullable: false),
-                    Name = table.Column<string>(nullable: true),
+                    Name = table.Column<string>(nullable: false),
                     Status = table.Column<bool>(nullable: false),
                     TTypes = table.Column<string>(nullable: true),
                     TimeEnd = table.Column<string>(nullable: true),
@@ -159,9 +160,9 @@ namespace GlobalEvent.Data.Migrations
                     EID = table.Column<int>(nullable: false),
                     EventID = table.Column<int>(nullable: true),
                     Limit = table.Column<int>(nullable: false),
-                    Price = table.Column<int>(nullable: false),
+                    Price = table.Column<decimal>(nullable: false),
                     Products = table.Column<string>(nullable: true),
-                    Type = table.Column<string>(nullable: true)
+                    Type = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -186,7 +187,7 @@ namespace GlobalEvent.Data.Migrations
                     Free = table.Column<bool>(nullable: false),
                     Limited = table.Column<bool>(nullable: false),
                     MaxLimit = table.Column<int>(nullable: false),
-                    Name = table.Column<string>(nullable: true)
+                    Name = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {

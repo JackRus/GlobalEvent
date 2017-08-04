@@ -54,11 +54,13 @@ namespace GlobalEvent.Models.OwnerViewModels
 		
 		[DataType(DataType.Currency)]
 		[Display(Name = "Revenue Plan, $ (optional)")]
+		[DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = true)]
 		public decimal RevPlan { get; set; } // revenue planed
 
 		[DataType(DataType.Currency)]
 		[Display(Name = "Revenue Fact, $")]
-		public int RevFact { get; set; } // revenue fact
+		[DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = true)]
+		public decimal RevFact { get; set; } // revenue fact
 
 		[Display(Name = "Free Event")]
 		public bool Free { get; set; } // if the evenT is free

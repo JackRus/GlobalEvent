@@ -8,8 +8,8 @@ using GlobalEvent.Data;
 namespace GlobalEvent.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170802141848_Todo")]
-    partial class Todo
+    [Migration("20170804040956_1")]
+    partial class _1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -159,13 +159,16 @@ namespace GlobalEvent.Data.Migrations
 
                     b.Property<string>("Comments");
 
-                    b.Property<string>("Deadline");
+                    b.Property<string>("Deadline")
+                        .IsRequired();
 
                     b.Property<bool>("Done");
 
                     b.Property<int>("EID");
 
-                    b.Property<string>("Task");
+                    b.Property<string>("Task")
+                        .IsRequired()
+                        .HasMaxLength(200);
 
                     b.HasKey("ID");
 
@@ -284,7 +287,7 @@ namespace GlobalEvent.Data.Migrations
                     b.Property<string>("Name")
                         .IsRequired();
 
-                    b.Property<int>("RevFact");
+                    b.Property<decimal>("RevFact");
 
                     b.Property<decimal>("RevPlan");
 
@@ -325,7 +328,8 @@ namespace GlobalEvent.Data.Migrations
 
                     b.Property<bool>("Free");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .IsRequired();
 
                     b.Property<bool>("Status");
 
@@ -357,11 +361,12 @@ namespace GlobalEvent.Data.Migrations
 
                     b.Property<int>("Limit");
 
-                    b.Property<int>("Price");
+                    b.Property<decimal>("Price");
 
                     b.Property<string>("Products");
 
-                    b.Property<string>("Type");
+                    b.Property<string>("Type")
+                        .IsRequired();
 
                     b.HasKey("ID");
 
@@ -387,7 +392,8 @@ namespace GlobalEvent.Data.Migrations
 
                     b.Property<int>("MaxLimit");
 
-                    b.Property<string>("Name");
+                    b.Property<string>("Name")
+                        .IsRequired();
 
                     b.HasKey("ID");
 
