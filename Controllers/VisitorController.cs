@@ -149,7 +149,7 @@ namespace GlobalEvent.Controllers
 					return View(v);
 				}
 			}
-            ViewBag.Message = "This ORDER number isn't correct. Please try again";
+            ViewBag.Message = "This ORDER number isn't correct.  Please try again.";
 			ViewBag.EID = v.EID;
             return View("PreRegister");
 		}

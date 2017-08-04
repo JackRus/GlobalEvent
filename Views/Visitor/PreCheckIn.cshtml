@@ -3,24 +3,21 @@
 	Layout = "_NoBody";
 }
 
-<div class="row c-c pad10" style="width: 400px;">
+<div class="row c-c pad10">
 	<div class="text-center">
 		<h1>Check In</h1>
 		<h4>Please provide your Registration Number:</h4>
 	</div>
 
 	<div class="text-center">
-
 		<form asp-action="CheckIn" autocomplete="off">
 			@if(ViewBag.Message != null)
 			{
-				<div class="f-attention m20-0-20-0">
-					<span>@ViewBag.Message </span>
-				</div>
+				<div class="f-attention">@ViewBag.Message </div>
 			}
 			<div class="form-group">
 				<span asp-validation-for="RegistrationNumber" class="Red"></span>
-				<input asp-for="RegistrationNumber" required type="number" class="form-control input-large" />
+				<input asp-for="RegistrationNumber" required class="form-control input-large m20-0-20-0" />
 			</div>
 
 			<input asp-for="EID" value="@Model.EID" class="eye"/>

@@ -156,9 +156,10 @@ h2 {
     font-style: normal;
     font-weight: 300;
     text-align: center;
-    margin-top: 40px;
-    margin-bottom: 30px; 
+    margin: 40px 15px 30px 15px; 
     text-transform: uppercase;
+    white-space: normal;
+    max-width: 100%;
 }
 
 h3,
@@ -495,6 +496,8 @@ label {
     font-size: 3em;
     font-weight: 300;
     margin-bottom: 5px;
+    max-width: 100%;
+    white-space: normal;
 }
 
 .btn-home:hover {

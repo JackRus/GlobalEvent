@@ -11,12 +11,12 @@
 
 	<div class="text-center">
 		<form asp-action="Register" autocomplete="off">
+			
 			@if(ViewBag.Message != null)
 			{
-				<div class="f-attention m20-0-20-0">
-					<span>@ViewBag.Message </span>
-				</div>
+				<div class="f-attention">@ViewBag.Message </div>
 			}
+			
 			<div class="form-group">
 				<span asp-validation-for="OrderNumber" class="Red"></span>
 				<input asp-for="OrderNumber" class="form-control input-large m20-0-20-0" />
@@ -49,7 +49,7 @@
 
 			<a data-id="div3" class="questions">I didn't buy a ticket yet.</a>
 			<div id="div3" class="answer">
-				You can purchase a ticket on <a href="https://www.eventbrite.com/e/global-event-opening-test-tickets-35326692087">Eventbrite</a>.
+				You can purchase a ticket on Eventbrite.com.
 			</div>
 
 		</div>
