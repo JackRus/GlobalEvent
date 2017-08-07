@@ -6,6 +6,7 @@ using GlobalEvent.Models.OwnerViewModels;
 using GlobalEvent.Models.VisitorViewModels;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace GlobalEvent.Controllers
 {
@@ -33,11 +34,12 @@ namespace GlobalEvent.Controllers
             return View(await _db.Events.ToListAsync());
         }
 
-        public async Task<IActionResult> Events ()
+        public async Task<IActionResult> Events (string message = null)
         {
             ViewBag.Active = await _db.Events.FirstOrDefaultAsync(x => x.Status);
             ViewBag.Future = await _db.Events.Where(x => !x.Status && !x.Archived).ToListAsync(); 
             ViewBag.Archived = await _db.Events.Where(x => x.Archived).ToListAsync();
+            ViewBag.Message = message;
             return View();
         }
 
@@ -55,11 +57,9 @@ namespace GlobalEvent.Controllers
             {
                 _db.Events.Add(e);
                 await _db.SaveChangesAsync();
-                ViewBag.Message2 = "The Event was successfully created.";
-                return View("Events", await _db.Events.ToListAsync());
+                return RedirectToAction("Events", new { message = "The Event was successfully created."});
             }
-            ViewBag.Message = "Event wasn't created. Something went wrong. Please try again.";
-            return View("Events", await _db.Events.ToListAsync());
+            return RedirectToAction("Events", new { message = "Event wasn't created. Something went wrong. Please try again."});
         }
 
         [HttpGet]
@@ -94,15 +94,15 @@ namespace GlobalEvent.Controllers
                     eOld.Status = false;
                     ViewBag.Message = "One of the Events is currently ACTIVE. And only 1 event can be ACTIVE at a time. You have to change it's status in order to make any other event ACTIVE. All other changes were saved.";
                 }
-                else eOld.Status = e.Status;
+                else
+                    eOld.Status = e.Status;
 
                 // saving changes
                 _db.Events.Update(eOld);
                 await _db.SaveChangesAsync();
                 return RedirectToAction("ViewEvent", new { ID = eOld.ID, message = ViewBag.Message });
             }
-            ViewBag.Message = "Something went wrong. Please try again.";
-            return RedirectToAction("Events");
+            return RedirectToAction("Events", new { message = "Something went wrong. Please try again."});
         }
 
         [HttpGet]
