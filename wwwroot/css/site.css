@@ -248,6 +248,19 @@ h6 {
     padding: 20px;
 }
 
+.mar5 {
+    margin: 5px;
+    box-sizing: border-box;
+}
+
+.mar10 {
+    margin: 10px;
+}
+
+.mar20 {
+    margin: 20px;
+}
+
 .m5-0-5-0 {
     margin: 5px 0px 5px 0px;
 }
@@ -652,7 +665,7 @@ label {
     max-width: 100%;
 }
 
-.i-block-owner :hover {
+.i-block-owner:hover {
     filter: brightness(120%);
     -moz-box-shadow: 0 0 14px #666;
     -webkit-box-shadow: 0 0 14px #666;
@@ -863,4 +876,10 @@ td.line-space {
 {
     max-width: 800px;
     margin: 0 auto;
+}
+
+/* DASHBOARD */
+.dash-name
+{
+    color: var(--colBase);
 }

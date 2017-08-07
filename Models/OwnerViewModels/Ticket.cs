@@ -12,7 +12,7 @@ namespace GlobalEvent.Models.OwnerViewModels
 		
 		[Required]
 		[DataType(DataType.Currency, ErrorMessage = "Has to be a decimal or integer value.")]
-		[DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = true)]
+		[DisplayFormat(DataFormatString = "{0:C}")]
 		public decimal Price { get; set; }
 		
 		[Display(Name = "Amount for Sale")]

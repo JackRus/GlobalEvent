@@ -54,7 +54,7 @@ namespace GlobalEvent.Models.OwnerViewModels
 		
 		[DataType(DataType.Currency)]
 		[Display(Name = "Revenue Plan, $ (optional)")]
-		[DisplayFormat(DataFormatString = "{0:C}", ApplyFormatInEditMode = true)]
+		[DisplayFormat(DataFormatString = "{0:C}")]
 		public decimal RevPlan { get; set; } // revenue planed
 
 		[DataType(DataType.Currency)]
@@ -96,7 +96,7 @@ namespace GlobalEvent.Models.OwnerViewModels
                 .Include(x => x.Orders)
 				.FirstOrDefaultAsync(x => x.ID == ID);
 
-			
+			//TODO
 		}
 	}
 }

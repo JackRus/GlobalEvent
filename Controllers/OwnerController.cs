@@ -31,7 +31,10 @@ namespace GlobalEvent.Controllers
 
         public async Task <IActionResult> Dashboard ()
         {
-            return View(await _db.Events.ToListAsync());
+            Event e = await _db.Events.FirstOrDefaultAsync(x => x.Status);
+            // TODO Event.Update();
+            
+            return View(e);
         }
 
         public async Task<IActionResult> Events (string message = null)

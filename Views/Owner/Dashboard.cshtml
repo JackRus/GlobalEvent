@@ -1,0 +1,49 @@
+@model Event
+@{
+	Layout = "_NoBody";
+}
+
+<h1> DASHBOARD</h1>
+
+@if(ViewBag.Message != null)
+{
+	<div id="tog" class="f-attention">@ViewBag.Message <br/>
+        <a class="btn mybtn-sm-red tog inline m5-0-5-0" data-id="tog">OK</a>
+    </div>
+}
+
+<div class="row mar5">
+	
+	<div class="col-sm-4 border mar5">
+		<div>
+			<span class="dash-name">Name: </span>
+			@Model.Name 
+		</div>
+		<div>
+			<span class="dash-name">Time frame: </span>
+			@Model.TimeStart, @Model.DateStart / @Model.TimeEnd, @Model.DateEnd
+		</div>
+		<div>
+			<span class="dash-name">Dates: </span>
+			@Model.TimeStart, @Model.DateStart / @Model.TimeEnd, @Model.DateEnd
+		</div>
+	</div>
+
+	<!-- TICKETS -->
+	<div class="col-sm-4 border mar5">
+		<div>
+			<span class="dash-name">Name: </span>
+			@Model.Name 
+		</div>
+	</div>
+
+	<!-- VISITORS -->
+	<div class="col-sm-4 border mar5">
+		<div>
+			<span class="dash-name">Name: </span>
+			@Model.Name 
+		</div>
+	</div>
+	
+
+</div>
