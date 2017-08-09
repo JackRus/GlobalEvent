@@ -118,11 +118,7 @@ namespace GlobalEvent.Controllers
 		{
 			if (EID == null) return RedirectToAction("Welcome", "Home");
 		
-			Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == EID);
-			// update orders, sync Eventbrite & DB
-			var url = "https://www.eventbriteapi.com/v3/events/" + e.EventbriteID + "/attendees/?token=" + e.HttpBase;
-
-			await Order.OrderUpdate(_db, url, (int)EID);
+			await Order.OrderUpdate(_db, (int)EID);
             ViewBag.EID = (int)EID;
 			return View();
 		}
@@ -132,7 +128,7 @@ namespace GlobalEvent.Controllers
 		public async Task <IActionResult> Register(Visitor v)
 		{
 			if (v.OrderNumber == null || v.EID == 0) 
-				return RedirectToAction("Menu", "Home", new { EID = v.EID});
+				return RedirectToAction("Welcome", "Home");
 
 			var orders = await _db.Orders.ToListAsync();
 			foreach (Order o in orders)

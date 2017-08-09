@@ -17,16 +17,15 @@
 		<span> Would you like to check-in? </span>
 	</div>
 		
-	<div class="col-xs-6 nopad">
-		<form asp-action="CheckIn" autocomplete="off">
+	<div class="text-center m10-0-10-0">
+		<form asp-action="CheckIn" autocomplete="off" style="display: inline-block;">
 			<input class="eye" asp-for="RegistrationNumber" value="@Model.RegistrationNumber" />
 			<input class="eye" asp-for="EID" value="@Model.EID" />
-			<button type="submit" class="btn mybtn bgBase" style="width: 100%;">
+			<button type="submit" class="btn mybtn bgBase">
 			Yes</button>
 		</form>
-	</div>
-	<div class="col-xs-6 nopad">
-		<a asp-action="Index" asp-controller="Home" class="btn mybtn bgBro" style="width: 100%;">No</a>
+
+		<a asp-action="Index" asp-controller="Home" class="btn mybtn bgBro">No</a>
 	</div>
 </div>
 
@@ -40,5 +39,7 @@
 		2. Please save this number, as you will need it later for Check In. You can simply take a picture with your phone.<br/>
 		3. Don't share it with anybody, this number is unique for EACH visitor.<br />
 	</div>			
-	<a id="ok" class="btn mybtn bgBro" style="width: 100%;">I understand.</a>
+	<div class="text-center m10-0-10-0">
+		<a id="ok" class="btn mybtn bgBro">I understand.</a>
+	</div>
 </div>

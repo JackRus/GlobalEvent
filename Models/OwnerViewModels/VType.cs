@@ -15,6 +15,8 @@ namespace GlobalEvent.Models.OwnerViewModels
         public int MaxLimit { get; set; } // max amount
         public int EID { get; set; }  // EventID
         public string Description { get; set; }
+        public int CheckIned { get; set; }
+        public int Registered { get; set; }
 
         public VType()
         {

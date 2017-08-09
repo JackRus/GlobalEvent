@@ -125,6 +125,7 @@ namespace GlobalEvent.Data.Migrations
                 {
                     ID = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    Attendees = table.Column<int>(nullable: false),
                     Capacity = table.Column<int>(nullable: false),
                     DateEnd = table.Column<string>(nullable: true),
                     DateStart = table.Column<string>(nullable: true),
@@ -156,12 +157,14 @@ namespace GlobalEvent.Data.Migrations
                 {
                     ID = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    CheckIned = table.Column<int>(nullable: false),
                     Description = table.Column<string>(nullable: true),
                     EID = table.Column<int>(nullable: false),
                     EventID = table.Column<int>(nullable: true),
                     Limit = table.Column<int>(nullable: false),
                     Price = table.Column<decimal>(nullable: false),
-                    Products = table.Column<string>(nullable: true),
+                    Registered = table.Column<int>(nullable: false),
+                    Sold = table.Column<int>(nullable: false),
                     Type = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
@@ -181,13 +184,15 @@ namespace GlobalEvent.Data.Migrations
                 {
                     ID = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
+                    CheckIned = table.Column<int>(nullable: false),
                     Description = table.Column<string>(nullable: true),
                     EID = table.Column<int>(nullable: false),
                     EventID = table.Column<int>(nullable: true),
                     Free = table.Column<bool>(nullable: false),
                     Limited = table.Column<bool>(nullable: false),
                     MaxLimit = table.Column<int>(nullable: false),
-                    Name = table.Column<string>(nullable: false)
+                    Name = table.Column<string>(nullable: false),
+                    Registered = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {

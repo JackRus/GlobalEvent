@@ -36,15 +36,18 @@ namespace GlobalEvent.Models.VisitorViewModels
             this.Cancelled = false;
         }
 
-        public static async Task OrderUpdate(ApplicationDbContext _newContext, string urlString, int EID)
+        public static async Task OrderUpdate(ApplicationDbContext _db, int EID)
         {
+            Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == EID);
+            var url = "https://www.eventbriteapi.com/v3/events/" + e.EventbriteID + "/attendees/?token=" + e.HttpBase;
+            
             // get request to Eventbrite
-            var text = new EBGet(urlString);
+            var text = new EBGet(url);
             // deserializing json to Atendee list.
             var visitors = JsonConvert.DeserializeObject<Attendees>(text.responseE);
 
             // finds the latest added order or 0
-            var lastOrder = _newContext.Orders.Count() == 0 ? 0 : _newContext.Orders.Last().Number;
+            var lastOrder = _db.Orders.Count() == 0 ? 0 : _db.Orders.Last().Number;
 
             // remove all existing orders
             var query = visitors.attendees
@@ -90,14 +93,9 @@ namespace GlobalEvent.Models.VisitorViewModels
                     orders.Add(order);
                 }
                 
-                // add new orders
-                Event e = await _newContext.Events
-                    .Include(x => x.Orders)
-                    .FirstOrDefaultAsync(x => x.ID == EID);
                 e.Orders.AddRange(orders);
-                
                 //update db
-                _newContext.Events.Update(e);
+                _db.Events.Update(e);
 
                 // reset container
                 orders = new List<Order>();
@@ -109,10 +107,10 @@ namespace GlobalEvent.Models.VisitorViewModels
                             orders.Add(o);
 
                 // remove refunded and cancelled
-                _newContext.Orders.RemoveRange(orders);
+                _db.Orders.RemoveRange(orders);
             }
             // save changes
-            await _newContext.SaveChangesAsync();
+            await _db.SaveChangesAsync();
         }
 
         public static async Task Increment (string number, ApplicationDbContext _db)

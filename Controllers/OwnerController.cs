@@ -38,12 +38,17 @@ namespace GlobalEvent.Controllers
                 .Include(x => x.Orders)
                 .Include(x => x.Visitors)
                 .FirstOrDefaultAsync(x => x.Status);
-            // TODO Event.Update();
+
             ViewBag.Active = e == null ? false : true;
             if (ViewBag.Active)
             {
-                //ViewBag.OrdersValue = _db.Orders
-                //    .Sum(x => x.EID == e.ID);           
+                // Update orders
+                await Order.OrderUpdate(_db, e.ID);
+                await Event.Update(_db, e.ID);
+
+                // Visitors
+                ViewBag.CheckIned = e.Visitors.Where(x => x.CheckIned).Count();
+                ViewBag.Registered = e.Visitors.Where(x => x.Registered).Count();
             }
             
             return View(e);

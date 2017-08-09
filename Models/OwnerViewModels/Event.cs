@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using GlobalEvent.Data;
 using GlobalEvent.Models.VisitorViewModels;
@@ -89,14 +90,40 @@ namespace GlobalEvent.Models.OwnerViewModels
 
 		public static async Task Update (ApplicationDbContext _db, int ID)
 		{
+
 			Event e = await _db.Events
 				.Include(x => x.Tickets)
 				.Include(x => x.Types)
-				.Include(x => x.Products)
                 .Include(x => x.Orders)
+				.Include(X => X.Visitors)
 				.FirstOrDefaultAsync(x => x.ID == ID);
 
-			//TODO
+			e.RevFact = 0;
+			// Tickets
+			foreach (Ticket t in e.Tickets)
+			{
+				t.Sold = e.Orders
+					.Where(x => x.TicketType == t.Type).Sum(x => x.Amount);
+				t.CheckIned = e.Visitors
+					.Where(x => x.TicketType == t.Type && x.CheckIned).Count();
+				t.Registered = e.Visitors
+					.Where(x => x.TicketType == t.Type && x.Registered).Count();
+				e.RevFact += t.Sold * t.Price;
+			}
+
+			e.TicketsSold = e.Orders.Sum(x => x.Amount);
+
+			//VTypes
+			foreach (VType v in e.Types)
+			{
+				v.CheckIned = e.Visitors
+					.Where(x => x.Type == v.Name && x.CheckIned && !x.Deleted).Count();
+				v.Registered = e.Visitors
+					.Where(x => x.Type == v.Name && x.Registered && !x.Deleted).Count();
+			}
+
+			_db.Events.Update(e);
+			await _db.SaveChangesAsync();
 		}
 	}
 }

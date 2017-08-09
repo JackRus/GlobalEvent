@@ -2,6 +2,11 @@
 
 <h1> DASHBOARD</h1>
 
+<div class="text-center">
+	<a asp-action="Daashboard" class="btn mybtn bgBase">Refresh</a>
+	<a asp-action="ViewEvent" asp-route-ID="@Model.ID" class="btn mybtn bgBro">Edit</a>
+</div>
+
 @if(ViewBag.Message != null)
 {
 	<div id="tog" class="f-attention">@ViewBag.Message <br/>
@@ -34,7 +39,8 @@
 				<span class="dash-name">Ticket Sales: </span>
 				@Model.TicketLink
 				<br />
-
+				<span class="dash-name">Description: </span>
+				@Model.Description
 			</div>
 		</div>
 
@@ -49,9 +55,12 @@
 				{
 					<div> @t.Type - @t.Limit for $@t.Price </div>
 				}
-
-				<span class="dash-name">Sold Tickets: </span> <br />
-
+				<br />
+				<span class="dash-name">Attendance (CheckIn/Register/Sold): </span> <br />
+				@foreach (Ticket t in @Model.Tickets)
+				{
+					<div> @t.Type - @t.CheckIned / @t.Registered / @t.Sold </div>
+				}
 
 			</div>
 		</div>
@@ -62,8 +71,15 @@
 				VISITORS
 			</div>
 			<div class="dash-section">
-				<span class="dash-name">Name: </span>
-				@Model.Name 
+				<span class="dash-name">Types: </span> <br />
+				@foreach (VType v in @Model.Types)
+				{
+					<div> @v.Name - @(v.Free ? "Free" : "Paid") </div>
+				}
+				<span class="dash-name">Checked In: </span> @ViewBag.CheckIned <br />
+				<span class="dash-name">Registered: </span> @ViewBag.Registered <br />
+				<span class="dash-name">Total Expected: </span> @Model.TicketsSold <br />
+
 			</div>
 		</div>
 	</div>
@@ -85,13 +101,13 @@
 			</div>
 			<div class="dash-section">
 				<span class="dash-name">Revenue Planned: </span>
-				@Model.RevPlan 
+				$@Model.RevPlan 
 				<br />
 				<span class="dash-name">Revenue Fact: </span>
-				@Model.RevFact 
+				$@Model.RevFact 
 				<br />
 				<span class="dash-name">Fact / Plan: </span>
-				@(Model.RevFact / Model.RevPlan * 100)%
+				@(String.Format("{0:#.0}", Model.RevFact / Model.RevPlan * 100))%
 				<br />
 			</div>
 		</div>

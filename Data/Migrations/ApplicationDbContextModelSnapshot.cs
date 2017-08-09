@@ -313,6 +313,8 @@ namespace GlobalEvent.Data.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int>("Attendees");
+
                     b.Property<int>("Capacity");
 
                     b.Property<string>("DateEnd");
@@ -352,6 +354,8 @@ namespace GlobalEvent.Data.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int>("CheckIned");
+
                     b.Property<string>("Description");
 
                     b.Property<int>("EID");
@@ -362,7 +366,9 @@ namespace GlobalEvent.Data.Migrations
 
                     b.Property<decimal>("Price");
 
-                    b.Property<string>("Products");
+                    b.Property<int>("Registered");
+
+                    b.Property<int>("Sold");
 
                     b.Property<string>("Type")
                         .IsRequired();
@@ -379,6 +385,8 @@ namespace GlobalEvent.Data.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<int>("CheckIned");
+
                     b.Property<string>("Description");
 
                     b.Property<int>("EID");
@@ -393,6 +401,8 @@ namespace GlobalEvent.Data.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired();
+
+                    b.Property<int>("Registered");
 
                     b.HasKey("ID");
 

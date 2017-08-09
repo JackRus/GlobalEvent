@@ -27,6 +27,7 @@ namespace GlobalEvent.Models.OwnerViewModels
 		[RegularExpression(@"^[0-9]{1,5}$", ErrorMessage = "Only digits are allowed.")]
 		public int EID { get; set; }
 		public string Description { get; set; }
+		public int Attendees { get; set; }
 
 		public Product()
 		{

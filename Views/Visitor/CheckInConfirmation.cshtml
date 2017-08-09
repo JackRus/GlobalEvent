@@ -11,16 +11,8 @@
 		<br /><br />
 		<span style="font-weight: 400;"> Are You Regestered? </span>
 	</div>
-	<div>
-		
-		<div class="col-xs-6 nopad">
-			<a asp-action="PreCheckIn" asp-route-EID="@ViewBag.EID" class="btn mybtn bgBase" style="width: 100%;">
-			Yes
-		</a>
-		</div>
-		<div class="col-xs-6 nopad">
-			<a asp-action="PreRegister" asp-route-EID="@ViewBag.EID" class="btn mybtn bgBro" style="width: 100%;">
-			No
-		</a>
+	<div class="text-center m10-0-10-0">
+		<a asp-action="PreCheckIn" asp-route-EID="@ViewBag.EID" class="btn mybtn bgBase">Yes</a>
+		<a asp-action="PreRegister" asp-route-EID="@ViewBag.EID" class="btn mybtn bgBro">No</a>
 	</div>
 </div>

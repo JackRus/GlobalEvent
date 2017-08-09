@@ -28,13 +28,12 @@ namespace GlobalEvent.Models.VisitorViewModels
 		[Display(Name = "Order Number")]
 		public string OrderNumber { get; set; }
 
-		[Required]
 		[RegularExpression(@"^[0-9]+$", ErrorMessage = "Only digits are allowed.")]
 		[Display(Name = "Registration Number")]
 		public string RegistrationNumber { get; set; }
 
 		[Required]
-		[RegularExpression(@"^[0-9a-zA-z]+@[0-9a-zA-z].[a-zA-z]+$", ErrorMessage = "Not a valid email.")]
+		[RegularExpression(@"^[0-9a-zA-z]+@[0-9a-zA-z]+.[a-zA-z]+$", ErrorMessage = "Not a valid email.")]
 		[Display(Name = "Email")]
 		public string Email { get; set; }
 
@@ -48,7 +47,7 @@ namespace GlobalEvent.Models.VisitorViewModels
 		public string Extention { get; set; }
 
 		[Required]
-		[RegularExpression(@"^[a-zA-Z]+$", ErrorMessage = "Contains non Alphabetic characters.")]
+		[RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "Contains non Alphabetic characters.")]
 		public string Occupation { get; set; }
 
 		[Required]
