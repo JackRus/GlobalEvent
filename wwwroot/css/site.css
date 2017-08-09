@@ -883,3 +883,18 @@ td.line-space {
 {
     color: var(--colBase);
 }
+
+.dash-section{
+    border: 1px solid var(--colBro);
+    margin: 5px;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+.dash-head{
+    background-color: var(--colBro);
+    color: #fff;
+    margin: 15px 5px 5px 5px;
+    padding: 5px;
+    text-align: center;
+}

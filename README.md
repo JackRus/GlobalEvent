@@ -1,5 +1,5 @@
 # Global Event 
-Event Management Application. You can try the app [here](https://ge.jackrus.us)
+Event Management Application. You can try the app [here](http://ge.jackrus.us)
 
 ## Features:
 

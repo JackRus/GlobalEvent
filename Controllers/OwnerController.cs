@@ -31,8 +31,20 @@ namespace GlobalEvent.Controllers
 
         public async Task <IActionResult> Dashboard ()
         {
-            Event e = await _db.Events.FirstOrDefaultAsync(x => x.Status);
+            Event e = await _db.Events
+                .Include(x => x.Tickets)
+				.Include(x => x.Types)
+				.Include(x => x.Products)
+                .Include(x => x.Orders)
+                .Include(x => x.Visitors)
+                .FirstOrDefaultAsync(x => x.Status);
             // TODO Event.Update();
+            ViewBag.Active = e == null ? false : true;
+            if (ViewBag.Active)
+            {
+                //ViewBag.OrdersValue = _db.Orders
+                //    .Sum(x => x.EID == e.ID);           
+            }
             
             return View(e);
         }

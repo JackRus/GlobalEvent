@@ -1,7 +1,4 @@
 @model Event
-@{
-	Layout = "_NoBody";
-}
 
 <h1> DASHBOARD</h1>
 
@@ -11,39 +8,111 @@
         <a class="btn mybtn-sm-red tog inline m5-0-5-0" data-id="tog">OK</a>
     </div>
 }
+@if (ViewBag.Active)
+{
+	<div class="row mar5">
+		
+		<div class="col-sm-4 nopad">
+			<div class="dash-head">
+				EVENT
+			</div>
+			<div class="dash-section">
+				<span class="dash-name">Name: </span>
+				@Model.Name 
+				<br />
+				<span class="dash-name">ID: </span>
+				@Model.ID 
+				<br />
+				<span class="dash-name">Time frame: </span>
+				@Model.TimeStart, @Model.DateStart / @Model.TimeEnd, @Model.DateEnd
+				<br />
+				<span class="dash-name">Dates: </span>
+				@Model.TimeStart, @Model.DateStart / @Model.TimeEnd, @Model.DateEnd
+				<span class="dash-name">Eventbrite ID: </span>
+				@Model.EventbriteID
+				<br />
+				<span class="dash-name">Ticket Sales: </span>
+				@Model.TicketLink
+				<br />
 
-<div class="row mar5">
-	
-	<div class="col-sm-4 border mar5">
-		<div>
-			<span class="dash-name">Name: </span>
-			@Model.Name 
+			</div>
 		</div>
-		<div>
-			<span class="dash-name">Time frame: </span>
-			@Model.TimeStart, @Model.DateStart / @Model.TimeEnd, @Model.DateEnd
+
+		<!-- TICKETS -->
+		<div class="col-sm-4 nopad">
+			<div class="dash-head">
+				TICKETS
+			</div>
+			<div class="dash-section">
+				<span class="dash-name">Types: </span> <br />
+				@foreach (Ticket t in @Model.Tickets)
+				{
+					<div> @t.Type - @t.Limit for $@t.Price </div>
+				}
+
+				<span class="dash-name">Sold Tickets: </span> <br />
+
+
+			</div>
 		</div>
-		<div>
-			<span class="dash-name">Dates: </span>
-			@Model.TimeStart, @Model.DateStart / @Model.TimeEnd, @Model.DateEnd
+
+		<!-- VISITORS -->
+		<div class="col-sm-4 nopad">
+			<div class="dash-head">
+				VISITORS
+			</div>
+			<div class="dash-section">
+				<span class="dash-name">Name: </span>
+				@Model.Name 
+			</div>
 		</div>
 	</div>
 
-	<!-- TICKETS -->
-	<div class="col-sm-4 border mar5">
-		<div>
-			<span class="dash-name">Name: </span>
-			@Model.Name 
+	<div class="row mar5">
+		<div class="col-sm-4 nopad">
+			<div class="dash-head">
+				PRODUCTS / EVENTS
+			</div>
+			<div class="dash-section">
+				<span class="dash-name">Name: </span>
+				@Model.Name 
+			</div>
+		</div>
+
+		<div class="col-sm-4 nopad">
+			<div class="dash-head">
+				SALES
+			</div>
+			<div class="dash-section">
+				<span class="dash-name">Revenue Planned: </span>
+				@Model.RevPlan 
+				<br />
+				<span class="dash-name">Revenue Fact: </span>
+				@Model.RevFact 
+				<br />
+				<span class="dash-name">Fact / Plan: </span>
+				@(Model.RevFact / Model.RevPlan * 100)%
+				<br />
+			</div>
+		</div>
+
+		<div class="col-sm-4 nopad">
+			<div class="dash-head">
+				VISITORS REQUESTS
+			</div>
+			<div class="dash-section">
+				<span class="dash-name">Total Requests: </span>
+				@Model.Name 
+			</div>
 		</div>
 	</div>
-
-	<!-- VISITORS -->
-	<div class="col-sm-4 border mar5">
-		<div>
-			<span class="dash-name">Name: </span>
-			@Model.Name 
+}
+else
+{
+	<div class="row pad10 text-center">
+		<div class="f-attention">You have no ACTIVE event yet!
 		</div>
+		<br />
+		<a asp-action="Index" asp-controller="Owner" class="btn mybtn bgBase">OK</a>
 	</div>
-	
-
-</div>
+}
