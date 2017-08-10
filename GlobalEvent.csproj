@@ -1,16 +1,13 @@
-<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk.Web">
-
+﻿<Project ToolsVersion="15.0" Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <TargetFramework>netcoreapp1.0</TargetFramework>
-    
     <UserSecretsId>aspnet-GlobalEvent-53bc9b9d-9d6a-45d4-8429-2a2761773502</UserSecretsId>
   </PropertyGroup>
-
   <ItemGroup>
     <None Update="GlobalEvent.db" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
-  
   <ItemGroup>
+    <PackageReference Include="BuildBundlerMinifier" Version="2.4.337" />
     <PackageReference Include="Microsoft.AspNetCore" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.Cookies" Version="1.1.2" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.EntityFrameworkCore" Version="1.1.2" />
@@ -23,7 +20,7 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="1.1.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer.Design" Version="1.1.2" PrivateAssets="All" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="1.1.1" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="1.1.2"  />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="1.1.2" />
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="1.1.2" />
     <PackageReference Include="Microsoft.VisualStudio.Web.BrowserLink" Version="1.1.2" />
   </ItemGroup>

@@ -3,7 +3,7 @@
 <h1> DASHBOARD</h1>
 
 <div class="text-center">
-	<a asp-action="Daashboard" class="btn mybtn bgBase">Refresh</a>
+	<a asp-action="Dashboard" class="btn mybtn bgBase">Refresh</a>
 	<a asp-action="ViewEvent" asp-route-ID="@Model.ID" class="btn mybtn bgBro">Edit</a>
 </div>
 
@@ -76,9 +76,25 @@
 				{
 					<div> @v.Name - @(v.Free ? "Free" : "Paid") </div>
 				}
-				<span class="dash-name">Checked In: </span> @ViewBag.CheckIned <br />
-				<span class="dash-name">Registered: </span> @ViewBag.Registered <br />
-				<span class="dash-name">Total Expected: </span> @Model.TicketsSold <br />
+				<br />
+				<span class="dash-name">Checked In: </span> @ViewBag.CheckIned out of @ViewBag.Registered <br />
+				
+				<div class="chart-base"> 
+					<div class="chart" style="width:@(ViewBag.Registered != 0 ? ViewBag.CheckIned * 100 / ViewBag.Registered: 0)%;"> @(ViewBag.Registered != 0 ? ViewBag.CheckIned * 100 / ViewBag.Registered: 0)% </div>
+				</div>
+
+				<span class="dash-name">Registered: </span> @ViewBag.Registered out of @Model.TicketsSold <br />
+				
+				<div class="chart-base"> 
+					<div class="chart" style="width:@(Model.TicketsSold != 0 ? ViewBag.Registered * 100 / Model.TicketsSold : 0)%;"> 
+					@(Model.TicketsSold != 0 ? ViewBag.Registered * 100 / Model.TicketsSold : 0)% </div>
+				</div>
+
+				<span class="dash-name">Tickets Sold: </span> @Model.TicketsSold out of @ViewBag.AllTickets <br />
+				<div class="chart-base"> 
+					<div class="chart" style="width:@(ViewBag.AllTickets != 0 ? Model.TicketsSold * 100 / ViewBag.AllTickets : 0)%;"> 
+					@(ViewBag.AllTickets != 0 ? Model.TicketsSold * 100 / ViewBag.AllTickets : 0)% </div>
+				</div>
 
 			</div>
 		</div>
@@ -90,8 +106,12 @@
 				PRODUCTS / EVENTS
 			</div>
 			<div class="dash-section">
-				<span class="dash-name">Name: </span>
-				@Model.Name 
+				<span class="dash-name">Events: </span> <br />
+				@foreach (Product p in @Model.Products)
+				{
+					<div> @p.Name - @(p.Free ? "Free" : "Paid") - @p.DateStart, @p.TimeStart/@p.TimeEnd - @(p.Status ? "<span class='Base'>Active</span>" : "Inactive") </div>
+				}
+				<br />
 			</div>
 		</div>
 
@@ -107,8 +127,16 @@
 				$@Model.RevFact 
 				<br />
 				<span class="dash-name">Fact / Plan: </span>
-				@(String.Format("{0:#.0}", Model.RevFact / Model.RevPlan * 100))%
+				<div class="chart-base"> 
+					<div class="chart" style="width:@(ViewBag.AllTickets != 0 ? Model.TicketsSold * 100 / ViewBag.AllTickets : 0)%;"> 
+					@(Model.RevPlan != 0 ? Model.RevFact * 100 / Model.RevPlan : 0)% </div>
+				</div>
+
+				<span class="dash-name">Tickets Sold: </span>
+				@Model.TicketsSold
 				<br />
+
+
 			</div>
 		</div>
 
@@ -118,7 +146,7 @@
 			</div>
 			<div class="dash-section">
 				<span class="dash-name">Total Requests: </span>
-				@Model.Name 
+				0 
 			</div>
 		</div>
 	</div>

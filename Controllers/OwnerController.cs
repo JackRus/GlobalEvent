@@ -49,6 +49,15 @@ namespace GlobalEvent.Controllers
                 // Visitors
                 ViewBag.CheckIned = e.Visitors.Where(x => x.CheckIned).Count();
                 ViewBag.Registered = e.Visitors.Where(x => x.Registered).Count();
+
+                
+                // All tickets
+                ViewBag.AllTickets = 0;
+                foreach (Ticket t in e.Tickets)
+                {
+                    ViewBag.AllTickets += t.Limit;
+                }
+
             }
             
             return View(e);
