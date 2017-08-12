@@ -1,12 +1,12 @@
 @model ToDo
 
-<h2 class="text-center">ADD ToDo Item (COPY)</h2>
-<br />
+<h1>EDIT ToDo Item</h1>
 
 <form asp-action="Edit" autocomplete="off">
     <div class="form-group">
         <label asp-for="Done" class="control-label">Mark As Done</label> &nbsp
-        <input asp-for="Done" />
+        <span class="true-false" data-id="box1"></span>
+        <input asp-for="Done" class="eye" id="box1"/> &nbsp &nbsp
     </div>
 
     <div class="form-group">
@@ -35,8 +35,8 @@
 
     <input asp-for="ID" value="@Model.ID" class="eye" />
 
-    <div class="form-group">
-        <button type="submit" class="btn mybtn bgBase">ADD</button>
+    <div class="form-group text-center">
+        <button type="submit" class="btn mybtn bgBase">SAVE</button>
         <button type="reset" class="btn mybtn bgBro">RESET</button>
         <a asp-action="Index" class="btn mybtn bgRed">CANCEL</a>
     </div>

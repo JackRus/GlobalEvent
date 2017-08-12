@@ -1,5 +1,3 @@
-// Write your Javascript code.
-
 /////////////////////
 //    Tickets
 /////////////////////
@@ -65,6 +63,10 @@ $(document).ready(function() {
 		//render : "table",
 		text   : number
 	});
+
+	$(":checkbox:checked").each(function() {
+		$("[data-id=" + $(this).attr('id') + "]").html('X').removeClass('true-false').addClass('true-false-checked');
+	}); 
 });
 
 /////////////////////
@@ -75,6 +77,10 @@ $('.questions').click(function(){
    $('#'+$(this).data('id')).toggle(); 
 });
 
+/////////////////////
+//    Toggles
+/////////////////////
+
 $('.tog').click(function(){
    $('#'+$(this).data('id')).toggle(); 
 });
@@ -82,4 +88,26 @@ $('.tog').click(function(){
 $("#ok").click(function(){
    $("#understand").addClass("eye"); 
    $("#understood").removeClass("eye");
+});
+
+$('.copy').on('change',function(){
+   $('#'+$(this).data('id')).attr('asp-route-ID', $(this).val()); 
+   $('#'+$(this).data('id')).attr('asp-route-Name', $(this).data('name')); 
+});
+
+/////////////////////
+//    Check-Box
+/////////////////////
+
+$('.true-false').click(function(){
+	if ($('#'+$(this).data('id')).is(':checked')) 
+	{
+		$(this).html('').removeClass('true-false-checked').addClass('true-false');
+		$('#'+$(this).data('id')).prop('checked', false);
+	}
+	else
+	{
+		$(this).html('X').removeClass('true-false').addClass('true-false-checked');
+		$('#'+$(this).data('id')).prop('checked', true)
+	}
 });

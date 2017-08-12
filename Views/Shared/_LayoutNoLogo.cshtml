@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GlobalEvent</title>
+    <title>@ViewData["Title"] - GlobalEvent</title>
 
     <environment names="Development">
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
@@ -17,16 +17,35 @@
     </environment>
 </head>
 <body>
-    <div class="logo">
-		<a href="/Home/Index">
-			<img src="~/img/logo-long.png" alt="GE Logo" width="150px;" style="max-width: 100%; height: auto;">
-		</a>
-	</div>
-    <div class="container body-content">
-        @RenderBody()
+    <div class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">GlobalEvent</a>
+            </div>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav">
+                    <li><a asp-controller="Owner" asp-action="Dashboard">Dashboard</a></li>
+                    <li><a asp-controller="Owner" asp-action="Index">Owner</a></li>
+                    <li><a asp-controller="Todo" asp-action="Index">ToDo</a></li>
+                    <li><a asp-controller="Admin" asp-action="Dashboard">Admin</a></li>
+                </ul>
+                @await Html.PartialAsync("_LoginPartial")
+            </div>
+        </div>
     </div>
 
-    <button type="button" id="admin" onclick="window.open('/Owner/Index','_self')">ADMIN</button>
+    <div class="container body-content">
+        @RenderBody()
+        
+        <footer>
+        </footer>
+    </div>
 
     <environment names="Development">
         <script src="~/lib/jquery/dist/jquery.js"></script>
@@ -48,6 +67,7 @@
         <script src="~/js/site.min.js" asp-append-version="true"></script>
     </environment> 
 
-    @RenderSection("scripts", required: false)
+    @RenderSection("scripts", required: false) 
+
 </body>
 </html>

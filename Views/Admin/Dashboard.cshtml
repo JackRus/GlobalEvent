@@ -1,0 +1,173 @@
+@model Event
+
+<h1> Admin DASHBOARD </h1>
+
+<div class="text-center">
+	<a asp-action="Dashboard" class="btn mybtn bgBase">Refresh</a>
+	<a class="btn mybtn bgBro tog" data-id="search">SEARCH VISITOR</a>	
+	<a asp-action="" class="btn mybtn bgBro">ADD VISITOR</a>
+	<a asp-action="" class="btn mybtn bgBro">ADD ORDER</a>
+</div>
+<div id="search" class="eye pad20 mar20 border">
+	<!-- BY ID -->
+	<div class="text-center m5-0">
+		<label class="label-admin">By ID</label> &nbsp
+		<input class="input-admin copy" type="number" data-id="VID" data-name="ID" />
+		<a asp-action="Search" asp-route-ID="" asp-route-Name="" class="btn mybtn bgAccent" id="VID" style="vertical-align: top;">SEARCH</a>
+	</div>
+	
+	<!-- BY NAME -->
+	<div class="text-center m5-0-5-0">
+		<label class="label-admin">By Name</label> &nbsp
+		<input class="input-admin copy" type="text" data-id="Name" data-name="Name" />
+		<a asp-action="Search" asp-route-ID="" asp-route-Name="" class="btn mybtn bgAccent" id="Name" style="vertical-align: top;">SEARCH</a>
+	</div>
+
+	<!-- BY LAST NAME -->
+	<div class="text-center m5-0-5-0">
+		<label class="label-admin">By Last Name</label> &nbsp
+		<input class="input-admin copy" type="text" data-id="Last" data-name="Last" />
+		<a asp-action="Search" asp-route-ID="" asp-route-Name="" class="btn mybtn bgAccent" id="Last" style="vertical-align: top;">SEARCH</a>
+	</div>
+
+	<!-- BY ORDER # -->
+	<div class="text-center m5-0-5-0">
+		<label class="label-admin">By Order #</label> &nbsp
+		<input class="input-admin copy" type="number" data-id="Order" data-name="Order" />
+		<a asp-action="Search" asp-route-ID="" asp-route-Name="" class="btn mybtn bgAccent" id="Order" style="vertical-align: top;">SEARCH</a>
+	</div>
+
+	<!-- BY Registration # -->
+	<div class="text-center m5-0-5-0">
+		<label class="label-admin">By Reg. #</label> &nbsp
+		<input class="input-admin copy" type="number" data-id="RegNumber" data-name="RegNumber" />
+		<a asp-action="Search" asp-route-ID="" asp-route-Name="" class="btn mybtn bgAccent" id="RegNumber" style="vertical-align: top;">SEARCH</a>
+	</div>
+
+</div>
+
+@if(ViewBag.Message != null)
+{
+	<div id="tog" class="f-attention">@ViewBag.Message <br/>
+        <a class="btn mybtn-sm-red tog inline m5-0-5-0" data-id="tog">OK</a>
+    </div>
+}
+@if (ViewBag.Active)
+{
+	<div class="row mar5">
+		
+		<div class="col-sm-4 nopad">
+			<div class="dash-head tog" data-id="event">
+				EVENT
+			</div>
+			<div class="dash-section" id="event">
+				<span class="dash-name">Name: </span>
+				@Model.Name 
+				<br />
+			
+				<span class="dash-name">Time frame: </span>
+				@Model.TimeStart, @Model.DateStart / @Model.TimeEnd, @Model.DateEnd
+				<br />
+				
+				<span class="dash-name">Ticket Sales: </span>
+				@Model.TicketLink
+				<br />
+
+				<span class="dash-name">Description: </span>
+				@Model.Description
+			</div>
+
+			<div class="dash-head tog" data-id="product">
+				PRODUCTS / EVENTS
+			</div>
+			<div class="dash-section eye" id="product">
+				<span class="dash-name">Events: </span> <br />
+				@foreach (Product p in @Model.Products)
+				{
+					<div> @p.Name - @(p.Free ? "Free" : "Paid") - @p.DateStart, @p.TimeStart/@p.TimeEnd - @(p.Status ? "<span class='Base'>Active</span>" : "Inactive") </div>
+				}
+				<br />
+			</div>
+
+		</div>
+		
+
+		<div class="col-sm-4 nopad">
+			<div class="dash-head tog" data-id="ticket">
+				TICKETS
+			</div>
+			<div class="dash-section" id="ticket">
+				<span class="dash-name">Types: </span> <br />
+				@foreach (Ticket t in @Model.Tickets)
+				{
+					<div> @t.Type - @t.Limit for $@t.Price </div>
+				}
+				<br />
+				<span class="dash-name">Attendance (CheckIn/Register/Sold): </span> <br />
+				@foreach (Ticket t in @Model.Tickets)
+				{
+					<div> @t.Type - @t.CheckIned / @t.Registered / @t.Sold </div>
+				}
+
+				<span class="dash-name">Tickets Sold: </span>
+				@Model.TicketsSold
+				<br />
+
+			</div>	
+
+			<div class="dash-head tog" data-id="request">
+				VISITORS REQUESTS
+			</div>
+			<div class="dash-section eye" id="request">
+				<span class="dash-name">Total Requests: </span>
+				0 
+			</div>
+		</div>
+		<div class="col-sm-4 nopad">
+			<div class="dash-head tog" data-id="visitor">
+				VISITORS
+			</div>
+			<div class="dash-section" id="visitor">
+				<span class="dash-name">Types: </span> <br />
+				@foreach (VType v in @Model.Types)
+				{
+					<div> @v.Name - @(v.Free ? "Free" : "Paid") </div>
+				}
+				<br />
+				<span class="dash-name">Checked In: </span> @ViewBag.CheckIned out of @ViewBag.Registered <br />
+				
+				<div class="chart-base"> 
+					<div class="chart" style="width:@(ViewBag.Registered != 0 ? ViewBag.CheckIned * 100 / ViewBag.Registered: 0)%;"> @(ViewBag.Registered != 0 ? ViewBag.CheckIned * 100 / ViewBag.Registered: 0)% </div>
+				</div>
+
+				<span class="dash-name">Registered: </span> @ViewBag.Registered out of @Model.TicketsSold <br />
+				
+				<div class="chart-base"> 
+					<div class="chart" style="width:@(Model.TicketsSold != 0 ? ViewBag.Registered * 100 / Model.TicketsSold : 0)%;"> 
+					@(Model.TicketsSold != 0 ? ViewBag.Registered * 100 / Model.TicketsSold : 0)% </div>
+				</div>
+
+				<span class="dash-name">Tickets Sold: </span> @Model.TicketsSold out of @ViewBag.AllTickets <br />
+				<div class="chart-base"> 
+					<div class="chart" style="width:@(ViewBag.AllTickets != 0 ? Model.TicketsSold * 100 / ViewBag.AllTickets : 0)%;"> 
+					@(ViewBag.AllTickets != 0 ? Model.TicketsSold * 100 / ViewBag.AllTickets : 0)% </div>
+				</div>
+
+			</div>	
+		</div>
+	</div>
+
+}
+else
+{
+	<div class="row pad10 text-center">
+		<div class="f-attention">You have no ACTIVE event yet!
+		</div>
+		<br />
+		<a asp-action="Index" asp-controller="Owner" class="btn mybtn bgBase">OK</a>
+	</div>
+}
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

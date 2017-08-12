@@ -25,7 +25,7 @@ else
 	
 	@if (ViewBag.Active != null)
 	{
-		<div class="events-number-container" style="border-bottom: 1px solid var(--colBase);">
+		<div class="events-number-container" style="border-bottom: 1px solid #3cb371;">
             <span class="events-number bgBase">ACTIVE</span>
         </div>
 		<a asp-action="ViewEvent" asp-route-id="@ViewBag.Active.ID" class="btn btn-events bgBase">
@@ -50,7 +50,7 @@ else
 	@if (archived.Count != 0)
 	{
 		<br />
-		<div class="events-number-container">
+		<div class="events-number-container" style="border-bottom: 1px solid gray">
             <span class="events-number bgGray">ARCHIVED</span>
         </div>
 		@foreach (Event e in archived)

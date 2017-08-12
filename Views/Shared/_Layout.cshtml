@@ -33,6 +33,7 @@
                     <li><a asp-controller="Owner" asp-action="Dashboard">Dashboard</a></li>
                     <li><a asp-controller="Owner" asp-action="Index">Owner</a></li>
                     <li><a asp-controller="Todo" asp-action="Index">ToDo</a></li>
+                    <li><a asp-controller="Admin" asp-action="Dashboard">Admin</a></li>
                 </ul>
                 @await Html.PartialAsync("_LoginPartial")
             </div>
@@ -67,7 +68,7 @@
         <!-- <script src='~/lib/qrcode/jquery.qrcode.js'></script>
         <script src='~/lib/qrcode/qrcode.js'></script> -->
         <script src="~/js/site.min.js" asp-append-version="true"></script>
-    </environment>
+    </environment> 
 
     @RenderSection("scripts", required: false) 
 

@@ -33,9 +33,6 @@ namespace GlobalEvent.Controllers
         {
             Event e = await _db.Events
                 .Include(x => x.Tickets)
-				.Include(x => x.Types)
-				.Include(x => x.Products)
-                .Include(x => x.Orders)
                 .Include(x => x.Visitors)
                 .FirstOrDefaultAsync(x => x.Status);
 

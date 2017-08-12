@@ -1,0 +1,39 @@
+@model Search
+
+<div id="search" class="eye pad20 mar20 border">
+	<!-- BY ID -->
+	<div class="text-center m5-0">
+		<label class="label-admin">By ID</label> &nbsp
+		<input asp-for="ID" class="input-admin copy" data-id="VID" data-name="ID" />
+		<a asp-action="Search" asp-route-ID="" asp-route-Name="" class="btn mybtn bgAccent" id="VID" style="vertical-align: top;">SEARCH</a>
+	</div>
+	
+	<!-- BY NAME -->
+	<div class="text-center m5-0-5-0">
+		<label class="label-admin">By Name</label> &nbsp
+		<input class="input-admin copy" type="text" data-id="Name" data-name="Name" />
+		<a asp-action="Search" asp-route-ID="" asp-route-Name="" class="btn mybtn bgAccent" id="Name" style="vertical-align: top;">SEARCH</a>
+	</div>
+
+	<!-- BY LAST NAME -->
+	<div class="text-center m5-0-5-0">
+		<label class="label-admin">By Last Name</label> &nbsp
+		<input class="input-admin copy" type="text" data-id="Last" data-name="Last" />
+		<a asp-action="Search" asp-route-ID="" asp-route-Name="" class="btn mybtn bgAccent" id="Last" style="vertical-align: top;">SEARCH</a>
+	</div>
+
+	<!-- BY ORDER # -->
+	<div class="text-center m5-0-5-0">
+		<label class="label-admin">By Order #</label> &nbsp
+		<input class="input-admin copy" type="number" data-id="Order" data-name="Order" />
+		<a asp-action="Search" asp-route-ID="" asp-route-Name="" class="btn mybtn bgAccent" id="Order" style="vertical-align: top;">SEARCH</a>
+	</div>
+
+	<!-- BY Registration # -->
+	<div class="text-center m5-0-5-0">
+		<label class="label-admin">By Reg. #</label> &nbsp
+		<input class="input-admin copy" type="number" data-id="RegNumber" data-name="RegNumber" />
+		<a asp-action="Search" asp-route-ID="" asp-route-Name="" class="btn mybtn bgAccent" id="RegNumber" style="vertical-align: top;">SEARCH</a>
+	</div>
+
+</div>

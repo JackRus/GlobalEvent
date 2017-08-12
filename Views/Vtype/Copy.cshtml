@@ -12,9 +12,12 @@
 
     <div class="form-group">
         <label asp-for="Free" class="control-label"></label>&nbsp
-        <input asp-for="Free" /> &nbsp &nbsp
+        <span class="true-false" data-id="box1"></span>
+        <input asp-for="Free" class="eye" id="box1"/> &nbsp &nbsp
+
         <label asp-for="Limited" class="control-label"></label>&nbsp
-        <input asp-for="Limited" />
+        <span class="true-false" data-id="box2"></span>
+        <input asp-for="Limited" class="eye" id="box2"/>     
     </div>
   
     <div class="form-group">
@@ -31,7 +34,7 @@
 
     <input asp-for="EID" value="@Model.EID" class="form-control eye" />
 
-    <div class="form-group">
+    <div class="form-group text-center">
         <button type="submit" class="btn mybtn bgBase">ADD</button>
         <button type="reset" class="btn mybtn bgBro">RESET</button>
         <a asp-action="Index" asp-route-ID="@Model.EID" class="btn mybtn bgRed">CANCEL</a>

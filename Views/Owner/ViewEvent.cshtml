@@ -11,7 +11,7 @@
 
 <div class="row">
     <div class="col-md-6">
-        <div class="stat-name" style="background-color: @(Model.Status ? "var(--colBase)" : "grey"); color: #fff; border-bottom: none;">Status: <span class="stat">@(Model.Status ? "ACTIVE" : "INACTIVE")</span></div>
+        <div class="stat-name" style="background-color: @(Model.Status ? "#3cb371" : "grey"); color: #fff; border-bottom: none;">Status: <span class="stat">@(Model.Status ? "ACTIVE" : "INACTIVE")</span></div>
     </div>
 
     <div class="col-md-6">
@@ -131,9 +131,9 @@
     </div>
 </div>
 
-<br />
-
-<a asp-action="Events" class="btn mybtn bgBase">BACK</a>
-<a asp-action="EditEvent" asp-route-id="@Model.ID" class="btn mybtn bgBro">EDIT</a>
-<a asp-action="DeleteEvent" asp-route-id="@Model.ID" class="btn mybtn bgRed">DELETE</a>
+<div class="text-center m20-0-20-0">
+    <a asp-action="Events" class="btn mybtn bgBase">BACK</a>
+    <a asp-action="EditEvent" asp-route-id="@Model.ID" class="btn mybtn bgBro">EDIT</a>
+    <a asp-action="DeleteEvent" asp-route-id="@Model.ID" class="btn mybtn bgRed">DELETE</a>
+</div>
 

@@ -24,6 +24,10 @@ namespace GlobalEvent.Controllers
                 .Where(x => !x.Done)
                 .OrderByDescending(x => x.Deadline)
                 .ToList();
+            ViewBag.Done = _db.ToDos
+                .Where(x => x.Done)
+                .OrderByDescending(x => x.Deadline)
+                .ToList();
             return View();
         }
 

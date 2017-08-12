@@ -121,10 +121,10 @@
 			</div>
 			<div class="dash-section">
 				<span class="dash-name">Revenue Planned: </span>
-				$@Model.RevPlan 
+				$@(String.Format("{0:0,0.00}", Model.RevPlan))
 				<br />
 				<span class="dash-name">Revenue Fact: </span>
-				$@Model.RevFact 
+				$@(String.Format("{0:0,0.00}", Model.RevFact))
 				<br />
 				<span class="dash-name">Fact / Plan: </span>
 				<div class="chart-base"> 

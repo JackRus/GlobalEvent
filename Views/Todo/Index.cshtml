@@ -1,5 +1,16 @@
 <h1>ALL ToDo Items</h1>
 
+<div class="text-center">
+	<a asp-action="AddFull" class="btn mybtn bgBro">ADD</a>
+	<a asp-action="Index" asp-controller="Owner" class="btn mybtn bgBase">BACK</a>
+	@if (ViewBag.Todos.Count != 0) 
+	{
+		<a asp-action="DeleteAll" class="btn mybtn bgRed">DELETE ALL</a>
+	}
+</div>
+<br />
+
+
 <div style="width: 100%">
 @if (ViewBag.Todos.Count != 0)
 {
@@ -40,18 +51,54 @@
 		</tbody>
 	</table>
 }
-else
+
+<br />
+<h3 class="text-center m20-0-20-0">Completed ToDo Items</h3>
+<br />
+
+@if (ViewBag.Done.Count != 0)
+{
+	<table class="table table-hover width700 Gray">
+		<thead>
+			<tr>
+				<th>Task</th>
+				<th>Deadline</th>
+				<th>Event ID</th>
+				<th>Comments</th>
+				<th></th>
+			</tr>
+		</thead>
+
+		<tbody>
+			<tr style="height: 4px;">
+					<td colspan="20" class="line-space"></td>
+			</tr>
+			@foreach(ToDo t in ViewBag.Done)
+			{
+				<tr>
+					<td>@t.Task</td>
+					<td>@t.Deadline</td>
+					<td>@t.EID</td>
+					<td>@t.Comments</td>
+					<td class="text-right">
+						<a asp-action="Copy" asp-route-ID="@t.ID" class="Gray">Copy</a> | 
+
+						<a asp-action="Edit" asp-route-ID="@t.ID" class="Gray">Edit</a> | 
+					
+						<a asp-action="Delete" asp-route-ID="@t.ID" class="Gray">Delete</a>
+					</td>
+				</tr>
+				<tr style="height: 4px;">
+					<td colspan="20" class="line-space"></td>
+				</tr>
+			}
+		</tbody>
+	</table>
+}
+
+@if (ViewBag.Todos.Count == 0 && ViewBag.Done.Count == 0)
 {
 	<div class="f-info">You have no ToDo Items yet.</div>
 }
-	<br />
-	<div class="text-center">
-		<a asp-action="AddFull" class="btn mybtn bgBro">ADD</a>
-		<a asp-action="Index" asp-controller="Owner" class="btn mybtn bgBase">BACK</a>
 
-		@if (ViewBag.Todos.Count != 0) 
-		{
-			<a asp-action="DeleteAll" class="btn mybtn bgRed">DELETE ALL</a>
-		}
-	</div>
 </div>
