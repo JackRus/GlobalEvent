@@ -26,99 +26,50 @@ body {
     padding-left: 0.5em;
 }
 
-
 /* Hide/rearrange for smaller screens */
 
 @media screen and (max-width: 767px) {
     /* Hide captions */
-    .carousel-caption {
-        display: none;
-    }
+    .carousel-caption {display: none;}
 }
-
 
 /*	--------------------------------------------------
 	---------------------MY STYLE---------------------
 	-------------------------------------------------- */
 
-
 /******************          
         VARS
 ******************/
 
- /* 
- :root {
+ /* :root
     --colBase: #3cb371;
     --colBro: #6495ed;
     --colGray: gray;
     --colAccent: blueviolet;
     --colContrast: blue;
     --colRed: #d02218;
-
     --radBig: 4px;
     --radSmall: 2px;
-    --radButton: 0px;
-}  
+    --radButton: 0px;  
 */
 
-
 /* BACKGROUND COLORS */
-
-.bgRed {
-    background-color: #d02218;
-}
-
-.bgBase {
-    background-color: #3cb371;
-}
-
-.bgBro {
-    background-color: #6495ed;
-}
-
-.bgGray {
-    background-color: gray;
-}
-
-.bgAccent {
-    background-color: blueviolet;
-}
-
-.bgContrast {
-    background-color: blue;
-}
-
-
+.bgRed {background-color: #d02218;}
+.bgBase {background-color: #3cb371;}
+.bgBro {background-color: #6495ed;}
+.bgGray {background-color: gray;}
+.bgAccent {background-color: blueviolet;}
+.bgContrast {background-color: blue;}
 /* END OF BACKGROUND COLORS */
 
 
 /* FONT COLORS */
-
-.Red {
-    color: #d02218;
-}
-
-.Base {
-    color: #3cb371;
-}
-
-.Bro {
-    color: #6495ed;
-}
-
-.Gray {
-    color: gray;
-}
-
-.Accent {
-    color: blueviolet;
-}
-
-.Contrast {
-    color: blue;
-}
-
-
+.Red {color: #d02218;}
+.Base {color: #3cb371;}
+.Bro {color: #6495ed;}
+.Gray {color: gray;}
+.Accent {color: blueviolet;}
+.Contrast {color: blue;}
 /* END OF FONT COLORS */
 
 
@@ -142,11 +93,7 @@ body {
     background-color: #6495ed;
 }
 
-.col-sm-3 {
-    text-align: center;
-}
-
-
+.col-sm-3 {text-align: center;}
 /* END OF BUTTONS */
 
 
@@ -166,6 +113,7 @@ h1, h2 {
 h3, h4, h5, h6 {
     font-style: normal;
     font-weight: 400;
+    text-align: center;
 }
 
 .f-attention {
@@ -208,81 +156,27 @@ h3, h4, h5, h6 {
     display: block;
     letter-spacing: 2px;
 }
-
-
 /* END OF FONTS */
 
-
 /* SPACING */
-
-.nopad {
-    padding: 0px;
-}
-
-.nomar {
-    margin: 0px;
-}
-
-.p5-0-5-0 {
-    padding: 5px 0px 5px 0px;
-}
-
-.p10-0-10-0 {
-    padding: 10px 0px 10px 0px;
-}
-
-.p20-0-20-0 {
-    padding: 20px 0px 20px 0px;
-}
-
-.pad5 {
-    padding: 5px;
-}
-
-.pad10 {
-    padding: 10px;
-}
-
-.pad20 {
-    padding: 20px;
-}
-
-.mar5 {
-    margin: 5px;
-    box-sizing: border-box;
-}
-
-.mar10 {
-    margin: 10px;
-}
-
-.mar20 {
-    margin: 20px;
-}
-
-.m5-0-5-0 {
-    margin: 5px 0px;
-}
-
-.m10-0-10-0 {
-    margin: 10px 0px;
-}
-
-.m15-0 {
-    margin: 15px 0px;
-}
-
-.m20-0-20-0 {
-    margin: 20px 0px 20px 0px;
-}
+.nopad {padding: 0px;}
+.nomar {margin: 0px;}
+.p5-0-5-0 {padding: 5px 0px;}
+.p10-0-10-0 {padding: 10px 0px;}
+.p20-0-20-0 {padding: 20px 0px;}
+.pad5 {padding: 5px;}
+.pad10 {padding: 10px;}
+.pad20 {padding: 20px;}
+.mar5 {margin: 5px;}
+.mar10 {margin: 10px;}
+.mar20 {margin: 20px;}
+.m5-0-5-0 {margin: 5px 0px;}
+.m10-0-10-0 {margin: 10px 0px;}
+.m15-0 {margin: 15px 0px;}
+.m20-0-20-0 {margin: 20px 0px;}
 
 
 /* FORMS */
-
-input[type="checkbox"] {
-    font-size: xx-large;
-}
-
 .form-control {
     /* center form controls */
     display: block;
@@ -319,16 +213,10 @@ select:-webkit-autofill {
     max-width: 400px;
 }
 
-
 /* Align Center Content */
-
-#form-conteiner {
-    text-align: center;
-}
-
+#form-conteiner {text-align: center;}
 
 /* Padding for forms */
-
 fieldset {
     padding-top: 10px;
     padding-bottom: 10px;
@@ -336,7 +224,6 @@ fieldset {
 
 
 /* Select Border radius O */
-
 select {
     -webkit-appearance: none;
     -webkit-border-radius: 0px;
@@ -414,8 +301,6 @@ label {
     width: 100%;
     margin: 10px auto 5px auto;
 }
-
-
 /* END OF FORMS */
 
 
@@ -423,7 +308,6 @@ label {
 
 
 /* BUTTONS FOR TABLES*/
-
 .mybtn-sm-base {
     padding: 2px;
     display: block;
@@ -435,12 +319,6 @@ label {
     font-size: 0.8em;
     margin-bottom: 5px;
     min-width: 40px;
-    /* box-shadow: 
-        0px 2px 10px rgba(0,0,0,.3), 
-        0px 0px 1px rgba(0,0,0,.1), 
-        inset 0px 1px 0px rgba(255,255,255,.25), 
-        inset 0px -1px 0px rgba(0,0,0,.15); */
-    
 }
 
 .mybtn-sm-base:hover {
@@ -459,18 +337,9 @@ label {
     color: #6495ed;
     background-color: #fff;
     min-width: 40px;
-    /* box-shadow: 
-        0px 2px 10px rgba(0,0,0,.3), 
-        0px 0px 1px rgba(0,0,0,.1), 
-        inset 0px 1px 0px rgba(255,255,255,.25), 
-        inset 0px -1px 0px rgba(0,0,0,.15); */
 }
 
-.mybtn-sm-bro:hover {
-    color: #fff;
-    background-color: #6495ed;
-}
-
+.mybtn-sm-bro:hover {color: #fff; background-color: #6495ed;}
 .mybtn-sm-red {
     padding: 2px;
     display: block;
@@ -482,18 +351,9 @@ label {
     font-size: 0.8em;
     margin-bottom: 5px;
     min-width: 40px;
-    /* box-shadow: 
-        0px 2px 10px rgba(0,0,0,.3), 
-        0px 0px 1px rgba(0,0,0,.1), 
-        inset 0px 1px 0px rgba(255,255,255,.25), 
-        inset 0px -1px 0px rgba(0,0,0,.15); */
 }
 
-.mybtn-sm-red:hover {
-    background-color: #d02218;
-    color: #fff;
-}
-
+.mybtn-sm-red:hover {background-color: #d02218; color: #fff;}
 .mybtn {
     border-radius: 0px;
     border: 0px solid blueviolet;
@@ -508,10 +368,7 @@ label {
         inset 0px -1px 0px rgba(0,0,0,.15);
 }
 
-.mybtn:hover {
-    filter: brightness(120%);
-
-}
+.mybtn:hover {filter: brightness(120%);}
 
 .mybtn-clear {
     border: 0px solid #fff;
@@ -546,11 +403,7 @@ label {
         inset 0px -1px 0px rgba(0,0,0,.15);
 }
 
-.btn-home:hover {
-    box-shadow: 0 0 14px #666;
-    color: #fff;
-}
-
+.btn-home:hover {box-shadow: 0 0 14px #666; color: #fff;}
 .btn-events {
     padding: 10px;
     display: block;
@@ -571,14 +424,7 @@ label {
         inset 0px -1px 0px rgba(0,0,0,.15);
 }
 
-.btn-events:hover {
-    /* border: 0px solid #3cb371; */
-    box-shadow: 0 0 10px #666;
-    color: #fff;
-}
-
-
-
+.btn-events:hover {box-shadow: 0 0 10px #666; color: #fff;}
 .event-future {
     padding: 10px;
     display: block;
@@ -595,33 +441,22 @@ label {
 
 #admin {
     position: fixed;
-    /* Fixed/sticky position */
     bottom: 10px;
-    /* Place the button at the bottom of the page */
     right: 10px;
-    /* Place the button 30px from the right */
     z-index: 99;
-    /* Make sure it does not overlap */
     border: 1px solid rgba(131, 128, 128, 0.38);
     outline: none;
-    /* Remove outline */
     background-color: transparent;
-    /* Set a background color */
     color: rgba(131, 128, 128, 0.38);
-    /* Text color */
     cursor: pointer;
-    /* Add a mouse pointer on hover */
     padding: 3px 5px;
-    /* Some padding */
     border-radius: 0px;
-    /* Rounded corners */
     transition: all .5s ease;
 }
 
 #admin:hover {
     border: 1px solid rgba(131, 128, 128, 1);
     background-color: gray;
-    /* Add a dark-grey background on hover */
     color: #fff
 }
 
@@ -654,7 +489,6 @@ label {
 
 
 /* BTN GLOW */
-
 .btn:focus {
     outline: none;
     outline-offset: 0px;
@@ -663,7 +497,6 @@ label {
 
 
 /* menu page buttons */
-
 .i-block {
     width: 300px;
     height: 100px;
@@ -740,8 +573,6 @@ label {
     padding: 4px 8px;
     margin: 10px 0px;
 }
-
-
 /*         END BUTTONS        */
 
 .c-c {
@@ -759,13 +590,8 @@ label {
     font-weight: 300;
 }
 
-
 /**************/
-
-
 /*  PRINTING  */
-
-
 /**************/
 
 @media print {
@@ -813,17 +639,12 @@ label {
 
 /*   END OF PRINTING   */
 
-.eye {
-    display: none;
-}
+.eye {display: none;}
 
-.border {
-    border: 1px solid blue;
-}
+.border {border: 1px solid blue;}
 
 
 /*  PICS  */
-
 .logo {
     position: fixed;
     top: 20px;
@@ -841,14 +662,8 @@ label {
     font-size: 1.5em;
 }
 
-.todo-com {
-    color: gray;
-}
-
-.todo {
-    color: #d02218;
-}
-
+.todo-com {color: gray;}
+.todo {color: #d02218;}
 .badge-todo {
     display: inline-block;
     min-width: 10px;
@@ -864,17 +679,12 @@ label {
     float: right;
 }
 
-.px60 {
-    width: 60px;
-}
+.px60 {width: 60px;}
 
-.inline {
-    display: inline-block;
-}
+.inline {display: inline-block;}
 
 /* DO NOT USE THIS NAMES*/
 /*      .tog {}         */
-
 
 /* ViewEvent PAGE */
 .stat-name
@@ -920,7 +730,6 @@ label {
     color: #fff;
     background-color: #6495ed;
 }
-
 /* END OF VIEW EVENT PAGE*/
 
 
@@ -929,18 +738,10 @@ td.line-space {
     background-color: gainsboro;
 }
 
-.width700
-{
-    max-width: 800px;
-    margin: 0 auto;
-}
+.width700 {max-width: 800px; margin: 0 auto;}
 
 /* DASHBOARD */
-.dash-name
-{
-    color: #3cb371;
-}
-
+.dash-name {color: #3cb371;}
 .dash-section{
     border: 1px solid #6495ed;
     margin: 0px 5px;
@@ -956,8 +757,7 @@ td.line-space {
     text-align: center;
 }
 
-.chart-base
-{
+.chart-base {
 	display: block;
 	width: 100%;
 	background-color: lightgrey;
@@ -965,8 +765,7 @@ td.line-space {
 	height: 28px;
 }
 
-.chart
-{
+.chart {
 	background-color: #3cb371;
     height: 26px;
     line-height: 26px;
@@ -1012,8 +811,7 @@ td.line-space {
     color: #fff;
 }
 
-.input-admin
-{
+.input-admin {
     display: inline-block;
     max-width: 400px;
     border-radius: 0px;
@@ -1026,9 +824,7 @@ td.line-space {
     padding: 5px;
 }
 
-.input-admin:focus {
-    outline: 0;
-}
+.input-admin:focus {outline: 0;}
 
 .label-admin
 {
@@ -1039,8 +835,7 @@ td.line-space {
     margin: 0px 10px;
 }
 
-.true-false
-{
+.true-false {
     height: 30px;
     width: 30px;
     display: inline-block;
@@ -1050,8 +845,8 @@ td.line-space {
     cursor: pointer;
     vertical-align: middle;
 }
-.true-false-checked
-{
+
+.true-false-checked {
     height: 30px;
     width: 30px;
     display: inline-block;
