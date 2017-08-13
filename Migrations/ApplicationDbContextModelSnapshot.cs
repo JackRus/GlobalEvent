@@ -5,13 +5,12 @@ using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using GlobalEvent.Data;
 
-namespace GlobalEvent.Data.Migrations
+namespace GlobalEvent.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170809013240_1")]
-    partial class _1
+    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
             modelBuilder
                 .HasAnnotation("ProductVersion", "1.1.2");
@@ -223,6 +222,12 @@ namespace GlobalEvent.Data.Migrations
                         .HasMaxLength(256);
 
                     b.Property<bool>("EmailConfirmed");
+
+                    b.Property<string>("FirstName");
+
+                    b.Property<string>("LastName");
+
+                    b.Property<string>("Level");
 
                     b.Property<bool>("LockoutEnabled");
 
@@ -502,8 +507,7 @@ namespace GlobalEvent.Data.Migrations
 
                     b.Property<bool>("Registered");
 
-                    b.Property<string>("RegistrationNumber")
-                        .IsRequired();
+                    b.Property<string>("RegistrationNumber");
 
                     b.Property<string>("TicketType");
 

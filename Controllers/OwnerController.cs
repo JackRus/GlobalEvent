@@ -7,6 +7,8 @@ using GlobalEvent.Models.VisitorViewModels;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
+using GlobalEvent.Models;
 
 namespace GlobalEvent.Controllers
 {
@@ -14,10 +16,12 @@ namespace GlobalEvent.Controllers
     public class OwnerController : Controller
     {
 		private readonly ApplicationDbContext _db;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-		public OwnerController (ApplicationDbContext context)
+		public OwnerController (UserManager<ApplicationUser> userManager, ApplicationDbContext context)
         {
             _db = context;
+            _userManager = userManager;
         }
         public IActionResult Index(string message = null)
         {
@@ -163,6 +167,21 @@ namespace GlobalEvent.Controllers
             _db.Events.Remove(e);
             await _db.SaveChangesAsync();
             return RedirectToAction("Events");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Admins ()
+        {
+            ViewBag.Admins = await _db.Users.ToListAsync();
+            return View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ChangeClaims (string ID = null)
+        {
+            if (ID == null) RedirectToAction("Admins", "Owner");
+            
+            return View();
         }
 	}
 }

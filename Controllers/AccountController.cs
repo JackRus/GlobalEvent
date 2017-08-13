@@ -12,12 +12,14 @@ using Microsoft.Extensions.Options;
 using GlobalEvent.Models;
 using GlobalEvent.Models.AccountViewModels;
 using GlobalEvent.Services;
+using GlobalEvent.Data;
 
 namespace GlobalEvent.Controllers
 {
     [Authorize]
     public class AccountController : Controller
     {
+        private readonly ApplicationDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
@@ -31,7 +33,7 @@ namespace GlobalEvent.Controllers
             IOptions<IdentityCookieOptions> identityCookieOptions,
             IEmailSender emailSender,
             ISmsSender smsSender,
-            ILoggerFactory loggerFactory)
+            ILoggerFactory loggerFactory, ApplicationDbContext db)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -39,6 +41,7 @@ namespace GlobalEvent.Controllers
             _emailSender = emailSender;
             _smsSender = smsSender;
             _logger = loggerFactory.CreateLogger<AccountController>();
+            _db = db;
         }
 
         //
@@ -98,6 +101,10 @@ namespace GlobalEvent.Controllers
         [AllowAnonymous]
         public IActionResult Register(string returnUrl = null)
         {
+            if (_db.Users.Any(x => x.Level == "Owner"))
+            {
+                return RedirectToAction("Login", "Account");
+            }
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
@@ -112,7 +119,7 @@ namespace GlobalEvent.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FirstName = model.FirstName, LastName = model.LastName, Level = model.Level };
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -130,6 +137,38 @@ namespace GlobalEvent.Controllers
             }
 
             // If we got this far, something failed, redisplay form
+            return View(model);
+        }
+
+
+        //
+        // GET: /Account/Register
+        [HttpGet]
+        public IActionResult AddUser(string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            return View();
+        }
+
+        //
+        // POST: /Account/Register
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddUser(RegisterViewModel model, string returnUrl = null)
+        {
+            ViewData["ReturnUrl"] = returnUrl;
+            if (ModelState.IsValid)
+            {
+                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FirstName = model.FirstName, LastName = model.LastName, Level = model.Level };
+                var result = await _userManager.CreateAsync(user, model.Password);
+                if (result.Succeeded)
+                {
+                    await _signInManager.SignInAsync(user, isPersistent: false);
+                    _logger.LogInformation(3, "User created a new account with password by Owner.");
+                    return RedirectToAction("Admins", "Owner");
+                }
+                AddErrors(result);
+            }
             return View(model);
         }
 
