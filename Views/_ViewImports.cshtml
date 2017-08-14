@@ -7,4 +7,7 @@
 @using GlobalEvent.Models.VisitorViewModels
 @using Microsoft.AspNetCore.Identity
 @using System.Collections.Generic
+@using Microsoft.AspNetCore.Authorization
 @addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+@inject IAuthorizationService AuthorizationService
+

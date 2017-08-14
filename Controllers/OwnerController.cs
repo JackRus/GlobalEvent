@@ -96,6 +96,7 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy="Event Editor")]
         public async Task<IActionResult> EditEvent (int? ID)
         {
             if (ID == null) return RedirectToAction("Events");

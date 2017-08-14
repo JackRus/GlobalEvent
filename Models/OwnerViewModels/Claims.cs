@@ -9,6 +9,7 @@ namespace GlobalEvent.Models.OwnerViewModels
 {
 	public class Claims
 	{
+	// events
 		public bool CanCreateEvent { get; set; }
 		public bool CanEditEvent { get; set; }
 		public bool CanDeleteEvent { get; set; }
@@ -18,14 +19,16 @@ namespace GlobalEvent.Models.OwnerViewModels
 		public bool CanBlockVisitor { get; set; }
 		public bool CanDeleteVisitor { get; set; }
 		public bool CanEditVisitor { get; set; }
-	// // products
+	// products
 		public bool CanCreateProduct { get; set; }
 		public bool CanEditProduct { get; set; }
 		public bool CanDeleteProduc { get; set; }
 		public bool CanChangeProductTickets { get; set; }
-	// // visitor types
-	// // orders
-	// // admins
+	// visitor types
+
+	// orders
+
+	// admins
 		public bool CanChangeAdminPassword { get; set; }
 		public bool CanCreateAdmin { get; set; }
 		public bool CanDeleteAdm { get; set; }

@@ -48,6 +48,10 @@ namespace GlobalEvent
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
+            services.AddAuthorization(options => {
+                options.AddPolicy("Event Editor", x => { x.RequireClaim("CanEditEvent"); });
+                });
+
             services.AddMvc();
 
             // Add application services.

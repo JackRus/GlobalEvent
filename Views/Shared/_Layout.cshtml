@@ -31,7 +31,11 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li><a asp-controller="Owner" asp-action="Dashboard">Dashboard</a></li>
-                    <li><a asp-controller="Owner" asp-action="Index">Owner</a></li>
+
+                    @if (await AuthorizationService.AuthorizeAsync(User, "Event Editor"))
+                    {
+                        <li><a asp-controller="Owner" asp-action="Index">Owner</a></li>
+                    }
                     <li><a asp-controller="Todo" asp-action="Index">ToDo</a></li>
                     <li><a asp-controller="Admin" asp-action="Dashboard">Admin</a></li>
                 </ul>
