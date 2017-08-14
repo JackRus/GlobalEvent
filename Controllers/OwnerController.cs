@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
 using GlobalEvent.Models;
+using System.Reflection;
+using System.Security.Claims;
 
 namespace GlobalEvent.Controllers
 {
@@ -38,6 +40,7 @@ namespace GlobalEvent.Controllers
             Event e = await _db.Events
                 .Include(x => x.Tickets)
                 .Include(x => x.Visitors)
+                .Include(x => x.Products)
                 .FirstOrDefaultAsync(x => x.Status);
 
             ViewBag.Active = e == null ? false : true;
@@ -177,11 +180,90 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ChangeClaims (string ID = null)
+        public async Task<IActionResult> EditAdmin (string ID = null)
         {
             if (ID == null) RedirectToAction("Admins", "Owner");
+            var u = await _userManager.FindByIdAsync(ID);
+            ViewBag.Claims = await _userManager.GetClaimsAsync(u);
+            EditAdmin a = new EditAdmin();
+            a.FirstName = u.FirstName;
+            a.LastName = u.LastName;
+            a.Level = u.Level;
+            a.Email = u.Email;
+            a.Id = u.Id;
+            return View(a);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditAdmin (EditAdmin a)
+        {
+            if (!ModelState.IsValid) RedirectToAction("Admins", "Owner");
+            var u = await _userManager.FindByIdAsync(a.Id);
+            u.FirstName = a.FirstName;
+            u.LastName = a.LastName;
+            u.Level = a.Level;
+            u.Email = a.Email;
+            await _userManager.UpdateAsync(u);
+
+            // change password if new one is provided
+            if (!string.IsNullOrEmpty(a.Password) && !string.IsNullOrEmpty(a.ConfirmPassword) && a.Password == a.ConfirmPassword)
+            {
+                await _userManager.RemovePasswordAsync(u);
+                await _userManager.AddPasswordAsync(u, a.Password); 
+            }
+            return RedirectToAction("Admins", "Owner");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ChangeClaims (string ID)
+        {
+            if (ID == null) RedirectToAction("Admins", "Owner");
+            Claims c = new Claims();
+
+            var properties = c.GetType().GetProperties().ToList();
+
+            // existing claims
+            var u = await _userManager.FindByIdAsync(ID);
+            var hasClaims = await _userManager.GetClaimsAsync(u);
+
+            // mapping
+            foreach (var claim in hasClaims)
+            {
+                foreach (var item in properties)
+                {
+                    if (item.Name == claim.Type)
+                    {
+                        item.SetValue(c, true);
+                    }
+                }
+            }
+            ViewBag.Properties = properties;
+            ViewBag.AID = u.Id;
+            return View(c);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeClaims (Claims c, string ID = null)
+        {
+            if (c == null || ID == null) RedirectToAction("Admins", "Owner");
             
-            return View();
+            var u = await _userManager.FindByIdAsync(ID);
+            var properties = c.GetType().GetProperties().ToList();
+            
+            // remove claims
+            var hasClaims = await _userManager.GetClaimsAsync(u);
+            await _userManager.RemoveClaimsAsync(u, hasClaims);
+            
+            // add claims
+            foreach(var item in properties)
+            {
+                if ((bool)item.GetValue(c, null) == true)
+                {
+                    await _userManager.AddClaimAsync(u, new Claim(item.Name, ""));
+                }
+            }
+
+            return RedirectToAction("EditAdmin", "Owner", new {ID = ID});
         }
 	}
 }

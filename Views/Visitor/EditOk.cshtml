@@ -16,16 +16,14 @@
 		<span> Would you like to check-in? </span>
 	</div>
 		
-	<div class="col-xs-6 nopad">
-		<form asp-action="CheckIn" autocomplete="off">
-			<input style="display: none;" asp-for="RegistrationNumber" value="@Model.RegistrationNumber" />
-			<input style="display: none;" asp-for="EID" value="@Model.EID" />
-			<button type="submit" class="btn mybtn bgBase" style="width: 100%;">
+	<div class="text-center m10-0-10-0">
+		<form asp-action="CheckIn" autocomplete="off" class="inline">
+			<input class="eye" asp-for="RegistrationNumber" value="@Model.RegistrationNumber" />
+			<input class="eye" asp-for="EID" value="@Model.EID" />
+			<button type="submit" class="btn mybtn bgBase">
 			Yes</button>
 		</form>
-	</div>
-	<div class="col-xs-6 nopad">
-		<a asp-action="Index" asp-controller="Home" class="btn mybtn bgBro" style="width: 100%;">
-		No</a>
+
+		<a asp-action="Index" asp-controller="Home" class="btn mybtn bgBro">No</a>
 	</div>
 </div>

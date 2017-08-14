@@ -3,14 +3,12 @@ body {
     padding-bottom: 20px;
 }
 
-
 /* Set some basic padding to keep content from hitting the edges */
 
 .body-content {
     padding-left: 15px;
     padding-right: 15px;
 }
-
 
 /* buttons and links extension to use brackets: [ click me ] */
 
@@ -72,6 +70,11 @@ body {
 .Contrast {color: blue;}
 /* END OF FONT COLORS */
 
+/* TABLES*/
+
+.vaMiddle{
+    vertical-align: middle!important;
+}
 
 /* BUTTONS ON THE MAIN OWNER SCREEN */
 
@@ -161,6 +164,7 @@ h3, h4, h5, h6 {
 /* SPACING */
 .nopad {padding: 0px;}
 .nomar {margin: 0px;}
+.mAuto {margin: auto!important;}
 .p5-0-5-0 {padding: 5px 0px;}
 .p10-0-10-0 {padding: 10px 0px;}
 .p20-0-20-0 {padding: 20px 0px;}
@@ -303,10 +307,7 @@ label {
 }
 /* END OF FORMS */
 
-
 /************BUTTONS**************/
-
-
 /* BUTTONS FOR TABLES*/
 .mybtn-sm-base {
     padding: 2px;
@@ -553,9 +554,6 @@ label {
 
 .i-block-owner:hover {
     filter: brightness(120%);
-    -moz-box-shadow: 0 0 14px #666;
-    -webkit-box-shadow: 0 0 14px #666;
-    box-shadow: 0 0 14px #666;
     color: #fff;
 }
 

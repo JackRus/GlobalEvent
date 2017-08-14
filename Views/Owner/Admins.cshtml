@@ -6,7 +6,7 @@
 </div>
 <br />
 
-<table class="table table-striped table-hover">
+<table class="table table-hover">
 	<thead>
 		<tr>
 			<th>First Name</th>
@@ -26,7 +26,7 @@
 				<td>@u.UserName</td>
 				<td>@u.Level</td>
 				<td>TODO</td>
-				<td><a asp-action="ChangeClaims" asp-route-name="@u.Id" class="btn mybtn-sm-bro">Edit</a></td> 
+				<td><a asp-action="EditAdmin" asp-route-ID="@u.Id" class="btn mybtn-sm-bro mAuto">Edit</a></td> 
 			</tr>
 		}
 	</tbody>

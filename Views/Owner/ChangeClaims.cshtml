@@ -1,0 +1,24 @@
+@model Claims
+@using System.Reflection
+
+<h1> User's access</h1>
+
+<form asp-action="ChangeClaims" asp-controller="Owner" asp-route-ID="@ViewBag.AID" autocomplete="off">
+	
+	<legend>Please select</legend>
+
+	@foreach(var c in ViewBag.Properties)
+	{
+		<div class="form-group">
+				<label class="control-label" for="@c.Name">@c.Name</label>&nbsp
+                
+				<span class="true-false" data-id="@c.Name"></span>
+                
+				<input class="eye" @(c.GetValue(Model, null) == false ? "" : "checked") data-val="true" data-val-required="The @c.Name Event field is required." id="@c.Name" name="@c.Name" type="checkbox" value="true" />
+		</div>
+	}
+	<div class="text-center form-group">
+		<button type="submit" class="btn mybtn bgBase">Save</button>
+		<a asp-action="EditAdmin" asp-controller="Owner" asp-route-ID="@ViewBag.AID" class="btn mybtn bgRed">Cancel</a>
+	</div>
+</form>
