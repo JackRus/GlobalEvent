@@ -3,7 +3,7 @@
 <div style="width: 100%">
 	@if (ViewBag.Tickets.Count != 0)
 	{
-		<table class="table table-hover width700">
+		<table class="table table-hover">
 			<thead>
 				<tr>
 					<th>Type</th>
@@ -25,7 +25,7 @@
 						<td>$@t.Price</td>
 						<td>@t.Limit</td>
 						<td>@t.Description </td>
-						<td>
+						<td style="width: auto; text-align: right;">
 							<a asp-action="Copy" asp-route-ID="@t.ID" class="btn mybtn-sm-base">Copy</a>
 
 							<a asp-action="Edit" asp-route-ID="@t.ID" class="btn mybtn-sm-bro">Edit</a>
@@ -42,12 +42,12 @@
 	}
 	else
 	{
-		<div class="text-center f-info Accent width700">This Event has no Tickets yet.</div>
+		<div class="text-center f-info Accent">This Event has no Tickets yet.</div>
 	}
 	<br />
-	<div class="width700 text-center">
-		<a asp-action="Add" asp-route-id="@ViewBag.ID" class="btn mybtn bgBro">ADD</a>
-		<a asp-action="ViewEvent" asp-controller="Owner" asp-route-id="@ViewBag.ID" class="btn mybtn bgBase">BACK</a>
+	<div class="text-center">
+		<a asp-action="Add" asp-route-id="@ViewBag.ID" class="btn mybtn bgBase">ADD</a>
+		<a asp-action="ViewEvent" asp-controller="Owner" asp-route-id="@ViewBag.ID" class="btn mybtn bgBro">BACK</a>
 
 		@if (ViewBag.Tickets.Count != 0) 
 		{

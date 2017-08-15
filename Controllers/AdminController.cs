@@ -20,6 +20,7 @@ namespace GlobalEvent.Controllers
             _db = context;
         }
 
+
         public async Task<IActionResult> Dashboard ()
         {
             Event e = await _db.Events
@@ -51,6 +52,7 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy="Visitors Viewer")]
         public async Task<IActionResult> Search (string ID = null, string Name = null)
         {
             if (ID == null || Name == null) return RedirectToAction("Dashboard");
@@ -91,6 +93,8 @@ namespace GlobalEvent.Controllers
             return View(v);
         }
 
+        [HttpGet]
+        [Authorize(Policy="Visitors Viewer")]
         public async Task <IActionResult> ListAll ()
         {
             // get Active event id

@@ -11,10 +11,13 @@
 }
 
 <div class="text-center">
+	@if(await AuthorizationService.AuthorizeAsync(User, "Event Creator"))
+	{
 	<a asp-action="CreateEvent" class="btn mybtn bgBase">ADD</a>
+	}
 	<a asp-action="Index" class="btn mybtn bgBro">BACK</a>
 </div>
-<br />
+	<br />
 
 @if (ViewBag.Active == null && future.Count == 0 && archived.Count == 0)
 {

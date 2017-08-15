@@ -67,6 +67,9 @@
                 <span class="true-false" data-id="box1"></span>
                 <input asp-for="Free" class="eye" id="box1"/> 
                 &nbsp &nbsp &nbsp 
+            
+            @if(await AuthorizationService.AuthorizeAsync(User, "Event Activator"))
+            {
                 <label asp-for="Status" class="control-label"></label>&nbsp 
                 <span class="true-false" data-id="box2"></span>
                 <input asp-for="Status" class="eye" id="box2"/>
@@ -74,6 +77,7 @@
                 <label asp-for="Archived" class="control-label"></label>&nbsp
                 <span class="true-false" data-id="box3"></span>
                 <input asp-for="Archived" class="eye" id="box3"/>
+            }
             </div>
 
             <div class="form-group">

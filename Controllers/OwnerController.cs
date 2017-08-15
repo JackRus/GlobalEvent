@@ -25,6 +25,8 @@ namespace GlobalEvent.Controllers
             _db = context;
             _userManager = userManager;
         }
+
+        [Authorize(Policy="Owner's Menu")]
         public IActionResult Index(string message = null)
         {
             ViewBag.Todos = _db.ToDos
@@ -35,6 +37,7 @@ namespace GlobalEvent.Controllers
             return View();
         }
 
+        [Authorize(Policy="Owner's Menu")]
         public async Task <IActionResult> Dashboard ()
         {
             Event e = await _db.Events
@@ -53,20 +56,16 @@ namespace GlobalEvent.Controllers
                 // Visitors
                 ViewBag.CheckIned = e.Visitors.Where(x => x.CheckIned).Count();
                 ViewBag.Registered = e.Visitors.Where(x => x.Registered).Count();
-
                 
                 // All tickets
                 ViewBag.AllTickets = 0;
                 foreach (Ticket t in e.Tickets)
-                {
                     ViewBag.AllTickets += t.Limit;
-                }
-
-            }
-            
+            }  
             return View(e);
         }
 
+        [Authorize(Policy="Events Viewer")]
         public async Task<IActionResult> Events (string message = null)
         {
             ViewBag.Active = await _db.Events.FirstOrDefaultAsync(x => x.Status);
@@ -77,6 +76,7 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy="Event Creator")]
         public IActionResult CreateEvent ()
         {
             return View();
@@ -84,6 +84,7 @@ namespace GlobalEvent.Controllers
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
+        [Authorize(Policy="Event Creator")]
         public async Task<IActionResult> CreateEvent (Event e)
         {
             if (ModelState.IsValid)
@@ -105,6 +106,7 @@ namespace GlobalEvent.Controllers
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
+        [Authorize(Policy="Event Editor")]
         public async Task<IActionResult> EditEvent (Event e)
         {
             if (ModelState.IsValid)
@@ -140,6 +142,7 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy="Event Viewer")]
 		public async Task<IActionResult> ViewEvent(int? ID, string message = null)
 		{
 			if (ID == null) return RedirectToAction("Events");
@@ -156,6 +159,7 @@ namespace GlobalEvent.Controllers
 		}
 
         [HttpGet]
+        [Authorize(Policy="Event Killer")]
         public async Task<IActionResult> DeleteEvent (int? ID)
         {
             if (ID == null) return RedirectToAction("Events");
@@ -163,6 +167,7 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy="Event Killer")]
         public async Task<IActionResult> DeleteEventOk (int? ID)
         {
             if (ID == null) return RedirectToAction("Events");
@@ -174,6 +179,7 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy="Admins Viewer")]
         public async Task<IActionResult> Admins ()
         {
             ViewBag.Admins = await _db.Users.ToListAsync();
@@ -181,6 +187,7 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy="Admin Editor")]
         public async Task<IActionResult> EditAdmin (string ID = null)
         {
             if (ID == null) RedirectToAction("Admins", "Owner");
@@ -196,6 +203,8 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        [Authorize(Policy="Admin Editor")]
         public async Task<IActionResult> EditAdmin (EditAdmin a)
         {
             if (!ModelState.IsValid) RedirectToAction("Admins", "Owner");
@@ -216,34 +225,30 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "Claims Editor")]
         public async Task<IActionResult> ChangeClaims (string ID)
         {
             if (ID == null) RedirectToAction("Admins", "Owner");
             Claims c = new Claims();
-
             var properties = c.GetType().GetProperties().ToList();
-
             // existing claims
             var u = await _userManager.FindByIdAsync(ID);
             var hasClaims = await _userManager.GetClaimsAsync(u);
-
+            
             // mapping
             foreach (var claim in hasClaims)
-            {
                 foreach (var item in properties)
-                {
                     if (item.Name == claim.Type)
-                    {
                         item.SetValue(c, true);
-                    }
-                }
-            }
+
             ViewBag.Properties = properties;
             ViewBag.AID = u.Id;
             return View(c);
         }
 
         [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        [Authorize(Policy = "Claims Editor")]
         public async Task<IActionResult> ChangeClaims (Claims c, string ID = null)
         {
             if (c == null || ID == null) RedirectToAction("Admins", "Owner");

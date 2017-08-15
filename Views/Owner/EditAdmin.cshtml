@@ -7,7 +7,7 @@
 
 <div class="row">
     <div class="col-sm-6">
-        <form asp-controller="Owner" asp-action="EditAdmin" asp-route-claims="" autocomplete="off">
+        <form asp-controller="Owner" asp-action="EditAdmin" autocomplete="off">
         
             <h2>@ViewData["Title"]. </h2>
 
@@ -34,7 +34,8 @@
                 <input asp-for="Email" class="form-control" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
-
+        @if(await AuthorizationService.AuthorizeAsync(User, "Password Editor"))
+        {
             <div class="form-group">
                 <label asp-for="Password" class="control-label"></label>
                 <input asp-for="Password" class="form-control" />
@@ -46,6 +47,7 @@
                 <input asp-for="ConfirmPassword" class="form-control" />
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
             </div>
+        }
 
             <input asp-for="Id" value="@Model.Id" class="eye"/>
 
@@ -64,9 +66,12 @@
             <div>@count. @c.Type </div>
             count++;
         }
-        <div class="text-center">
-            <a asp-action="ChangeClaims" asp-controller="Owner" asp-route-ID="@Model.Id" class="btn mybtn bgBase">Edit</a>
-        </div>
+        @if(await AuthorizationService.AuthorizeAsync(User, "Claims Editor"))
+        {
+            <div class="text-center">
+                <a asp-action="ChangeClaims" asp-controller="Owner" asp-route-ID="@Model.Id" class="btn mybtn bgBase">Edit</a>
+            </div>
+        }
     </div>
 
 </div>

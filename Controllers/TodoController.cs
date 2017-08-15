@@ -22,11 +22,11 @@ namespace GlobalEvent.Controllers
         {
             ViewBag.Todos = _db.ToDos
                 .Where(x => !x.Done)
-                .OrderByDescending(x => x.Deadline)
+                .OrderBy(x => x.Deadline)
                 .ToList();
             ViewBag.Done = _db.ToDos
                 .Where(x => x.Done)
-                .OrderByDescending(x => x.Deadline)
+                .OrderBy(x => x.Deadline)
                 .ToList();
             return View();
         }

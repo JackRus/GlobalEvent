@@ -26,7 +26,11 @@
 				<td>@u.UserName</td>
 				<td>@u.Level</td>
 				<td>TODO</td>
-				<td><a asp-action="EditAdmin" asp-route-ID="@u.Id" class="btn mybtn-sm-bro mAuto">Edit</a></td> 
+				<td style="width: auto; text-align: right;">
+					<a asp-action="EditAdmin" asp-route-ID="@u.Id" class="btn mybtn-sm-base ">Edit</a>
+					<a asp-action="CopyAdmin" asp-route-ID="@u.Id" class="btn mybtn-sm-bro ">Copy</a>
+					<a asp-action="DeleteAdmin" asp-route-ID="@u.Id" class="btn mybtn-sm-red ">Delete</a>
+				</td> 
 			</tr>
 		}
 	</tbody>

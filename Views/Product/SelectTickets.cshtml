@@ -1,13 +1,13 @@
 <h1>ADD Tickets</h1>
 
 <div style="width: 100%">
-    <div class="width700">
-        <a id="addall" class="btn mybtn-sm-base inline">ADD ALL</a>
-        <a id="all" class="btn mybtn-sm-red inline">REMOVE ALL</a>
-    </div>
+
+    <a id="addall" class="btn mybtn-sm-base" style="width: 90px;">ADD ALL</a>
+    <a id="all" class="btn mybtn-sm-red" style="width: 90px;">REMOVE ALL</a>
+    
 	@if (ViewBag.Tickets.Count != 0)
 	{
-		<table class="table table-hover width700">
+		<table class="table table-hover ">
 			<thead>
 				<tr>
 					<th>Type</th>
@@ -60,11 +60,10 @@
 	}
 	else
 	{
-		<div class="f-info width700">This Event has no Tickets yet.</div>
+		<div class="f-info ">This Event has no Tickets yet.</div>
 	}
 
-	<br />
-	<div class="table table-hover width700">	
+	<div class="text-center">	
         <form asp-action="SaveTickets" autocomplete="off">
             <input id="save" name="result" value="@ViewBag.Types" class="eye" />
             <input name="ID" value="@ViewBag.ID" class="eye" />

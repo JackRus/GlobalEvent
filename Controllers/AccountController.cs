@@ -144,6 +144,7 @@ namespace GlobalEvent.Controllers
         //
         // GET: /Account/Register
         [HttpGet]
+        [Authorize(Policy="Admin Creator")]
         public IActionResult AddUser(string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
@@ -154,6 +155,7 @@ namespace GlobalEvent.Controllers
         // POST: /Account/Register
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Policy="Admin Creator")]
         public async Task<IActionResult> AddUser(RegisterViewModel model, string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
@@ -164,7 +166,7 @@ namespace GlobalEvent.Controllers
                 if (result.Succeeded)
                 {
                     await _signInManager.SignInAsync(user, isPersistent: false);
-                    _logger.LogInformation(3, "User created a new account with password by Owner.");
+                    _logger.LogInformation(3, "Owner/Manager created a new account with password.");
                     return RedirectToAction("Admins", "Owner");
                 }
                 AddErrors(result);

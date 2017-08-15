@@ -311,14 +311,13 @@ label {
 /* BUTTONS FOR TABLES*/
 .mybtn-sm-base {
     padding: 2px;
-    display: block;
+    display: inline-block;
     color: #3cb371;
     transition: all .5s ease;
     border: 1px solid #3cb371;
     background-color: #fff;
     border-radius: 0px;
     font-size: 0.8em;
-    margin-bottom: 5px;
     min-width: 40px;
 }
 
@@ -329,12 +328,11 @@ label {
 
 .mybtn-sm-bro {
     padding: 2px;
-    display: block;
+    display: inline-block;
     transition: all .5s ease;
     border: 1px solid #6495ed;
     border-radius: 0px;
     font-size: 0.8em;
-    margin-bottom: 5px;
     color: #6495ed;
     background-color: #fff;
     min-width: 40px;
@@ -343,14 +341,13 @@ label {
 .mybtn-sm-bro:hover {color: #fff; background-color: #6495ed;}
 .mybtn-sm-red {
     padding: 2px;
-    display: block;
+    display: inline-block;
     transition: all .5s ease;
     border: 1px solid #d02218;
     color: #d02218;
     background-color: #fff;
     border-radius: 0px;
     font-size: 0.8em;
-    margin-bottom: 5px;
     min-width: 40px;
 }
 
@@ -479,7 +476,6 @@ label {
     transition: all .5s ease;
     border-radius: 0px;
     font-size: 0.8em;
-    margin-bottom: 5px;
     max-width: 80px;
     box-shadow: 
         0px 2px 10px rgba(0,0,0,.3), 

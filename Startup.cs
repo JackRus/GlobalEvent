@@ -49,8 +49,22 @@ namespace GlobalEvent
                 .AddDefaultTokenProviders();
 
             services.AddAuthorization(options => {
-                options.AddPolicy("Event Editor", x => { x.RequireClaim("CanEditEvent"); });
-                });
+                options.AddPolicy("Event Editor", x => {x.RequireClaim("CanEditEvent");});
+                options.AddPolicy("Claims Editor", x => x.RequireClaim("CanChangeClaims"));
+                options.AddPolicy("Password Editor", x => {x.RequireClaim("CanChangeAdminPassword"); });
+                options.AddPolicy("Event Creator", x => x.RequireClaim("CanCreateEvent"));
+                options.AddPolicy("Event Viewer", x => x.RequireClaim("CanSeeEventDetails"));
+                options.AddPolicy("Owner's Menu", x => x.RequireClaim("CanSeeOwnersPage"));
+                options.AddPolicy("Owner's Dashboard", x => x.RequireClaim("CanSeeMainDashboard"));
+                options.AddPolicy("Events Viewer", x => x.RequireClaim("CanSeeAllEvents"));
+                options.AddPolicy("Event Killer", x => x.RequireClaim("CanDeleteEvent"));
+                options.AddPolicy("Event Activator", x => x.RequireClaim("CanChangeEventStatus"));
+                options.AddPolicy("Admins Viewer", x => x.RequireClaim("CanSeeAllAdmins"));
+                options.AddPolicy("Admin Editor", x => x.RequireClaim("CanEditAdmin"));
+                options.AddPolicy("Admin Creator", x => x.RequireClaim("CanCreateAdmin"));
+                options.AddPolicy("Visitors Viewer", x => x.RequireClaim("CanAccessAllVisitors"));
+                
+            });
 
             services.AddMvc();
 
