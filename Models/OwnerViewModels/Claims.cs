@@ -43,7 +43,7 @@ namespace GlobalEvent.Models.OwnerViewModels
 	// admins
 		public bool CanChangeAdminPassword { get; set; } // owner. manager +
 		public bool CanCreateAdmin { get; set; }	// owner, manager +
-		public bool CanDeleteAdmin { get; set; }  // TODO
+		public bool CanDeleteAdmin { get; set; }  // owner
 		public bool CanEditAdmin { get; set; } // owner, manager +
 		public bool CanChangeClaims { get; set; } // owner, manager +
 		public bool CanSeeAllAdmins { get; set; } // owner, manager +
@@ -55,7 +55,7 @@ namespace GlobalEvent.Models.OwnerViewModels
 
 	// todo
 		public bool CanSeeToDoList { get; set; }	// manager, owner +
-		public bool CanAddTodo { get; set; }
-		public bool CanEditDeleteTodo { get; set; }
+		public bool CanAddTodo { get; set; } // manager, owner +
+		public bool CanEditDeleteTodo { get; set; } // owner, manager +
 	}
 }

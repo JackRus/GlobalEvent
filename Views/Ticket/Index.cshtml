@@ -1,62 +1,71 @@
 <h1>ALL Tickets</h1>
 
 <div style="width: 100%">
-	@if (ViewBag.Tickets.Count != 0)
-	{
-		<table class="table table-hover">
-			<thead>
-				<tr>
-					<th>Type</th>
-					<th>Price</th>
-					<th>Amount</th>
-					<th>Description</th> 
-					<th></th>
-				</tr>
-			</thead>
+@if (ViewBag.Tickets.Count != 0)
+{
+	<table class="table table-hover">
+	<thead>
+		<tr>
+			<th>Type</th>
+			<th>Price</th>
+			<th>Amount</th>
+			<th>Description</th> 
+			<th></th>
+		</tr>
+	</thead>
 
-			<tbody>
-				<tr style="height: 4px;">
-						<td colspan="20" class="line-space"></td>
-				</tr>
-				@foreach(Ticket t in ViewBag.Tickets)
-				{
-					<tr>
-						<td>@t.Type</td>
-						<td>$@t.Price</td>
-						<td>@t.Limit</td>
-						<td>@t.Description </td>
-						<td style="width: auto; text-align: right;">
+	<tbody>
+		<tr style="height: 4px;">
+				<td colspan="20" class="line-space"></td>
+		</tr>
+		@foreach(Ticket t in ViewBag.Tickets)
+		{
+			<tr>
+				<td>@t.Type</td>
+				<td>$@t.Price</td>
+				<td>@t.Limit</td>
+				<td>@t.Description </td>
+				<td style="width: auto; text-align: right;">
+
+				<div class="dropdown">
+					<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
+					<span class="caret"></span></button>
+					
+					<ul class="dropdown-menu dropdown-menu-right">
 						@if(await AuthorizationService.AuthorizeAsync(User, "Ticket Creator"))
 						{	
-							<a asp-action="Copy" asp-route-ID="@t.ID" class="btn mybtn-sm-base">Copy</a>
+							<li><a asp-action="Copy" asp-route-ID="@t.ID">Copy</a></li>
 
-							<a asp-action="Edit" asp-route-ID="@t.ID" class="btn mybtn-sm-bro">Edit</a>
+							<li><a asp-action="Edit" asp-route-ID="@t.ID">Edit</a></li>
 						}
 						@if(await AuthorizationService.AuthorizeAsync(User, "Ticket Killer"))
 						{
-							<a asp-action="Delete" asp-route-ID="@t.ID" class="btn mybtn-sm-red">Delete</a>
+							<li><a asp-action="Delete" asp-route-ID="@t.ID">Delete</a></li>
 						}
-						</td>
-					</tr>
-					<tr style="height: 4px;">
-						<td colspan="20" class="line-space"></td>
-					</tr>
-				}
-			</tbody>
-		</table>
-	}
-	else
-	{
-		<div class="text-center f-info Accent">This Event has no Tickets yet.</div>
-	}
+					</ul>
+
+				</div>
+				</td>
+			</tr>
+			<tr style="height: 4px;">
+				<td colspan="20" class="line-space"></td>
+			</tr>
+		}
+	</tbody>
+	</table>
+}
+else
+{
+	<div class="text-center f-info Accent">This Event has no Tickets yet.</div>
+}
 	<br />
 	<div class="text-center">
 		<a asp-action="Add" asp-route-id="@ViewBag.ID" class="btn mybtn bgBase">ADD</a>
 		<a asp-action="ViewEvent" asp-controller="Owner" asp-route-id="@ViewBag.ID" class="btn mybtn bgBro">BACK</a>
-
-		@if (ViewBag.Tickets.Count != 0 && (await AuthorizationService.AuthorizeAsync(User, "Is Owner"))) 
-		{
-			<a asp-action="DeleteAll" asp-route-id="@ViewBag.ID" class="btn mybtn bgRed">DELETE ALL</a>
-		}
+		
+	@if (ViewBag.Tickets.Count != 0 && (await AuthorizationService.AuthorizeAsync(User, "Is Owner"))) 
+	{
+		<a asp-action="DeleteAll" asp-route-id="@ViewBag.ID" class="btn mybtn bgRed">DELETE ALL</a>
+	}
 	</div>
 </div>

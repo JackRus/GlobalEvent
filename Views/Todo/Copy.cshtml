@@ -2,7 +2,7 @@
 
 <h1>ADD ToDo Item (COPY)</h1>
 
-<form asp-action="Add" autocomplete="off">
+<form asp-action="Add" asp-route-url="Todo" autocomplete="off">
     <div class="form-group">
         <label asp-for="Task" class="control-label"></label>
         <input asp-for="Task" class="form-control"/>
@@ -27,7 +27,7 @@
         <span asp-validation-for="EID" class="Red"></span>
     </div>
 
-    <input asp-for="ID" value="@Model.ID" class="eye" />
+    <input asp-for="ID" value="0" class="eye" />
 
     <div class="form-group text-center">
         <button type="submit" class="btn mybtn bgBase">ADD</button>

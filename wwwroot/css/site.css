@@ -351,7 +351,11 @@ label {
     min-width: 40px;
 }
 
-.mybtn-sm-red:hover {background-color: #d02218; color: #fff;}
+.mybtn-sm-red:hover {
+    background-color: #d02218; 
+    color: #fff;
+}
+
 .mybtn {
     border-radius: 0px;
     border: 0px solid blueviolet;
@@ -401,6 +405,22 @@ label {
         inset 0px 1px 0px rgba(255,255,255,.25), 
         inset 0px -1px 0px rgba(0,0,0,.15);
 }
+
+.mybtn-sm-actions {
+    padding: 2px 4px;
+    display: inline-block;
+    color: #FFF;
+    transition: all .5s ease;
+    border-radius: 0px;
+    font-size: 0.8em;
+    min-width: 40px;
+}
+
+.mybtn-sm-actions:hover {
+    filter: brightness(120%); 
+    color: #fff;
+}
+
 
 .btn-home {
     padding: 10px;
@@ -873,4 +893,9 @@ td.line-space {
     vertical-align: middle;
     color: #fff;
     background-color: #6495ed;
+}
+
+/*   DROPDOWNS    */
+.dropdown-menu li{
+    text-align: center;
 }

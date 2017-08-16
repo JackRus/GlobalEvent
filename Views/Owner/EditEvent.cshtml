@@ -74,9 +74,12 @@
                 <span class="true-false" data-id="box2"></span>
                 <input asp-for="Status" class="eye" id="box2"/>
                 &nbsp &nbsp &nbsp 
-                <label asp-for="Archived" class="control-label"></label>&nbsp
-                <span class="true-false" data-id="box3"></span>
-                <input asp-for="Archived" class="eye" id="box3"/>
+                @if(!Model.Status)
+                {
+                    <label asp-for="Archived" class="control-label"></label>&nbsp
+                    <span class="true-false" data-id="box3"></span>
+                    <input asp-for="Archived" class="eye" id="box3"/>
+                }
             }
             </div>
 

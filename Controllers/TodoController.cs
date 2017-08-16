@@ -39,20 +39,21 @@ namespace GlobalEvent.Controllers
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         [Authorize(Policy="Todo Creator")]
-        public async Task<IActionResult> Add (ToDo t) // from Main Menu
+        public async Task<IActionResult> Add (ToDo t, string url = "Owner") // from Main Menu
         {
             if (ModelState.IsValid)
             {
                 _db.ToDos.Add(t);
                 await _db.SaveChangesAsync();
-                return RedirectToAction("Index", "Owner");
+                return RedirectToAction("Index", url);
             }
             return RedirectToAction("Index", "Owner", new { message = "Couldn't create ToDo item. Please try again."});
         }
+        
 
         [HttpGet]
         [Authorize(Policy="Todo Creator")]
-        public IActionResult AddFull() // from separate page
+        public IActionResult AddFull() // from Todo/Index
         {
             return View(new ToDo());
         }
@@ -138,5 +139,23 @@ namespace GlobalEvent.Controllers
             }
             return RedirectToAction("Index");
         }
+
+        [HttpGet]
+        [Authorize(Policy="Todo EditorKiller")]
+        public async Task<IActionResult> Done (int? ID)
+        {
+            if (ID == null) 
+            {
+                return RedirectToAction("Index", "Todo");
+            }
+
+            ToDo t = await _db.ToDos.SingleOrDefaultAsync(x => x.ID == ID);
+            t.Done = true;
+            _db.ToDos.Update(t);
+            await _db.SaveChangesAsync();
+
+            return RedirectToAction("Index", "Todo");
+        }
+
 	}
 }

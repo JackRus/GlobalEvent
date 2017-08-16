@@ -28,16 +28,23 @@
 					<td>@v.Free</td>
 					<td style="max-width: 250px;">@v.Description</td>
 					<td style="width: auto; text-align: right;">
-					@if(await AuthorizationService.AuthorizeAsync(User, "VType Creator"))
-					{
-						<a asp-action="Copy" asp-route-ID="@v.ID" class="btn mybtn-sm-base">Copy</a>
+						<div class="dropdown">
+							<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
+							<span class="caret"></span></button>
+							
+							<ul class="dropdown-menu dropdown-menu-right">
+								@if(await AuthorizationService.AuthorizeAsync(User, "VType Creator"))
+								{
+									<li><a asp-action="Copy" asp-route-ID="@v.ID">Copy</a></li>
 
-						<a asp-action="Edit" asp-route-ID="@v.ID" class="btn mybtn-sm-bro">Edit</a>
-					}
-					@if(await AuthorizationService.AuthorizeAsync(User, "VType Killer"))
-					{
-						<a asp-action="Delete" asp-route-ID="@v.ID" class="btn mybtn-sm-red">Delete</a>
-					}
+									<li><a asp-action="Edit" asp-route-ID="@v.ID">Edit</a></li>
+								}
+								@if(await AuthorizationService.AuthorizeAsync(User, "VType Killer"))
+								{
+									<li><a asp-action="Delete" asp-route-ID="@v.ID">Delete</a></li>
+								}
+							</ul>
+						</div>						
 					</td>
 				</tr>
 				<tr style="height: 4px;">

@@ -165,7 +165,6 @@ namespace GlobalEvent.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    await _signInManager.SignInAsync(user, isPersistent: false);
                     _logger.LogInformation(3, "Owner/Manager created a new account with password.");
                     return RedirectToAction("Admins", "Owner");
                 }
@@ -173,6 +172,35 @@ namespace GlobalEvent.Controllers
             }
             return View(model);
         }
+
+        [HttpGet]
+        [Authorize(Policy="Is Owner")]
+        public async Task<IActionResult> DeleteUser(string ID = null)
+        {
+            if (ID == null)
+            {
+                ViewBag.Message = "User ID isn't correct. Couldn't delete the user.";
+                return RedirectToAction("Admins", "Owner");
+            }
+            
+            var u = await _userManager.FindByIdAsync(ID);
+            return View(u);
+        }
+        
+        [HttpGet]
+        [Authorize(Policy="Is Owner")]
+        public async Task<IActionResult> DeleteUserOk(string ID = null)
+        {
+            if (ID != null)
+            {                
+                var u = await _userManager.FindByIdAsync(ID);
+                await _userManager.DeleteAsync(u);
+            }
+
+            return RedirectToAction("Admins", "Owner");
+        }
+
+
 
         //
         // POST: /Account/Logout

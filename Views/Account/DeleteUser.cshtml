@@ -1,0 +1,11 @@
+@model ApplicationUser
+
+<h1>DELETE User</h1>
+
+<div class="f-attention">You are going to delete the User:
+<h4><strong>@Model.FirstName @Model.LastName </strong></h4></div>
+
+<div class="text-center">
+	<a asp-action="Admins" asp-controller="Owner" class="btn mybtn bgBase">CANCEL</a>
+	<a asp-action="DeleteUserOk" asp-controller="Account" asp-route-ID="@Model.Id" class="btn mybtn bgRed">DELETE</a>
+</div>

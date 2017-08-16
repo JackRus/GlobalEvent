@@ -3,77 +3,82 @@
 <h1>ALL Products</h1>
 
 <div style="width: 100%">
-	@if (ViewBag.Products.Count != 0)
-	{
-		<table class="table table-hover">
-			<thead>
-				<tr>
-					<th>Name</th>
-					<th>Capacity</th>
-					<th>Status</th>
-					<th>Starts on</th>
-					<th>Ends on</th>
-					<th>Free</th>
-					<th>Tickets</th>
-					<th style="max-width: 300px;">Description</th>
-					<th style="width: auto;"></th>
-				</tr>
-			</thead>
+@if (ViewBag.Products.Count != 0)
+{
+	<table class="table table-hover">
+	<thead>
+		<tr>
+			<th>Name</th>
+			<th>Capacity</th>
+			<th>Status</th>
+			<th>Starts on</th>
+			<th>Ends on</th>
+			<th>Free</th>
+			<th>Tickets</th>
+			<th style="max-width: 300px;">Description</th>
+			<th style="width: auto;"></th>
+		</tr>
+	</thead>
 
-			<tbody>
-				<tr style="height: 4px;">
-						<td colspan="20" class="line-space"></td>
-				</tr>
-				@foreach(Product p in ViewBag.Products)
-				{
-					<tr>
-						<td>@p.Name</td>
-						<td>@p.Capacity</td>
-						<td>@(p.Status ? "Yes": "No")</td>
-						<td>@p.DateStart <br /> @p.TimeStart</td>
-						<td>@p.DateEnd <br /> @p.TimeEnd</td>
-						<td>@(p.Free ? "Yes" : "No")</td>
-						<td>
+	<tbody>
+		<tr style="height: 4px;">
+				<td colspan="20" class="line-space"></td>
+		</tr>
+		@foreach(Product p in ViewBag.Products)
+		{
+			<tr>
+				<td>@p.Name</td>
+				<td>@p.Capacity</td>
+				<td>@(p.Status ? "Yes": "No")</td>
+				<td>@p.DateStart <br /> @p.TimeStart</td>
+				<td>@p.DateEnd <br /> @p.TimeEnd</td>
+				<td>@(p.Free ? "Yes" : "No")</td>
+				<td>
+					@if (p.TTypes != null && p.TTypes != "")
+					{
+						var i = @p.TTypes.Split('|').ToList();
+						foreach(string s in i)
+						{
+							<div>@s</div>
+						}
+					}
+				</td>
+				<td style="max-width: 300px;">@p.Description </td>
+				<td style="width: auto; text-align: right;">
+					<div class="dropdown">
+						<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
+						<span class="caret"></span></button>
 						
-						@if(await AuthorizationService.AuthorizeAsync(User, "Product Creator"))
-						{	
-							<a asp-action="SelectTickets" asp-route-ID="@p.ID" asp-route-EID="@p.EID" class="btn mybtn-sm-base" style="width: 75px;">Add/Remove</a>
-						}
-							@if (p.TTypes != null && p.TTypes != "")
+						<ul class="dropdown-menu dropdown-menu-right">
+							@if(await AuthorizationService.AuthorizeAsync(User, "Product Creator"))
 							{
-								var i = @p.TTypes.Split('|').ToList();
-								foreach(string s in i)
-								{
-									<div>@s</div>
-								}
-							}
-						</td>
-						<td style="max-width: 300px;">@p.Description </td>
-						<td style="width: auto; text-align: right;">
-							
-						@if(await AuthorizationService.AuthorizeAsync(User, "Product Creator"))
-						{
-							<a asp-action="Copy" asp-route-ID="@p.ID" class="btn mybtn-sm-base">Copy</a>
+								<li><a asp-action="Copy" asp-route-ID="@p.ID">Copy</a></li>
 
-							<a asp-action="Edit" asp-route-ID="@p.ID" class="btn mybtn-sm-bro">Edit</a>
-						}
-						@if(await AuthorizationService.AuthorizeAsync(User, "Product Killer"))
-						{
-							<a asp-action="Delete" asp-route-ID="@p.ID" class="btn mybtn-sm-red">Delete</a>
-						}
-						</td>
-					</tr>
-					<tr style="height: 4px;">
-						<td colspan="20" class="line-space"></td>
-					</tr>
-				}
-			</tbody>
-		</table>
-	}
-	else
-	{
-		<div class="f-info">This Event has no Products yet.</div>
-	}
+								<li><a asp-action="Edit" asp-route-ID="@p.ID">Edit</a></li>
+							}
+							@if(await AuthorizationService.AuthorizeAsync(User, "Product Killer"))
+							{
+								<li><a asp-action="Delete" asp-route-ID="@p.ID">Delete</a></li>
+							}
+							@if(await AuthorizationService.AuthorizeAsync(User, "Product Creator"))
+							{	
+								<li><a asp-action="SelectTickets" asp-route-ID="@p.ID" asp-route-EID="@p.EID">Add/Remove Tickets</a></li>
+							}
+						</ul>
+					</div>
+				</td>
+			</tr>
+			<tr style="height: 4px;">
+				<td colspan="20" class="line-space"></td>
+			</tr>
+		}
+	</tbody>
+	</table>
+}
+else
+{
+	<div class="f-info">This Event has no Products yet.</div>
+}
 	
 	<br />
 	<div class="text-center">

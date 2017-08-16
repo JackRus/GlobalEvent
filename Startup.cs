@@ -49,37 +49,68 @@ namespace GlobalEvent
                 .AddDefaultTokenProviders();
 
             services.AddAuthorization(options => {
+                // EVENTS
                 options.AddPolicy("Event Editor", x => {x.RequireClaim("CanEditEvent");});
-                options.AddPolicy("Claims Editor", x => x.RequireClaim("CanChangeClaims"));
-                options.AddPolicy("Password Editor", x => {x.RequireClaim("CanChangeAdminPassword"); });
                 options.AddPolicy("Event Creator", x => x.RequireClaim("CanCreateEvent"));
                 options.AddPolicy("Event Viewer", x => x.RequireClaim("CanSeeEventDetails"));
-                options.AddPolicy("Owner's Menu", x => x.RequireClaim("CanSeeOwnersPage"));
-                options.AddPolicy("Owner's Dashboard", x => x.RequireClaim("CanSeeMainDashboard"));
                 options.AddPolicy("Events Viewer", x => x.RequireClaim("CanSeeAllEvents"));
                 options.AddPolicy("Event Killer", x => x.RequireClaim("CanDeleteEvent"));
                 options.AddPolicy("Event Activator", x => x.RequireClaim("CanChangeEventStatus"));
+                // VISITORS
+                options.AddPolicy("Visitors Viewer", x => x.RequireClaim("CanAccessAllVisitors"));
+                // ADMIN
                 options.AddPolicy("Admins Viewer", x => x.RequireClaim("CanSeeAllAdmins"));
                 options.AddPolicy("Admin Editor", x => x.RequireClaim("CanEditAdmin"));
                 options.AddPolicy("Admin Creator", x => x.RequireClaim("CanCreateAdmin"));
-                options.AddPolicy("Visitors Viewer", x => x.RequireClaim("CanAccessAllVisitors"));
-                options.AddPolicy("Tickets Viewer", x => x.RequireClaim("CanSeeAllTickets"));
+                options.AddPolicy("Admin Killer", x => x.RequireClaim("CanDeleteAdmin")); 
+                options.AddPolicy("Password Editor", x => {x.RequireClaim("CanChangeAdminPassword");});
+                options.AddPolicy("Claims Editor", x => x.RequireClaim("CanChangeClaims"));
+                // PRODUCT
                 options.AddPolicy("Products Viewer", x => x.RequireClaim("CanSeeAllProducts"));
-                options.AddPolicy("VTypes Viewer", x => x.RequireClaim("CanSeeAllVTypes"));
-                options.AddPolicy("Is Owner", x => x.RequireClaim("IsOwner"));
                 options.AddPolicy("Product Creator", x => x.RequireClaim("CanCreateEditProduct"));
                 options.AddPolicy("Product Killer", x => x.RequireClaim("CanDeleteProduct"));
+                // TICKET
                 options.AddPolicy("Ticket Creator", x => x.RequireClaim("CanCreateEditTicket"));
                 options.AddPolicy("Ticket Killer", x => x.RequireClaim("CanDeleteTicket"));
+                options.AddPolicy("Tickets Viewer", x => x.RequireClaim("CanSeeAllTickets"));
+                // Visitor Types
                 options.AddPolicy("VType Creator", x => x.RequireClaim("CanCreateEditVType"));
                 options.AddPolicy("VType Killer", x => x.RequireClaim("CanDeleteVType"));
+                options.AddPolicy("VTypes Viewer", x => x.RequireClaim("CanSeeAllVTypes"));
+                // TODOs
                 options.AddPolicy("Todo Viewer", x => x.RequireClaim("CanSeeToDoList"));
                 options.AddPolicy("Todo Creator", x => x.RequireClaim("CanAddTodo"));
                 options.AddPolicy("Todo EditorKiller", x => x.RequireClaim("CanEditDeleteTodo"));
-
+                // OWNER
+                options.AddPolicy("Is Owner", x => x.RequireClaim("IsOwner"));
+                options.AddPolicy("Owner's Menu", x => x.RequireClaim("CanSeeOwnersPage"));
+                options.AddPolicy("Owner's Dashboard", x => x.RequireClaim("CanSeeMainDashboard"));
             });
 
             services.AddMvc();
+
+            // Configure Identity
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Password settings
+                options.Password.RequireDigit = true;
+                options.Password.RequiredLength = 8;
+                options.Password.RequireNonAlphanumeric = true;
+                options.Password.RequireUppercase = true;
+                options.Password.RequireLowercase = true;
+
+                // Lockout settings
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+                options.Lockout.MaxFailedAccessAttempts = 5;
+
+                // Cookie settings
+                options.Cookies.ApplicationCookie.ExpireTimeSpan = TimeSpan.FromDays(1);
+                options.Cookies.ApplicationCookie.LoginPath = "/Account/LogIn";
+                options.Cookies.ApplicationCookie.LogoutPath = "/Account/LogOut";
+
+                // User settings
+                options.User.RequireUniqueEmail = true;
+            });
 
             // Add application services.
             services.AddTransient<IEmailSender, AuthMessageSender>();

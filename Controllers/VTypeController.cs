@@ -39,6 +39,7 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy="VType Creator")]
         public IActionResult Add(int? ID)
         {
             if (ID == null) 
@@ -51,6 +52,7 @@ namespace GlobalEvent.Controllers
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
+        [Authorize(Policy="VType Creator")]
         public async Task<IActionResult> Add(VType v)
         {
             // reset Product ID to 0
@@ -68,6 +70,7 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy="VType Creator")]
         public async Task<IActionResult> Copy (int? ID)
         {
             if (ID == null) 
@@ -80,6 +83,7 @@ namespace GlobalEvent.Controllers
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
+        [Authorize(Policy="VType Creator")]
         public async Task<IActionResult> Copy (VType v)
         { 
             // reset VType ID to 0 si
@@ -90,13 +94,14 @@ namespace GlobalEvent.Controllers
                 e.Types.Add(v);
                 _db.Events.Update(e);
                 await _db.SaveChangesAsync();
-
                 return RedirectToAction("Index", new { ID = v.EID });
             }
+
             return RedirectToAction("Events", "Owner");
         }
 
         [HttpGet]
+        [Authorize(Policy="VType Creator")]
         public async Task<IActionResult> Edit(int? ID)
         {
             if (ID == null) 
@@ -109,6 +114,7 @@ namespace GlobalEvent.Controllers
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
+        [Authorize(Policy="VType Creator")]
         public async Task<IActionResult> Edit(VType v)
         {
             if (ModelState.IsValid)
@@ -123,6 +129,7 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy="VType Killer")]
         public async Task<IActionResult> Delete(int? ID)
         {
             if (ID == null) 
@@ -134,6 +141,7 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy="VType Killer")]
         public async Task<IActionResult> DeleteOk(int? ID)
         {
             if (ID == null) 
@@ -150,6 +158,7 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy="Is Owner")]
         public async Task<IActionResult> DeleteAll(int? ID)
         {
             if (ID == null) 
@@ -166,6 +175,7 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy="Is Owner")]
         public async Task<IActionResult> DeleteAllOk(int? ID)
         {
             // redirects if no event ID provided || direct access
