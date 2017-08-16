@@ -63,7 +63,20 @@ namespace GlobalEvent
                 options.AddPolicy("Admin Editor", x => x.RequireClaim("CanEditAdmin"));
                 options.AddPolicy("Admin Creator", x => x.RequireClaim("CanCreateAdmin"));
                 options.AddPolicy("Visitors Viewer", x => x.RequireClaim("CanAccessAllVisitors"));
-                
+                options.AddPolicy("Tickets Viewer", x => x.RequireClaim("CanSeeAllTickets"));
+                options.AddPolicy("Products Viewer", x => x.RequireClaim("CanSeeAllProducts"));
+                options.AddPolicy("VTypes Viewer", x => x.RequireClaim("CanSeeAllVTypes"));
+                options.AddPolicy("Is Owner", x => x.RequireClaim("IsOwner"));
+                options.AddPolicy("Product Creator", x => x.RequireClaim("CanCreateEditProduct"));
+                options.AddPolicy("Product Killer", x => x.RequireClaim("CanDeleteProduct"));
+                options.AddPolicy("Ticket Creator", x => x.RequireClaim("CanCreateEditTicket"));
+                options.AddPolicy("Ticket Killer", x => x.RequireClaim("CanDeleteTicket"));
+                options.AddPolicy("VType Creator", x => x.RequireClaim("CanCreateEditVType"));
+                options.AddPolicy("VType Killer", x => x.RequireClaim("CanDeleteVType"));
+                options.AddPolicy("Todo Viewer", x => x.RequireClaim("CanSeeToDoList"));
+                options.AddPolicy("Todo Creator", x => x.RequireClaim("CanAddTodo"));
+                options.AddPolicy("Todo EditorKiller", x => x.RequireClaim("CanEditDeleteTodo"));
+
             });
 
             services.AddMvc();
@@ -95,9 +108,7 @@ namespace GlobalEvent
             }
             else
             {
-                app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
-                //app.UseExceptionHandler("/Home/Error");
+                app.UseExceptionHandler("/Shared/Error");
             }
 
             app.UseStaticFiles();

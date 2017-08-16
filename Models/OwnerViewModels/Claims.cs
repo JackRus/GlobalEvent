@@ -23,14 +23,18 @@ namespace GlobalEvent.Models.OwnerViewModels
 		public bool CanDeleteVisitor { get; set; }
 		public bool CanEditVisitor { get; set; }
 	// products
-		public bool CanCreateProduct { get; set; }
-		public bool CanEditProduct { get; set; }
-		public bool CanDeleteProduct { get; set; }
-		public bool CanChangeProductTickets { get; set; }
+		public bool CanCreateEditProduct { get; set; } // owner, manager + 
+		public bool CanDeleteProduct { get; set; }	// owner, manager +
+		public bool CanSeeAllProducts { get; set; }   // all +
+
+	// tickets
+		public bool CanSeeAllTickets { get; set; } // all +
+		public bool CanDeleteTicket { get; set; }	// +
+		public bool CanCreateEditTicket { get; set; }	// +
 	// visitor types
-		public bool CanCreateVType { get; set; }
-		public bool CanEditVType { get; set; }
-		public bool CanDeleteVType { get; set; }
+		public bool CanCreateEditVType { get; set; }    // +
+		public bool CanDeleteVType { get; set; }	// +
+		public bool CanSeeAllVTypes { get; set; }   // all +
 	// orders
 		public bool CanCreateOrder { get; set; }	// owner, manager
 		public bool CanCancelOrder { get; set; }	// manager. owner
@@ -42,15 +46,15 @@ namespace GlobalEvent.Models.OwnerViewModels
 		public bool CanDeleteAdmin { get; set; }  // TODO
 		public bool CanEditAdmin { get; set; } // owner, manager +
 		public bool CanChangeClaims { get; set; } // owner, manager +
-		public bool CanAddAdmin { get; set; }	// owner, manager +
 		public bool CanSeeAllAdmins { get; set; } // owner, manager +
 
 	// owner
 		public bool CanSeeMainDashboard { get; set; } // owner +
+		public bool IsOwner { get; set; }   // only owner + 
 		public bool CanSeeOwnersPage { get; set; }	// MAIN MENU: manager, owner +
 
 	// todo
-		public bool CanSeeToDoList { get; set; }	// manager, owner
+		public bool CanSeeToDoList { get; set; }	// manager, owner +
 		public bool CanAddTodo { get; set; }
 		public bool CanEditDeleteTodo { get; set; }
 	}

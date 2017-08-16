@@ -28,6 +28,7 @@ namespace GlobalEvent.Controllers
                 .Include(x => x.Visitors)
                 .FirstOrDefaultAsync(x => x.Status);
 
+            // get active event
             ViewBag.Active = e == null ? false : true;
             if (ViewBag.Active)
             {
@@ -47,7 +48,6 @@ namespace GlobalEvent.Controllers
                     ViewBag.AllTickets += t.Limit;
                 }
             }
- 
             return View(e);
         }
 
@@ -55,7 +55,10 @@ namespace GlobalEvent.Controllers
         [Authorize(Policy="Visitors Viewer")]
         public async Task<IActionResult> Search (string ID = null, string Name = null)
         {
-            if (ID == null || Name == null) return RedirectToAction("Dashboard");
+            if (ID == null || Name == null) 
+            {
+                return RedirectToAction("Dashboard");
+            }
 
             List<Visitor> v = new List<Visitor>();
             
@@ -89,7 +92,6 @@ namespace GlobalEvent.Controllers
             {
 
             }
-
             return View(v);
         }
 
@@ -99,6 +101,8 @@ namespace GlobalEvent.Controllers
         {
             // get Active event id
             var EID = (await _db.Events.SingleOrDefaultAsync(x => x.Status)).ID;
+            
+            // get all visitors for active event
             List<Visitor> v = await _db.Visitors.Where(x => x.EID == EID).ToListAsync(); 
             return View(v);
         }

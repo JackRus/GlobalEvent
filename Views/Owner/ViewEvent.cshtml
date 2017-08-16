@@ -51,7 +51,12 @@
 
 <div class="row">
     <div class="col-md-6">
-        <div class="stat-name">Eventbrite's Token: <span class="stat">@Model.HttpBase </span></div>
+        <div class="stat-name">Eventbrite's Token: 
+        @if(await AuthorizationService.AuthorizeAsync(User, "Is Owner"))
+            {<span class="stat">@Model.HttpBase </span>}
+        else
+            {<span class="stat">****************</span>}
+        </div>
     </div>
 
     <div class="col-md-6">
@@ -73,7 +78,13 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div class="stat-name" style="text-align: justify;">Ticket Types: <a asp-action="Index" asp-controller="Ticket" asp-route-id="@Model.ID" class="btn mybtn-sm-event" data-id="tog" >MANAGE TICKETS</a><br />
+        <div class="stat-name" style="text-align: justify;">Ticket Types: 
+            @if(await AuthorizationService.AuthorizeAsync(User, "Tickets Viewer"))
+            {
+            <a asp-action="Index" asp-controller="Ticket" asp-route-id="@Model.ID" class="btn mybtn-sm-event" data-id="tog" >MANAGE TICKETS</a>
+            }
+            
+            <br />
             @if (@Model.Tickets.Count() < 1)
             {
                 <span>Not created yet</span>
@@ -93,7 +104,12 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div class="stat-name" style="text-align: justify;"> Products/Events: <a asp-action="Index" asp-controller="Product" asp-route-id="@Model.ID" class="btn mybtn-sm-event" data-id="tog" >MANAGE PRODUCTS</a><br />
+        <div class="stat-name" style="text-align: justify;"> Products/Events: 
+            @if(await AuthorizationService.AuthorizeAsync(User, "Products Viewer"))
+            {
+            <a asp-action="Index" asp-controller="Product" asp-route-id="@Model.ID" class="btn mybtn-sm-event" data-id="tog" >MANAGE PRODUCTS</a>
+            }
+            <br />
             @if (@Model.Products.Count() < 1)
             {
                 <span>Not created yet</span>
@@ -113,7 +129,12 @@
 
 <div class="row">
     <div class="col-md-12">
-        <div class="stat-name" style="text-align: justify;"> Visitor Types: <a asp-action="Index" asp-controller="VType" asp-route-id="@Model.ID" class="btn mybtn-sm-event" data-id="tog" >MANAGE VISITOR TYPES</a><br />
+        <div class="stat-name" style="text-align: justify;"> Visitor Types: 
+            @if(await AuthorizationService.AuthorizeAsync(User, "VTypes Viewer"))
+            {
+            <a asp-action="Index" asp-controller="VType" asp-route-id="@Model.ID" class="btn mybtn-sm-event" data-id="tog" >MANAGE VISITOR TYPES</a>
+            }
+            <br />
             @if (@Model.Types.Count() < 1)
             {
                 <span>Not created yet</span>

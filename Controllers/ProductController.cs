@@ -21,78 +21,110 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy="Products Viewer")]
         public async Task<IActionResult> Index(int? ID) //displays all Products
         {
-            if (ID == null) return RedirectToAction("Events", "Owner");
+            if (ID == null) 
+            {
+                return RedirectToAction("Events", "Owner");
+            }
+
+            // get all products for the current event
             ViewBag.Products = await _db.Products
                 .Where(x => x.EID == ID)
                 .ToListAsync();
+
             ViewBag.ID = ID;
             return View();
         }
 
         [HttpGet]
+        [Authorize(Policy="Product Creator")]
         public IActionResult Add(int? ID)
         {
-            if (ID == null) return RedirectToAction("Events", "Owner");
+            if (ID == null) 
+            {
+                return RedirectToAction("Events", "Owner");
+            }
+
             return View(new Product(){EID = (int)ID});
         }
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
+        [Authorize(Policy="Product Creator")]
         public async Task<IActionResult> Add(Product p)
         {
             // reset Product ID to 0
             p.ID = 0;
             if (ModelState.IsValid)
             {
+                // update Event's products
                 Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == p.EID);
                 e.Products.Add(p);
                 _db.Events.Update(e);
+
+                // save changes
                 await _db.SaveChangesAsync();
+
                 return RedirectToAction("Index", new { ID = p.EID });
             }
             return RedirectToAction("Events", "Owner");
         }
 
         [HttpGet]
+        [Authorize(Policy="Product Creator")]
         public async Task<IActionResult> Copy (int? ID)
         {
-            if (ID == null) return RedirectToAction("Events", "Owner");
+            if (ID == null) 
+            {
+                return RedirectToAction("Events", "Owner");
+            }
 
             // extrats event with the matching ID
             Product p = await _db.Products
                 .Where(x => x.ID == ID)
                 .FirstOrDefaultAsync();
+
             return View(p);
         }
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
+        [Authorize(Policy="Product Creator")]
         public async Task<IActionResult> Copy (Product p)
         {
             // reset Product ID to 0
             p.ID = 0;
             if (ModelState.IsValid)
             {
+                // update and save changes
                 Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == p.EID);
                 e.Products.Add(p);
                 _db.Events.Update(e);
                 await _db.SaveChangesAsync();
+
                 return RedirectToAction("Index", new { ID = p.EID });
             }
+
             return RedirectToAction("Events", "Owner");
         }
 
         [HttpGet]
+        [Authorize(Policy="Product Creator")]
         public async Task<IActionResult> Edit(int? ID)
         {
-            if (ID == null) return RedirectToAction("Events", "Owner");
+            if (ID == null) 
+            {
+                return RedirectToAction("Events", "Owner");
+            }
+
             return View(await _db.Products.FirstOrDefaultAsync(x => x.ID == ID));
         }
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
+        [Authorize(Policy="Product Creator")]
         public async Task<IActionResult> Edit(Product p)
         {
             if (ModelState.IsValid)
@@ -105,67 +137,102 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy="Product Killer")]
         public async Task<IActionResult> Delete(int? ID)
         {
-            if (ID == null) return RedirectToAction("Events", "Owner");
+            if (ID == null) 
+            {
+                return RedirectToAction("Events", "Owner");
+            }
+
             return View(await _db.Products.FirstOrDefaultAsync(x => x.ID == ID));
         }
 
         [HttpGet]
+        [Authorize(Policy="Product Killer")]
         public async Task<IActionResult> DeleteOk(int? ID)
         {
-            if (ID == null)return RedirectToAction("Events", "Owner");
+            if (ID == null)
+            {
+                return RedirectToAction("Events", "Owner");
+            }
 
             // extrats event with the matching ID
             Product p = await _db.Products.FirstOrDefaultAsync(x => x.ID == ID);
+            // remove and save changes
             _db.Products.Remove(p);
             await _db.SaveChangesAsync();
+
             return RedirectToAction("Index", new { ID = p.EID });
         }
 
         [HttpGet]
+        [Authorize(Policy="Is Owner")]
         public async Task<IActionResult> DeleteAll(int? ID)
         {
-            if (ID == null) return RedirectToAction("Events", "Owner");
+            if (ID == null) 
+            {
+                return RedirectToAction("Events", "Owner");
+            }
 
             // confirmation page
             Event e = await _db.Events
                 .Include(x => x.Products)
                 .FirstOrDefaultAsync(x => x.ID == ID);
+
             return View(e);
         }
 
         [HttpGet]
+        [Authorize(Policy="Is Owner")]
         public async Task<IActionResult> DeleteAllOk(int? ID)
         {
-            if (ID == null) return RedirectToAction("Events", "Owner");
+            if (ID == null) 
+            {
+                return RedirectToAction("Events", "Owner");
+            }
 
             // delete all Products for a specific event
             _db.Products.RemoveRange(_db.Products.Where(x => x.EID == ID));
             await _db.SaveChangesAsync();
+
             return RedirectToAction("Index", new { ID = ID });
         }
 
         [HttpGet]
+        [Authorize(Policy="Product Creator")]
         public async Task<IActionResult> SelectTickets (int? ID, int? EID) //product ID
         {
-            if (ID == null || EID == null) return RedirectToAction("Events", "Owner");
+            if (ID == null || EID == null) 
+            {
+                return RedirectToAction("Events", "Owner");
+            }
+            // get all tickets for the event
             ViewBag.Tickets = await _db.Tickets.Where(x => x.EID == EID).ToListAsync();
+            // get all ticket types for the event
             ViewBag.Types = (await _db.Products.FirstOrDefaultAsync(x => x.ID == ID)).TTypes; //string
+           
             ViewBag.ID = (int)ID;
             ViewBag.EID = (int)EID;
+
             return View();
         }
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
+        [Authorize(Policy="Product Creator")]
         public async Task<IActionResult> SaveTickets (int? ID, string result) // product ID
         {
-            if (ID == null) return RedirectToAction("Events", "Owner");
+            if (ID == null) 
+            {
+                return RedirectToAction("Events", "Owner");
+            }
+
             Product p = await _db.Products.FirstOrDefaultAsync(x => x.ID == ID);
             p.TTypes = result;
             _db.Products.Update(p);
             await _db.SaveChangesAsync();
+            
             return RedirectToAction("Index", new { ID = p.EID });
         }
     }

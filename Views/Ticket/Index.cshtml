@@ -9,7 +9,7 @@
 					<th>Type</th>
 					<th>Price</th>
 					<th>Amount</th>
-					<th>Description</th>
+					<th>Description</th> 
 					<th></th>
 				</tr>
 			</thead>
@@ -26,11 +26,16 @@
 						<td>@t.Limit</td>
 						<td>@t.Description </td>
 						<td style="width: auto; text-align: right;">
+						@if(await AuthorizationService.AuthorizeAsync(User, "Ticket Creator"))
+						{	
 							<a asp-action="Copy" asp-route-ID="@t.ID" class="btn mybtn-sm-base">Copy</a>
 
 							<a asp-action="Edit" asp-route-ID="@t.ID" class="btn mybtn-sm-bro">Edit</a>
-						
+						}
+						@if(await AuthorizationService.AuthorizeAsync(User, "Ticket Killer"))
+						{
 							<a asp-action="Delete" asp-route-ID="@t.ID" class="btn mybtn-sm-red">Delete</a>
+						}
 						</td>
 					</tr>
 					<tr style="height: 4px;">
@@ -49,7 +54,7 @@
 		<a asp-action="Add" asp-route-id="@ViewBag.ID" class="btn mybtn bgBase">ADD</a>
 		<a asp-action="ViewEvent" asp-controller="Owner" asp-route-id="@ViewBag.ID" class="btn mybtn bgBro">BACK</a>
 
-		@if (ViewBag.Tickets.Count != 0) 
+		@if (ViewBag.Tickets.Count != 0 && (await AuthorizationService.AuthorizeAsync(User, "Is Owner"))) 
 		{
 			<a asp-action="DeleteAll" asp-route-id="@ViewBag.ID" class="btn mybtn bgRed">DELETE ALL</a>
 		}

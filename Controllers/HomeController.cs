@@ -25,14 +25,23 @@ namespace GlobalEvent.Controllers
 
         public async Task<IActionResult> Welcome()
         {
-            ViewBag.Future = await _db.Events.Where(x => !x.Status && !x.Archived).ToListAsync();
+            // get all future events
+            ViewBag.Future = await _db.Events
+                .Where(x => !x.Status && !x.Archived)
+                .ToListAsync();
+                
+            // get active event
             ViewBag.Active = await _db.Events.FirstOrDefaultAsync(x => x.Status);
             return View();
         }
 
         public IActionResult Menu (int? EID)
         {
-            if (EID == null) return RedirectToAction("Welcome", "Home");
+            if (EID == null) 
+            {
+                return RedirectToAction("Welcome", "Home");
+            }
+
             ViewBag.EID = (int)EID;
             return View();
         }

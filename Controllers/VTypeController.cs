@@ -22,20 +22,30 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy="VTypes Viewer")]
         public async Task<IActionResult> Index(int? ID) //displays all Products
         {
-            if (ID == null) return RedirectToAction("Events", "Owner");
+            if (ID == null) 
+            {
+                return RedirectToAction("Events", "Owner");
+            }
+
             ViewBag.VTypes = await _db.Types
                 .Where(x => x.EID == ID)
                 .ToListAsync();
             ViewBag.ID = ID;
+
             return View();
         }
 
         [HttpGet]
         public IActionResult Add(int? ID)
         {
-            if (ID == null) return RedirectToAction("Events", "Owner");
+            if (ID == null) 
+            {
+                return RedirectToAction("Events", "Owner");
+            }
+
             return View(new VType(){EID = (int)ID});
         }
 
@@ -51,6 +61,7 @@ namespace GlobalEvent.Controllers
                 e.Types.Add(v);
                 _db.Events.Update(e);
                 await _db.SaveChangesAsync();
+
                 return RedirectToAction("Index", new { ID = v.EID });
             }
             return RedirectToAction("Events", "Owner");
@@ -59,7 +70,11 @@ namespace GlobalEvent.Controllers
         [HttpGet]
         public async Task<IActionResult> Copy (int? ID)
         {
-            if (ID == null) return RedirectToAction("Events", "Owner");
+            if (ID == null) 
+            {
+                return RedirectToAction("Events", "Owner");
+            }
+
             return View(await _db.Types.FirstOrDefaultAsync(x => x.ID == ID));
         }
 
@@ -75,6 +90,7 @@ namespace GlobalEvent.Controllers
                 e.Types.Add(v);
                 _db.Events.Update(e);
                 await _db.SaveChangesAsync();
+
                 return RedirectToAction("Index", new { ID = v.EID });
             }
             return RedirectToAction("Events", "Owner");
@@ -83,7 +99,11 @@ namespace GlobalEvent.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int? ID)
         {
-            if (ID == null) return RedirectToAction("Events");
+            if (ID == null) 
+            {
+                return RedirectToAction("Events");
+            }
+
             return View(await _db.Types.FirstOrDefaultAsync(x => x.ID == ID));
         }
 
@@ -95,39 +115,53 @@ namespace GlobalEvent.Controllers
             {
                 _db.Types.Update(v);
                 await _db.SaveChangesAsync();
+
                 return RedirectToAction("Index", new { ID = v.EID });
             }
+
             return RedirectToAction("Events", "Owner");
         }
 
         [HttpGet]
         public async Task<IActionResult> Delete(int? ID)
         {
-            if (ID == null) return RedirectToAction("Events", "Owner");
+            if (ID == null) 
+            {
+                return RedirectToAction("Events", "Owner");
+            }
+
             return View(await _db.Types.FirstOrDefaultAsync(x => x.ID == ID));
         }
 
         [HttpGet]
         public async Task<IActionResult> DeleteOk(int? ID)
         {
-            if (ID == null) return RedirectToAction("Events", "Owner");
+            if (ID == null) 
+            {
+                return RedirectToAction("Events", "Owner");
+            }
 
             // extrats event with the matching ID
             VType v = await _db.Types.FirstOrDefaultAsync(x => x.ID == ID);
             _db.Types.Remove(v);
             await _db.SaveChangesAsync();
+
             return RedirectToAction("Index", new { ID = v.EID });
         }
 
         [HttpGet]
         public async Task<IActionResult> DeleteAll(int? ID)
         {
-            if (ID == null) return RedirectToAction("Events", "Owner");
+            if (ID == null) 
+            {
+                return RedirectToAction("Events", "Owner");
+            }
 
             // confirmation page
             Event e = await _db.Events
                 .Include(x => x.Types)
                 .FirstOrDefaultAsync(x => x.ID == ID);
+
             return View(e);
         }
 
@@ -135,11 +169,15 @@ namespace GlobalEvent.Controllers
         public async Task<IActionResult> DeleteAllOk(int? ID)
         {
             // redirects if no event ID provided || direct access
-            if (ID == null) return RedirectToAction("Events", "Owner");
+            if (ID == null) 
+            { 
+                return RedirectToAction("Events", "Owner");
+            }
 
             // delete all Products for a specific event
             _db.Types.RemoveRange(_db.Types.Where(x => x.EID == ID));
             await _db.SaveChangesAsync();
+            
             return RedirectToAction("Index", new { ID = ID });
         }
     }

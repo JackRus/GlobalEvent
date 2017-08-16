@@ -24,7 +24,10 @@
 	<div class="col-sm-6"> 
 		<div>
 			<h4 class="inline">TODO List &nbsp &nbsp</h4>
-			<a class="btn mybtn-sm-base px60 tog" data-id="todo-add" style="vertical-align: text-bottom;">ADD</a>
+			@if(await AuthorizationService.AuthorizeAsync(User, "Todo Creator"))
+			{
+				<a class="btn mybtn-sm-base px60 tog" data-id="todo-add" style="vertical-align: text-bottom;">ADD</a>
+			}
 			<a asp-action="Index" asp-controller="Todo" class="btn mybtn-sm-bro px60" style="vertical-align: text-bottom;">Show All</a>
 		</div>
 

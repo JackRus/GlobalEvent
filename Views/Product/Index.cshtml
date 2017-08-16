@@ -16,7 +16,7 @@
 					<th>Free</th>
 					<th>Tickets</th>
 					<th style="max-width: 300px;">Description</th>
-					<th>Action</th>
+					<th style="width: auto;"></th>
 				</tr>
 			</thead>
 
@@ -34,8 +34,11 @@
 						<td>@p.DateEnd <br /> @p.TimeEnd</td>
 						<td>@(p.Free ? "Yes" : "No")</td>
 						<td>
+						
+						@if(await AuthorizationService.AuthorizeAsync(User, "Product Creator"))
+						{	
 							<a asp-action="SelectTickets" asp-route-ID="@p.ID" asp-route-EID="@p.EID" class="btn mybtn-sm-base" style="width: 75px;">Add/Remove</a>
-
+						}
 							@if (p.TTypes != null && p.TTypes != "")
 							{
 								var i = @p.TTypes.Split('|').ToList();
@@ -47,12 +50,17 @@
 						</td>
 						<td style="max-width: 300px;">@p.Description </td>
 						<td style="width: auto; text-align: right;">
+							
+						@if(await AuthorizationService.AuthorizeAsync(User, "Product Creator"))
+						{
 							<a asp-action="Copy" asp-route-ID="@p.ID" class="btn mybtn-sm-base">Copy</a>
 
 							<a asp-action="Edit" asp-route-ID="@p.ID" class="btn mybtn-sm-bro">Edit</a>
-
+						}
+						@if(await AuthorizationService.AuthorizeAsync(User, "Product Killer"))
+						{
 							<a asp-action="Delete" asp-route-ID="@p.ID" class="btn mybtn-sm-red">Delete</a>
-
+						}
 						</td>
 					</tr>
 					<tr style="height: 4px;">
@@ -69,10 +77,13 @@
 	
 	<br />
 	<div class="text-center">
+		@if(await AuthorizationService.AuthorizeAsync(User, "Product Creator"))
+		{
 		<a asp-action="Add" asp-route-id="@ViewBag.ID" class="btn mybtn bgBase">ADD</a>
+		}
 		<a asp-action="ViewEvent" asp-controller="Owner" asp-route-id="@ViewBag.ID" class="btn mybtn bgBro">BACK</a>
 
-		@if (ViewBag.Products.Count != 0) 
+		@if (ViewBag.Products.Count != 0 && (await AuthorizationService.AuthorizeAsync(User, "Is owner")))
 		{
 			<a asp-action="DeleteAll" asp-route-id="@ViewBag.ID" class="btn mybtn bgRed">DELETE ALL</a>
 		}

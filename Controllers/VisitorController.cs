@@ -22,7 +22,11 @@ namespace GlobalEvent.Controllers
 
 		public IActionResult CheckInConfirmation(int? EID)
 		{
-			if (EID == null) return RedirectToAction("Welcome", "Home");
+			if (EID == null) 
+			{
+				return RedirectToAction("Welcome", "Home");
+			}
+
 			ViewBag.EID = (int)EID;
 			return View();
 		}
@@ -30,7 +34,11 @@ namespace GlobalEvent.Controllers
 		[HttpGet]
 		public IActionResult PreCheckIn(int? EID)
 		{
-			if (EID == null) return RedirectToAction("Welcome", "Home");
+			if (EID == null) 
+			{
+				return RedirectToAction("Welcome", "Home");
+			}
+
 			return View(new Visitor(){EID = (int)EID});
 		}
 
@@ -39,8 +47,11 @@ namespace GlobalEvent.Controllers
 		public async Task<IActionResult> CheckIn(Visitor v)
 		{
 			if (v.RegistrationNumber == null || v.EID == 0) 
+			{
 				return RedirectToAction("Menu", "Home", new { EID = v.EID});
+			}
 
+			// get visitor by reg #
 			var newV = await _db.Visitors.FirstOrDefaultAsync(x => x.RegistrationNumber == v.RegistrationNumber);
 
 			if (newV != null)
@@ -61,7 +72,10 @@ namespace GlobalEvent.Controllers
 		[HttpGet]
 		public async Task<IActionResult> CheckInOk (string number, int? EID)
 		{
-			if (number == null || EID == null) return RedirectToAction("Welcome", "Home");
+			if (number == null || EID == null) 
+			{
+				return RedirectToAction("Welcome", "Home");
+			}
 			
 			var v = await _db.Visitors.FirstOrDefaultAsync(x => x.RegistrationNumber == number);
 			
@@ -70,22 +84,29 @@ namespace GlobalEvent.Controllers
 				ViewBag.Message = "Something went wrong. Please try again.";
 				return RedirectToAction("Menu", "Home", new { EID = EID });
 			}
-
+			
+			// update and save changges
 			v.CheckIned = true;
 			_db.Visitors.Update(v);
 			await _db.SaveChangesAsync();
+
 			return View();
 		}
 
 		[HttpGet]
 		public async Task<IActionResult> Edit (string number)
 		{
-			if (number == null) return RedirectToAction("Welcome", "Home");
+			if (number == null) 
+			{
+				return RedirectToAction("Welcome", "Home");
+			}
 			
 			Visitor v = await _db.Visitors.FirstOrDefaultAsync(x => x.RegistrationNumber == number); 
 
 			if (v == null || v.CheckIned)
+			{
 				return RedirectToAction("Welcome", "Home");
+			}
 			
 			return View(v);
 		}
@@ -94,7 +115,10 @@ namespace GlobalEvent.Controllers
 		[AutoValidateAntiforgeryToken]
 		public async Task<IActionResult> EditOk(Visitor v)
 		{
-			if (!ModelState.IsValid) return RedirectToAction("Menu", "Home", new {EID = v.EID});
+			if (!ModelState.IsValid) 
+			{
+				return RedirectToAction("Menu", "Home", new {EID = v.EID});
+			}
 
 			// get the existing visitor
 			var oldV = await _db.Visitors.FirstOrDefaultAsync(x => x.RegistrationNumber == v.RegistrationNumber); 
@@ -110,16 +134,21 @@ namespace GlobalEvent.Controllers
 			// update visitor
 			_db.Visitors.Update(oldV);
 			await _db.SaveChangesAsync();
+
 			return View(oldV);
 		}
 
 		[HttpGet]
 		public async Task<IActionResult> PreRegister(int? EID)
 		{
-			if (EID == null) return RedirectToAction("Welcome", "Home");
+			if (EID == null) 
+			{
+				return RedirectToAction("Welcome", "Home");
+			}
 		
 			await Order.OrderUpdate(_db, (int)EID);
             ViewBag.EID = (int)EID;
+
 			return View();
 		}
 
@@ -128,7 +157,9 @@ namespace GlobalEvent.Controllers
 		public async Task <IActionResult> Register(Visitor v)
 		{
 			if (v.OrderNumber == null || v.EID == 0) 
+			{
 				return RedirectToAction("Welcome", "Home");
+			}
 
 			var orders = await _db.Orders.ToListAsync();
 			foreach (Order o in orders)
@@ -145,6 +176,7 @@ namespace GlobalEvent.Controllers
 					return View(v);
 				}
 			}
+
             ViewBag.Message = "This ORDER number isn't correct.  Please try again.";
 			ViewBag.EID = v.EID;
             return View("PreRegister");
@@ -154,10 +186,14 @@ namespace GlobalEvent.Controllers
 		[AutoValidateAntiforgeryToken]
 		public async Task<IActionResult> RegisterOk(Visitor v)
 		{
-			if (!ModelState.IsValid) return RedirectToAction("Menu", "Home", new {EID = v.EID});
+			if (!ModelState.IsValid) 
+			{
+				return RedirectToAction("Menu", "Home", new {EID = v.EID});
+			}
 
 			// if dublicate found/already registered
-			if (_db.Visitors.Any(x => x.OrderNumber == v.OrderNumber 
+			if (_db.Visitors.Any(x => 
+				x.OrderNumber == v.OrderNumber 
 				&& x.Name == v.Name && x.Last == v.Last))
 			{
 				ViewBag.Message = "Record for this attendee already exist. If you have any questions please refer to one of the representative.";
@@ -169,9 +205,10 @@ namespace GlobalEvent.Controllers
 			Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == v.EID);
 			e.Visitors.Add(v);
 			
-			// update order
+			// update order and save changes
 			await Order.Increment(v.OrderNumber, _db);
 			await _db.SaveChangesAsync();
+
 			return View(v);
 		}
 

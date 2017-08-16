@@ -18,12 +18,17 @@ namespace GlobalEvent.Controllers
             _db = context;
         }
 
+        [HttpGet]
+        [Authorize(Policy="Todo Viewer")]
         public IActionResult Index()
         {
+            // get all active todos
             ViewBag.Todos = _db.ToDos
                 .Where(x => !x.Done)
                 .OrderBy(x => x.Deadline)
                 .ToList();
+
+            // get completed todos
             ViewBag.Done = _db.ToDos
                 .Where(x => x.Done)
                 .OrderBy(x => x.Deadline)
@@ -33,7 +38,8 @@ namespace GlobalEvent.Controllers
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
-        public async Task<IActionResult> Add (ToDo t)
+        [Authorize(Policy="Todo Creator")]
+        public async Task<IActionResult> Add (ToDo t) // from Main Menu
         {
             if (ModelState.IsValid)
             {
@@ -44,61 +50,84 @@ namespace GlobalEvent.Controllers
             return RedirectToAction("Index", "Owner", new { message = "Couldn't create ToDo item. Please try again."});
         }
 
-        public IActionResult AddFull()
+        [HttpGet]
+        [Authorize(Policy="Todo Creator")]
+        public IActionResult AddFull() // from separate page
         {
             return View(new ToDo());
         }
 
         [HttpGet]
+        [Authorize(Policy="Todo Creator")]
         public async Task<IActionResult> Copy (int? ID)
         {
-            if (ID == null) return RedirectToAction("Index");
+            if (ID == null) 
+            {
+                return RedirectToAction("Index");
+            }
+
             return View(await _db.ToDos.FirstOrDefaultAsync(x => x.ID == ID));
         }
 
         [HttpGet]
+        [Authorize(Policy="Todo EditorKiller")]
         public async Task<IActionResult> Edit (int? ID)
         {
-            if (ID == null) return RedirectToAction("Index");
+            if (ID == null) 
+            {
+                return RedirectToAction("Index");
+            }
             return View(await _db.ToDos.FirstOrDefaultAsync(x => x.ID == ID));
         }
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
+        [Authorize(Policy="Todo EditorKiller")]
         public async Task<IActionResult> Edit (ToDo t)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
-                ToDo tOld = await _db.ToDos.FirstOrDefaultAsync(x => x.ID == t.ID);
-                tOld.Task = t.Task;
-                tOld.Comments = t.Comments;
-                tOld.Done = t.Done;
-                tOld.EID = t.EID;
-                tOld.Deadline = t.Deadline;
-                _db.ToDos.Update(tOld);
-                await _db.SaveChangesAsync();
                 return RedirectToAction("Index");
             }
+
+            ToDo tOld = await _db.ToDos.FirstOrDefaultAsync(x => x.ID == t.ID);
+            tOld.Task = t.Task;
+            tOld.Comments = t.Comments;
+            tOld.Done = t.Done;
+            tOld.EID = t.EID;
+            tOld.Deadline = t.Deadline;
+            _db.ToDos.Update(tOld);
+            await _db.SaveChangesAsync();
+
             return RedirectToAction("Index");
         }
 
         [HttpGet]
+        [Authorize(Policy="Todo EditorKiller")]
         public async Task<IActionResult> Delete (int? ID)
         {
-            if (ID == null) return RedirectToAction("Index");
+            if (ID == null) 
+            {
+                return RedirectToAction("Index");
+            }
 
             ToDo t = await _db.ToDos.FirstOrDefaultAsync(x => x.ID == ID);
             _db.ToDos.Remove(t);
             await _db.SaveChangesAsync();
+            
             return RedirectToAction("index");
         }
 
+        [HttpGet]
+        [Authorize(Policy="Is Owner")]
         public async Task<IActionResult> DeleteAll ()
         {
             ViewBag.Todos = await _db.ToDos.ToListAsync();
             return View();
         }
 
+        [HttpGet]
+        [Authorize(Policy="Is Owner")]
         public async Task<IActionResult> DeleteAllOk (string code = null)
         {
             if (code == "dltok")
