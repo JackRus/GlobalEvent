@@ -1,0 +1,137 @@
+@model Visitor
+
+<h1>Visitor's details</h1> 
+
+@if(ViewBag.Message != null)
+{
+	<div id="tog" class="f-attention">@ViewBag.Message
+    </div>
+	<div class="text-center">
+		<a asp-action="Dashboard" class="btn mybtn bgBase">OK</a>
+	</div>
+}
+
+<div class="text-center">
+	Check In: <div class="bulp @(Model.CheckIned ? "bgBase" : "bgGray")" style="vertical-align: bottom"></div>
+	Registration: <div class="bulp @(Model.Registered ? "bgBase" : "bgGray")" style="vertical-align: bottom"></div>
+	Block: <div class="bulp @(Model.Blocked ? "bgRed" : "bgBase")" style="vertical-align: bottom"></div>
+</div>
+
+<div class="row mar5">
+		
+		<div class="col-sm-4 nopad">
+			<div class="dash-head tog" data-id="info">
+				Visitor's Info
+			</div>
+			<div class="dash-section" id="info">
+				<span class="dash-name">First Name: </span>
+				@Model.Name 
+				<br />
+				<span class="dash-name">Last Name: </span>
+				@Model.Last
+				<br />
+				<span class="dash-name">Ticket: </span>
+				@Model.TicketType
+				<br />
+				<span class="dash-name">Category: </span>
+				@Model.Type
+				<br />
+				<span class="dash-name">Registration #: </span>
+				@Model.RegistrationNumber
+				<br />
+				<span class="dash-name">Order #: </span>
+				@Model.OrderNumber
+				<br />
+				<span class="dash-name">Reg. time: </span>
+				@Model.RegTime,  @Model.RegDate
+				<br />
+				<span class="dash-name">Company: </span>
+				@Model.Company
+				<br />
+				<span class="dash-name">Occupation: </span>
+				@Model.Occupation
+				<br />
+				<span class="dash-name">Phone / ext.: </span>
+				@Model.Phone @(Model.Extention == null ? "" : "/ " + Model.Extention)
+				<br />
+				<span class="dash-name">Email: </span>
+				@Model.Email
+				<br />
+			@if(Model.Blocked)
+			{
+				<span class="dash-name">Block Reason: </span>
+				@Model.BlockReason
+				<br />
+			}
+
+
+				
+			</div>
+		</div>
+
+		<div class="col-sm-4 nopad">
+			<div class="dash-head">
+				Requests/Complaints
+			</div>
+			<div class="dash-section">
+			
+			</div>
+		</div>
+
+		<div class="col-sm-4 nopad">
+			<div class="dash-head">
+				Visitor's Notes
+			</div>
+			<div class="dash-section">
+
+			
+			</div>
+		</div>
+</div>
+
+ <!-- VISITOR"S LOGS -->
+<div class="row mar5">
+		
+@if(Model.Logs != null && Model.Logs.Count != 0)
+{
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th>Log ID</th>
+				<th>Date</th>
+				<th>Time Begin / End</th>
+				<th>Stage</th>
+				<th>Description</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+		@foreach(var v in Model)
+		{	
+			<tr>
+				<td>@v.ID</td>
+				<td>@v.Name</td>
+				<td>@v.Last</td>
+				<td>@v.RegistrationNumber</td>
+				<td>@v.OrderNumber</td>
+				<td>@v.Company</td>
+				<td>@v.Occupation</td>
+				<td>@v.Phone</td>
+				<td>
+					<div class="bulp @(v.CheckIned ? "bgBase" : "bgGray")"></div>
+				</td>
+				<td>
+					<div class="bulp @(v.Registered ? "bgBase" : "bgGray")"></div>
+				</td>
+				<td>
+					<div class="bulp @(v.Blocked ? "bgRed" : "bgBase")"></div>
+				</td>
+				<td>
+					<a asp-action="ViewVisitor" asp-route-ID="@v.ID">Details</a>
+				</td>
+			</tr>
+		}
+		</tbody>
+	</table>
+}
+			

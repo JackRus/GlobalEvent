@@ -63,6 +63,8 @@ namespace GlobalEvent.Controllers
 					return View("PreCheckIn", v);
 				}
 				ViewBag.Event = (await _db.Events.FirstOrDefaultAsync(x => x.ID == v.EID)).Name;
+				newV.AddLog("Check In", "Check In Started", true);
+				await _db.SaveChangesAsync();
 				return View(newV);
 			}
 			ViewBag.Message = "This Registration number isn't correct. Please try again.";
@@ -87,6 +89,7 @@ namespace GlobalEvent.Controllers
 			
 			// update and save changges
 			v.CheckIned = true;
+			v.AddLog("Check In", "Check In Completed", true);
 			_db.Visitors.Update(v);
 			await _db.SaveChangesAsync();
 
@@ -107,7 +110,11 @@ namespace GlobalEvent.Controllers
 			{
 				return RedirectToAction("Welcome", "Home");
 			}
-			
+
+			v.AddLog("Check In", "Edition Started", true);
+			_db.Visitors.Update(v);
+			await _db.SaveChangesAsync();
+
 			return View(v);
 		}
 
@@ -119,7 +126,6 @@ namespace GlobalEvent.Controllers
 			{
 				return RedirectToAction("Menu", "Home", new {EID = v.EID});
 			}
-
 			// get the existing visitor
 			var oldV = await _db.Visitors.FirstOrDefaultAsync(x => x.RegistrationNumber == v.RegistrationNumber); 
 
@@ -132,6 +138,7 @@ namespace GlobalEvent.Controllers
 			oldV.Email = v.Email;
 
 			// update visitor
+			oldV.AddLog("Check In", "Edition Finished", true);
 			_db.Visitors.Update(oldV);
 			await _db.SaveChangesAsync();
 
@@ -161,20 +168,18 @@ namespace GlobalEvent.Controllers
 				return RedirectToAction("Welcome", "Home");
 			}
 
-			var orders = await _db.Orders.ToListAsync();
-			foreach (Order o in orders)
+			var order = await _db.Orders
+				.SingleOrDefaultAsync(x => x.Number.ToString() == v.OrderNumber);
+			if (order != null)
             {
-                if (o.Number.ToString() == v.OrderNumber)
-                {
-                    if (o.Full)
-                    {
-						ViewBag.Message = "All visitors with this ORDER number were registered. Please use another ORDER number or purchase a ticket.";
-						ViewBag.EID = v.EID;
-                        return View("PreRegister");
-					}
-					v.TicketType = o.TicketType;
-					return View(v);
+				if (order.Full)
+				{
+					ViewBag.Message = "All visitors with this ORDER number were registered. Please use another ORDER number or purchase a ticket.";
+					ViewBag.EID = v.EID;
+					return View("PreRegister");
 				}
+				v.TicketType = order.TicketType;
+				return View(v);
 			}
 
             ViewBag.Message = "This ORDER number isn't correct.  Please try again.";
@@ -203,6 +208,9 @@ namespace GlobalEvent.Controllers
 			// auto fill the missing info
 			Visitor.CompleteRegistration(v, _db);
 			Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == v.EID);
+			
+			// add log
+			v.AddLog("Registration", "Initial", true);
 			e.Visitors.Add(v);
 			
 			// update order and save changes

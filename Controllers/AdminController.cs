@@ -53,7 +53,7 @@ namespace GlobalEvent.Controllers
 
         [HttpGet]
         [Authorize(Policy="Visitors Viewer")]
-        public async Task<IActionResult> Search (string ID = null, string Name = null)
+        public async Task<IActionResult> Search (string Name = null, string ID = null)
         {
             if (ID == null || Name == null) 
             {
@@ -66,31 +66,33 @@ namespace GlobalEvent.Controllers
             var EID = (await _db.Events.SingleOrDefaultAsync(x => x.Status)).ID;
             if (Name == "ID")
             {
-                int intID;
-                // convert to int
-                int.TryParse(ID, out intID);
                 // find all matches
-                v = await _db.Visitors.Where(x => x.EID == EID && x.ID == intID).ToListAsync();
+                v = await _db.Visitors.Where(x => x.EID == EID && x.ID == int.Parse(ID)).ToListAsync();
             }
             else if (Name == "Name")
             {
-
+                v = v = await _db.Visitors.Where(x => x.EID == EID && x.Name == ID).ToListAsync();
             }
             else if (Name == "Last")
             {
-
+                v = v = await _db.Visitors.Where(x => x.EID == EID && x.Last == ID).ToListAsync();
             }
             else if (Name == "Order")
             {
-
+                v = v = await _db.Visitors.Where(x => x.EID == EID && x.OrderNumber == ID).ToListAsync();
             }
             else if (Name == "RegNumber")
             {
-
+                v = v = await _db.Visitors.Where(x => x.EID == EID && x.RegistrationNumber == ID).ToListAsync();
             }
             else if (Name == "Email")
             {
+                v = v = await _db.Visitors.Where(x => x.EID == EID && x.Email == ID).ToListAsync();
+            }
 
+            if (v == null || v.Count == 0)
+            {
+                ViewBag.Message = "No Visitors were found. Please try different search creteria or make sure you input is correct.";
             }
             return View(v);
         }
@@ -106,6 +108,26 @@ namespace GlobalEvent.Controllers
             List<Visitor> v = await _db.Visitors.Where(x => x.EID == EID).ToListAsync(); 
             return View(v);
         }
+
+
+        [HttpGet]
+        [Authorize(Policy="Visitors Viewer")]
+        public async Task <IActionResult> ViewVisitor (int? ID)
+        {
+            if (ID == null)
+            {
+                return RedirectToAction("Dashboard", "Admin");
+            }
+
+            Visitor v = await _db.Visitors
+                .Include(x => x.Notes)
+                .Include(x => x.Requests)
+                .Include(x => x.Logs)
+                .SingleOrDefaultAsync(x => x.ID == ID);
+            
+            return View(v);
+        }
+
 
     }
 }

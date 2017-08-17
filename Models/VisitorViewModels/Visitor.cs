@@ -99,7 +99,43 @@ namespace GlobalEvent.Models.VisitorViewModels
             v.Registered = true;
 			v.RegDate = DateTime.Now.ToString("yyyy-MM-dd");
 			v.RegTime = DateTime.Now.ToString("HH:mm");
-			v.Logs.Add( new VisitorLog("registration", "initial") { TimeEnd = DateTime.Now.ToString("HH:mm")});
+			v.AddLog("Registration", "Initial Registration");
+		}
+
+		public void AddLog (string stage, string description)
+		{
+			VisitorLog vl = new VisitorLog();
+
+			vl.Type = stage;
+            vl.Action = description;
+            vl.VID = this.ID;
+            vl.Date = DateTime.Now.ToString("yyyy-MM-dd");
+            vl.Time = DateTime.Now.ToString("HH:mm");
+			this.Logs.Add(vl);
+		}
+
+		public void AddLog (string stage, string description, bool change)
+		{
+			VisitorLog vl = new VisitorLog();
+			
+			if (change) // if chnages need to be saved
+			{
+				vl.CurrentState.Name = this.Name;
+				vl.CurrentState.Last = this.Last;
+				vl.CurrentState.Company = this.Company;
+				vl.CurrentState.Phone = this.Phone;
+				vl.CurrentState.Email = this.Email;
+				vl.CurrentState.Extention = this.Extention;
+				vl.CurrentState.Occupation = this.Occupation;
+			}
+			
+			vl.Type = stage;
+            vl.Action = description;
+            vl.VID = this.ID;
+            vl.Date = DateTime.Now.ToString("yyyy-MM-dd");
+            vl.Time = DateTime.Now.ToString("HH:mm");
+
+			this.Logs.Add(vl);
 		}
 	}
 }

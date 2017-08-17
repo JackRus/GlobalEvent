@@ -6,27 +6,17 @@ namespace GlobalEvent.Models.AdminViewModels
     {
         public int ID { get; set; } 
         public string Type { get; set; } // type of action (ex: checkin help) ex: change, add, new, login, logout etc
-
-        // registration
-        // checkin
-        // info-change
-        // print
-
-        public string Action { get; set; } // specific action ex: registration, checkin
+        public string Action { get; set; } // description
         public string Date { get; set; }
-        public string TimeBegin { get; set; } 
-        public string TimeEnd { get; set; }
-        public Change Before { get; set; }
-        public Change After { get; set; }
+        public string Time { get; set; } 
+        public Change CurrentState { get; set; } 
         public int VID { get; set; }
 
-        public VisitorLog (string type, string action)
+        public VisitorLog ()
         {
-            this.Type = type;
-            this.Action = action;
             this.Date = DateTime.Now.ToString("yyyy-MM-dd");
-            this.TimeBegin = DateTime.Now.ToString("HH:mm");
+            this.Time = DateTime.Now.ToString("HH:mm");
+            this.CurrentState = new Change();
         }
-
     }
 }

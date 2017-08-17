@@ -74,13 +74,13 @@ namespace GlobalEvent.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<string>("Action");
-
                     b.Property<int>("AdminID");
 
                     b.Property<string>("AdminName");
 
                     b.Property<string>("Date");
+
+                    b.Property<string>("Description");
 
                     b.Property<string>("Time");
 
@@ -100,11 +100,13 @@ namespace GlobalEvent.Migrations
 
                     b.Property<string>("AdminName");
 
-                    b.Property<string>("Body");
-
                     b.Property<string>("Date");
 
-                    b.Property<bool>("Status");
+                    b.Property<string>("Description");
+
+                    b.Property<bool>("Important");
+
+                    b.Property<bool>("SeenByAdmin");
 
                     b.Property<string>("Time");
 
@@ -128,11 +130,13 @@ namespace GlobalEvent.Migrations
 
                     b.Property<string>("AdminName");
 
-                    b.Property<string>("Body");
-
                     b.Property<string>("Date");
 
+                    b.Property<string>("Description");
+
                     b.Property<bool>("Important");
+
+                    b.Property<bool>("SeenByAdmin");
 
                     b.Property<bool>("Solved");
 
@@ -181,15 +185,11 @@ namespace GlobalEvent.Migrations
 
                     b.Property<string>("Action");
 
-                    b.Property<int?>("AfterID");
-
-                    b.Property<int?>("BeforeID");
+                    b.Property<int?>("CurrentStateID");
 
                     b.Property<string>("Date");
 
-                    b.Property<string>("TimeBegin");
-
-                    b.Property<string>("TimeEnd");
+                    b.Property<string>("Time");
 
                     b.Property<string>("Type");
 
@@ -199,9 +199,7 @@ namespace GlobalEvent.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("AfterID");
-
-                    b.HasIndex("BeforeID");
+                    b.HasIndex("CurrentStateID");
 
                     b.HasIndex("VisitorID");
 
@@ -223,11 +221,14 @@ namespace GlobalEvent.Migrations
 
                     b.Property<bool>("EmailConfirmed");
 
-                    b.Property<string>("FirstName");
+                    b.Property<string>("FirstName")
+                        .IsRequired();
 
-                    b.Property<string>("LastName");
+                    b.Property<string>("LastName")
+                        .IsRequired();
 
-                    b.Property<string>("Level");
+                    b.Property<string>("Level")
+                        .IsRequired();
 
                     b.Property<bool>("LockoutEnabled");
 
@@ -643,13 +644,9 @@ namespace GlobalEvent.Migrations
 
             modelBuilder.Entity("GlobalEvent.Models.AdminViewModels.VisitorLog", b =>
                 {
-                    b.HasOne("GlobalEvent.Models.AdminViewModels.Change", "After")
+                    b.HasOne("GlobalEvent.Models.AdminViewModels.Change", "CurrentState")
                         .WithMany()
-                        .HasForeignKey("AfterID");
-
-                    b.HasOne("GlobalEvent.Models.AdminViewModels.Change", "Before")
-                        .WithMany()
-                        .HasForeignKey("BeforeID");
+                        .HasForeignKey("CurrentStateID");
 
                     b.HasOne("GlobalEvent.Models.VisitorViewModels.Visitor")
                         .WithMany("Logs")

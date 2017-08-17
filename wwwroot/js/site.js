@@ -91,13 +91,14 @@ $("#ok").click(function(){
 });
 
 $('.copy').on('change',function(){
-   $('#'+$(this).data('id')).attr('asp-route-ID', $(this).val()); 
-   $('#'+$(this).data('id')).attr('asp-route-Name', $(this).data('name')); 
+	var link = $('#'+$(this).data('id')).attr('href');
+	$('#'+$(this).data('id')).attr('href', link + '&ID=' + $(this).val()); 
+   //$('#'+$(this).data('id')).attr('asp-route-Name', $(this).data('name')); 
 });
 
 /////////////////////
 //    Check-Box
-/////////////////////
+///////////////////// 
 
 $('.true-false').click(function(){
 	if ($('#'+$(this).data('id')).is(':checked')) 

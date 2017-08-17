@@ -13,6 +13,8 @@ using GlobalEvent.Models;
 using GlobalEvent.Models.AccountViewModels;
 using GlobalEvent.Services;
 using GlobalEvent.Data;
+using GlobalEvent.Models.OwnerViewModels;
+using System.Reflection;
 
 namespace GlobalEvent.Controllers
 {
@@ -121,17 +123,21 @@ namespace GlobalEvent.Controllers
             {
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FirstName = model.FirstName, LastName = model.LastName, Level = model.Level };
                 var result = await _userManager.CreateAsync(user, model.Password);
+                var u = await _userManager.FindByEmailAsync(model.Email);
+                
+                // Adding All Claims
+                var properties = new Claims().GetType().GetProperties().ToList();
+                foreach(var item in properties)
+                {
+                    await _userManager.AddClaimAsync(u, new Claim(item.Name, ""));
+                }
+                
+                // LogIn
                 if (result.Succeeded)
                 {
-                    // For more information on how to enable account confirmation and password reset please visit https://go.microsoft.com/fwlink/?LinkID=532713
-                    // Send an email with this link
-                    //var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-                    //var callbackUrl = Url.Action(nameof(ConfirmEmail), "Account", new { userId = user.Id, code = code }, protocol: HttpContext.Request.Scheme);
-                    //await _emailSender.SendEmailAsync(model.Email, "Confirm your account",
-                    //    $"Please confirm your account by clicking this link: <a href='{callbackUrl}'>link</a>");
-                    await _signInManager.SignInAsync(user, isPersistent: false);
-                    _logger.LogInformation(3, "User created a new account with password.");
-                    return RedirectToLocal(returnUrl);
+                    await _signInManager.SignInAsync(u, isPersistent: false);
+                    _logger.LogInformation(3, "Owner's profile was created.");
+                    return RedirectToAction("Index", "Owner");
                 }
                 AddErrors(result);
             }

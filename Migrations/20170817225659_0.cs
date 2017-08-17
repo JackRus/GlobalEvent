@@ -55,10 +55,10 @@ namespace GlobalEvent.Migrations
                 {
                     ID = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Action = table.Column<string>(nullable: true),
                     AdminID = table.Column<int>(nullable: false),
                     AdminName = table.Column<string>(nullable: true),
                     Date = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
                     Time = table.Column<string>(nullable: true),
                     Type = table.Column<string>(nullable: true)
                 },
@@ -93,9 +93,9 @@ namespace GlobalEvent.Migrations
                     ConcurrencyStamp = table.Column<string>(nullable: true),
                     Email = table.Column<string>(maxLength: 256, nullable: true),
                     EmailConfirmed = table.Column<bool>(nullable: false),
-                    FirstName = table.Column<string>(nullable: true),
-                    LastName = table.Column<string>(nullable: true),
-                    Level = table.Column<string>(nullable: true),
+                    FirstName = table.Column<string>(nullable: false),
+                    LastName = table.Column<string>(nullable: false),
+                    Level = table.Column<string>(nullable: false),
                     LockoutEnabled = table.Column<bool>(nullable: false),
                     LockoutEnd = table.Column<DateTimeOffset>(nullable: true),
                     NormalizedEmail = table.Column<string>(maxLength: 256, nullable: true),
@@ -419,9 +419,10 @@ namespace GlobalEvent.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     AdminID = table.Column<int>(nullable: false),
                     AdminName = table.Column<string>(nullable: true),
-                    Body = table.Column<string>(nullable: true),
                     Date = table.Column<string>(nullable: true),
-                    Status = table.Column<bool>(nullable: false),
+                    Description = table.Column<string>(nullable: true),
+                    Important = table.Column<bool>(nullable: false),
+                    SeenByAdmin = table.Column<bool>(nullable: false),
                     Time = table.Column<string>(nullable: true),
                     VID = table.Column<int>(nullable: false),
                     VisitorID = table.Column<int>(nullable: true)
@@ -445,9 +446,10 @@ namespace GlobalEvent.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     AdminID = table.Column<int>(nullable: false),
                     AdminName = table.Column<string>(nullable: true),
-                    Body = table.Column<string>(nullable: true),
                     Date = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
                     Important = table.Column<bool>(nullable: false),
+                    SeenByAdmin = table.Column<bool>(nullable: false),
                     Solved = table.Column<bool>(nullable: false),
                     Time = table.Column<string>(nullable: true),
                     VID = table.Column<int>(nullable: false),
@@ -472,11 +474,9 @@ namespace GlobalEvent.Migrations
                     ID = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Action = table.Column<string>(nullable: true),
-                    AfterID = table.Column<int>(nullable: true),
-                    BeforeID = table.Column<int>(nullable: true),
+                    CurrentStateID = table.Column<int>(nullable: true),
                     Date = table.Column<string>(nullable: true),
-                    TimeBegin = table.Column<string>(nullable: true),
-                    TimeEnd = table.Column<string>(nullable: true),
+                    Time = table.Column<string>(nullable: true),
                     Type = table.Column<string>(nullable: true),
                     VID = table.Column<int>(nullable: false),
                     VisitorID = table.Column<int>(nullable: true)
@@ -485,14 +485,8 @@ namespace GlobalEvent.Migrations
                 {
                     table.PrimaryKey("PK_VLogs", x => x.ID);
                     table.ForeignKey(
-                        name: "FK_VLogs_Changes_AfterID",
-                        column: x => x.AfterID,
-                        principalTable: "Changes",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_VLogs_Changes_BeforeID",
-                        column: x => x.BeforeID,
+                        name: "FK_VLogs_Changes_CurrentStateID",
+                        column: x => x.CurrentStateID,
                         principalTable: "Changes",
                         principalColumn: "ID",
                         onDelete: ReferentialAction.Restrict);
@@ -515,14 +509,9 @@ namespace GlobalEvent.Migrations
                 column: "VisitorID");
 
             migrationBuilder.CreateIndex(
-                name: "IX_VLogs_AfterID",
+                name: "IX_VLogs_CurrentStateID",
                 table: "VLogs",
-                column: "AfterID");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_VLogs_BeforeID",
-                table: "VLogs",
-                column: "BeforeID");
+                column: "CurrentStateID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_VLogs_VisitorID",

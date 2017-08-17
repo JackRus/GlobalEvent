@@ -1,0 +1,61 @@
+@model List<Visitor>
+
+<h1>Search Results</h1> 
+
+@if(ViewBag.Message != null)
+{
+	<div id="tog" class="f-attention">@ViewBag.Message
+    </div>
+	<div class="text-center">
+		<a asp-action="Dashboard" class="btn mybtn bgBase">OK</a>
+	</div>
+}
+
+@if(Model != null && Model.Count != 0)
+{
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>First Name</th>
+				<th>Last Name</th>
+				<th>Reg. Number</th>
+				<th>Order Number</th>
+				<th>Company</th>
+				<th>Ocupation</th>
+				<th>Phone #</th>
+				<th>Chk</th>
+				<th>Reg</th>
+				<th>Blk</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+		@foreach(var v in Model)
+		{	
+			<tr>
+				<td>@v.ID</td>
+				<td>@v.Name</td>
+				<td>@v.Last</td>
+				<td>@v.RegistrationNumber</td>
+				<td>@v.OrderNumber</td>
+				<td>@v.Company</td>
+				<td>@v.Occupation</td>
+				<td>@v.Phone</td>
+				<td>
+					<div class="bulp @(v.CheckIned ? "bgBase" : "bgGray")"></div>
+				</td>
+				<td>
+					<div class="bulp @(v.Registered ? "bgBase" : "bgGray")"></div>
+				</td>
+				<td>
+					<div class="bulp @(v.Blocked ? "bgRed" : "bgBase")"></div>
+				</td>
+				<td>
+					<a asp-action="ViewVisitor" asp-route-ID="@v.ID">Details</a>
+				</td>
+			</tr>
+		}
+		</tbody>
+	</table>
+}
