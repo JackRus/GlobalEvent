@@ -70,13 +70,16 @@
             
             @if(await AuthorizationService.AuthorizeAsync(User, "Event Activator"))
             {
-                <label asp-for="Status" class="control-label"></label>&nbsp 
+                <label asp-for="Status" class="control-label"></label>
+                <span>&nbsp</span>
                 <span class="true-false" data-id="box2"></span>
                 <input asp-for="Status" class="eye" id="box2"/>
-                &nbsp &nbsp &nbsp 
+                <span>&nbsp &nbsp &nbsp</span>
+
                 @if(!Model.Status)
                 {
-                    <label asp-for="Archived" class="control-label"></label>&nbsp
+                    <label asp-for="Archived" class="control-label"></label>
+                    <span>&nbsp</span>
                     <span class="true-false" data-id="box3"></span>
                     <input asp-for="Archived" class="eye" id="box3"/>
                 }

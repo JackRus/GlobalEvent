@@ -22,7 +22,7 @@ namespace GlobalEvent.Controllers
     public class AccountController : Controller
     {
         private readonly ApplicationDbContext _db;
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager; 
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
@@ -69,12 +69,16 @@ namespace GlobalEvent.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                // This doesn't count login failures towards account lockout
-                // To enable password failures to trigger account lockout, set lockoutOnFailure: true
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
                     _logger.LogInformation(1, "User logged in.");
+
+                    // log
+                    var user = await _userManager.GetUserAsync(User);
+                    await _db.Logs.AddAsync(user.CreateLog("Log In", "User Loged In"));
+                    await _db.SaveChangesAsync();
+
                     return RedirectToLocal(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -84,6 +88,12 @@ namespace GlobalEvent.Controllers
                 if (result.IsLockedOut)
                 {
                     _logger.LogWarning(2, "User account locked out.");
+                    
+                    // log
+                    var user = await _userManager.GetUserAsync(User);
+                    await _db.Logs.AddAsync(user.CreateLog("Log In", "User account locked out"));
+                    await _db.SaveChangesAsync();
+
                     return View("Lockout");
                 }
                 else
@@ -132,6 +142,10 @@ namespace GlobalEvent.Controllers
                     await _userManager.AddClaimAsync(u, new Claim(item.Name, ""));
                 }
                 
+                // log
+                await _db.Logs.AddAsync(u.CreateLog("Register", $"Owner's initial registration"));
+                await _db.SaveChangesAsync();
+
                 // LogIn
                 if (result.Succeeded)
                 {
@@ -172,6 +186,15 @@ namespace GlobalEvent.Controllers
                 if (result.Succeeded)
                 {
                     _logger.LogInformation(3, "Owner/Manager created a new account with password.");
+
+                    // log for creator
+                    var creator = await _userManager.GetUserAsync(User);
+                    await _db.Logs.AddAsync(creator.CreateLog("Create User", $"{model.Level.ToUpper()}: {model.FirstName} {model.LastName}, was created"));
+                    
+                    // log for created user
+                    await _db.Logs.AddAsync(user.CreateLog("Create User", $"{model.Level.ToUpper()} created by {creator.Level}: {creator.FirstName} {creator.LastName}"));
+                    await _db.SaveChangesAsync();
+
                     return RedirectToAction("Admins", "Owner");
                 }
                 AddErrors(result);
@@ -200,6 +223,14 @@ namespace GlobalEvent.Controllers
             if (ID != null)
             {                
                 var u = await _userManager.FindByIdAsync(ID);
+                
+                // log for deleter
+                var user = await _userManager.GetUserAsync(User);
+                await _db.Logs.AddAsync(user.CreateLog("Delete User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, was deleted"));
+                // lof for deleted user
+                await _db.Logs.AddAsync(u.CreateLog("Delete User", $"User was deleted by {user.FirstName} {user.LastName}"));
+                await _db.SaveChangesAsync();
+
                 await _userManager.DeleteAsync(u);
             }
 
@@ -214,6 +245,11 @@ namespace GlobalEvent.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
+            // log
+            var user = await _userManager.GetUserAsync(User);
+            await _db.Logs.AddAsync(user.CreateLog("Log Out", "User Loged Out"));
+            await _db.SaveChangesAsync();
+            
             await _signInManager.SignOutAsync();
             _logger.LogInformation(4, "User logged out.");
             return RedirectToAction(nameof(HomeController.Index), "Home");

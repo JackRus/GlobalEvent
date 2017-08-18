@@ -7,6 +7,8 @@ using GlobalEvent.Data;
 using GlobalEvent.Models.OwnerViewModels;
 using Microsoft.EntityFrameworkCore;
 using GlobalEvent.Models.VisitorViewModels;
+using Microsoft.AspNetCore.Identity;
+using GlobalEvent.Models;
 
 namespace GlobalEvent.Controllers
 {
@@ -14,10 +16,12 @@ namespace GlobalEvent.Controllers
     public class AdminController : Controller
     {
         private readonly ApplicationDbContext _db;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-		public AdminController (ApplicationDbContext context)
+		public AdminController (ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _db = context;
+            _userManager = userManager;
         }
 
 
@@ -89,6 +93,11 @@ namespace GlobalEvent.Controllers
             {
                 v = v = await _db.Visitors.Where(x => x.EID == EID && x.Email == ID).ToListAsync();
             }
+
+            // adding log
+            var u = await _userManager.GetUserAsync(User);
+            await _db.Logs.AddAsync(u.CreateLog("Search", $"Search by {Name}: {ID}"));
+            await _db.SaveChangesAsync();
 
             if (v == null || v.Count == 0)
             {

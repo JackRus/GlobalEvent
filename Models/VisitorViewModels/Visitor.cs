@@ -99,7 +99,6 @@ namespace GlobalEvent.Models.VisitorViewModels
             v.Registered = true;
 			v.RegDate = DateTime.Now.ToString("yyyy-MM-dd");
 			v.RegTime = DateTime.Now.ToString("HH:mm");
-			v.AddLog("Registration", "Initial Registration");
 		}
 
 		public void AddLog (string stage, string description)

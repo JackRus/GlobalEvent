@@ -105,6 +105,11 @@ namespace GlobalEvent.Controllers
             if (ModelState.IsValid)
             {
                 _db.Events.Add(e);
+
+                // log
+                var user = await _userManager.GetUserAsync(User);
+                await _db.Logs.AddAsync(user.CreateLog("Event", $"Event: {e.Name}, was created"));
+                // save changes
                 await _db.SaveChangesAsync();
                 return RedirectToAction("Events", new { message = "The Event was successfully created."});
             }
@@ -163,6 +168,11 @@ namespace GlobalEvent.Controllers
 
             // saving changes
             _db.Events.Update(eOld);
+
+            // log
+            var user = await _userManager.GetUserAsync(User);
+            await _db.Logs.AddAsync(user.CreateLog("Event", $"Event: {eOld.Name}, was EDITED"));
+
             await _db.SaveChangesAsync();
 
             return RedirectToAction("ViewEvent", new { ID = eOld.ID, message = ViewBag.Message });
@@ -214,6 +224,10 @@ namespace GlobalEvent.Controllers
             
             // save changes
             _db.Events.Remove(e);
+
+            // log
+            var user = await _userManager.GetUserAsync(User);
+            await _db.Logs.AddAsync(user.CreateLog("Event", $"Event: {e.Name}, was DELETED"));
             await _db.SaveChangesAsync();
 
             return RedirectToAction("Events");
@@ -269,6 +283,11 @@ namespace GlobalEvent.Controllers
             u.Email = a.Email;
             await _userManager.UpdateAsync(u);
 
+            // logs
+            var user = await _userManager.GetUserAsync(User);
+            await _db.Logs.AddAsync(user.CreateLog("Edit User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, was EDITED"));
+            await _db.Logs.AddAsync(u.CreateLog("Edit User", $"User was EDITED by {user.FirstName} {user.LastName}"));
+
             // change password if new one is provided
             if (!string.IsNullOrEmpty(a.Password) 
                 && !string.IsNullOrEmpty(a.ConfirmPassword) 
@@ -276,7 +295,12 @@ namespace GlobalEvent.Controllers
             {
                 await _userManager.RemovePasswordAsync(u);
                 await _userManager.AddPasswordAsync(u, a.Password); 
+
+                // logs
+                await _db.Logs.AddAsync(user.CreateLog("Edit User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, PASSWORD was changed"));
+                await _db.Logs.AddAsync(u.CreateLog("Edit User", $"Password was changed by {user.FirstName} {user.LastName}"));
             }
+            await _db.SaveChangesAsync();
             return RedirectToAction("Admins", "Owner");
         }
 
@@ -342,6 +366,12 @@ namespace GlobalEvent.Controllers
                     await _userManager.AddClaimAsync(u, new Claim(item.Name, ""));
                 }
             }
+
+            // logs
+            var user = await _userManager.GetUserAsync(User);
+            await _db.Logs.AddAsync(user.CreateLog("Edit User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, CLAIMS were changed"));
+            await _db.Logs.AddAsync(u.CreateLog("Edit User", $"User's CLAIMS were changed by {user.FirstName} {user.LastName}"));
+            await _db.SaveChangesAsync();
 
             return RedirectToAction("EditAdmin", "Owner", new {ID = ID});
         }

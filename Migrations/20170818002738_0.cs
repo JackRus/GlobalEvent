@@ -34,7 +34,7 @@ namespace GlobalEvent.Migrations
                 {
                     ID = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    AdminID = table.Column<int>(nullable: false),
+                    AdminID = table.Column<string>(nullable: true),
                     AdminName = table.Column<string>(nullable: true),
                     Body = table.Column<string>(nullable: true),
                     Date = table.Column<string>(nullable: true),
@@ -55,7 +55,7 @@ namespace GlobalEvent.Migrations
                 {
                     ID = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    AdminID = table.Column<int>(nullable: false),
+                    AdminID = table.Column<string>(nullable: true),
                     AdminName = table.Column<string>(nullable: true),
                     Date = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
@@ -444,7 +444,7 @@ namespace GlobalEvent.Migrations
                 {
                     ID = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    AdminID = table.Column<int>(nullable: false),
+                    AdminID = table.Column<string>(nullable: true),
                     AdminName = table.Column<string>(nullable: true),
                     Date = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),

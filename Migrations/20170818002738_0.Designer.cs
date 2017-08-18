@@ -8,7 +8,7 @@ using GlobalEvent.Data;
 namespace GlobalEvent.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170817225659_0")]
+    [Migration("20170818002738_0")]
     partial class _0
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -47,7 +47,7 @@ namespace GlobalEvent.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("AdminID");
+                    b.Property<string>("AdminID");
 
                     b.Property<string>("AdminName");
 
@@ -75,7 +75,7 @@ namespace GlobalEvent.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("AdminID");
+                    b.Property<string>("AdminID");
 
                     b.Property<string>("AdminName");
 
@@ -127,7 +127,7 @@ namespace GlobalEvent.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("AdminID");
+                    b.Property<string>("AdminID");
 
                     b.Property<string>("AdminName");
 

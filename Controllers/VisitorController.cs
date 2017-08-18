@@ -63,8 +63,9 @@ namespace GlobalEvent.Controllers
 					return View("PreCheckIn", v);
 				}
 				ViewBag.Event = (await _db.Events.FirstOrDefaultAsync(x => x.ID == v.EID)).Name;
-				newV.AddLog("Check In", "Check In Started", true);
+				newV.AddLog("Check In", "Check-In Started", true);
 				await _db.SaveChangesAsync();
+
 				return View(newV);
 			}
 			ViewBag.Message = "This Registration number isn't correct. Please try again.";
@@ -89,7 +90,7 @@ namespace GlobalEvent.Controllers
 			
 			// update and save changges
 			v.CheckIned = true;
-			v.AddLog("Check In", "Check In Completed", true);
+			v.AddLog("Check In", "Check-In Completed. Tag Printed", true);
 			_db.Visitors.Update(v);
 			await _db.SaveChangesAsync();
 
@@ -138,7 +139,7 @@ namespace GlobalEvent.Controllers
 			oldV.Email = v.Email;
 
 			// update visitor
-			oldV.AddLog("Check In", "Edition Finished", true);
+			oldV.AddLog("Check In", "Edition Completed", true);
 			_db.Visitors.Update(oldV);
 			await _db.SaveChangesAsync();
 

@@ -2,9 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using GlobalEvent.Data;
+using GlobalEvent.Models;
 using GlobalEvent.Models.OwnerViewModels;
 using GlobalEvent.Models.VisitorViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -14,10 +16,12 @@ namespace GlobalEvent.Controllers
     public class ProductController : Controller
     {
         private readonly ApplicationDbContext _db;
+		 private readonly UserManager<ApplicationUser> _userManager;
 
-        public ProductController(ApplicationDbContext context)
+		public ProductController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _db = context;
+            _userManager = userManager;
         }
 
         [HttpGet]
@@ -64,6 +68,9 @@ namespace GlobalEvent.Controllers
                 e.Products.Add(p);
                 _db.Events.Update(e);
 
+                // logs
+                var user = await _userManager.GetUserAsync(User);
+                await _db.Logs.AddAsync(user.CreateLog("Product", $"Product: {p.Name}, was CREATED"));
                 // save changes
                 await _db.SaveChangesAsync();
 
@@ -102,6 +109,10 @@ namespace GlobalEvent.Controllers
                 Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == p.EID);
                 e.Products.Add(p);
                 _db.Events.Update(e);
+
+                // logs
+                var user = await _userManager.GetUserAsync(User);
+                await _db.Logs.AddAsync(user.CreateLog("Product", $"Product: {p.Name}, was COPIED"));
                 await _db.SaveChangesAsync();
 
                 return RedirectToAction("Index", new { ID = p.EID });
@@ -130,6 +141,11 @@ namespace GlobalEvent.Controllers
             if (ModelState.IsValid)
             {
                 _db.Products.Update(p);
+                
+                // logs
+                var user = await _userManager.GetUserAsync(User);
+                await _db.Logs.AddAsync(user.CreateLog("Product", $"Product: {p.Name}, was EDITED"));
+
                 await _db.SaveChangesAsync();
                 return RedirectToAction("Index", new { ID = p.EID });
             }
@@ -161,6 +177,10 @@ namespace GlobalEvent.Controllers
             Product p = await _db.Products.FirstOrDefaultAsync(x => x.ID == ID);
             // remove and save changes
             _db.Products.Remove(p);
+            
+            // logs
+            var user = await _userManager.GetUserAsync(User);
+            await _db.Logs.AddAsync(user.CreateLog("Product", $"Product: {p.Name}, was DELETED"));
             await _db.SaveChangesAsync();
 
             return RedirectToAction("Index", new { ID = p.EID });
@@ -194,6 +214,10 @@ namespace GlobalEvent.Controllers
 
             // delete all Products for a specific event
             _db.Products.RemoveRange(_db.Products.Where(x => x.EID == ID));
+
+            // logs
+            var user = await _userManager.GetUserAsync(User);
+            await _db.Logs.AddAsync(user.CreateLog("Product", $"All Products for Event ID: {ID}, were DELETED"));
             await _db.SaveChangesAsync();
 
             return RedirectToAction("Index", new { ID = ID });
@@ -231,6 +255,10 @@ namespace GlobalEvent.Controllers
             Product p = await _db.Products.FirstOrDefaultAsync(x => x.ID == ID);
             p.TTypes = result;
             _db.Products.Update(p);
+
+            // logs
+            var user = await _userManager.GetUserAsync(User);
+            await _db.Logs.AddAsync(user.CreateLog("Product", $"Tickets for Product: {p.Name}, were UPDATED"));
             await _db.SaveChangesAsync();
             
             return RedirectToAction("Index", new { ID = p.EID });

@@ -46,7 +46,7 @@ namespace GlobalEvent.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("AdminID");
+                    b.Property<string>("AdminID");
 
                     b.Property<string>("AdminName");
 
@@ -74,7 +74,7 @@ namespace GlobalEvent.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("AdminID");
+                    b.Property<string>("AdminID");
 
                     b.Property<string>("AdminName");
 
@@ -126,7 +126,7 @@ namespace GlobalEvent.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("AdminID");
+                    b.Property<string>("AdminID");
 
                     b.Property<string>("AdminName");
 
