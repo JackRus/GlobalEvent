@@ -1,4 +1,5 @@
 <h1>ADD Tickets</h1>
+<h3>@ViewBag.Product.Name </h3>
 
 <div style="width: 100%">
 
@@ -32,9 +33,9 @@
 						<td>
 							@{
 								var check = false;
-								if (ViewBag.Types != null && ViewBag.Types != "")
+								if (ViewBag.Product.TTypes != null &&  ViewBag.Product.TTypes != "")
 								{
-									string types = @ViewBag.Types;
+									string types = @ViewBag.Product.TTypes;
 									var i = types.Split('|').ToList();
 									foreach(string s in i){
 										if (@t.Type == s){

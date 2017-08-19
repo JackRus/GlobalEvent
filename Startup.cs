@@ -50,41 +50,49 @@ namespace GlobalEvent
 
             services.AddAuthorization(options => {
                 // EVENTS
-                options.AddPolicy("Event Editor", x => {x.RequireClaim("CanEditEvent");});
-                options.AddPolicy("Event Creator", x => x.RequireClaim("CanCreateEvent"));
-                options.AddPolicy("Event Viewer", x => x.RequireClaim("CanSeeEventDetails"));
-                options.AddPolicy("Events Viewer", x => x.RequireClaim("CanSeeAllEvents"));
-                options.AddPolicy("Event Killer", x => x.RequireClaim("CanDeleteEvent"));
-                options.AddPolicy("Event Activator", x => x.RequireClaim("CanChangeEventStatus"));
+                options.AddPolicy("Event Editor", x => {x.RequireClaim("EventCanEdit");});
+                options.AddPolicy("Event Creator", x => x.RequireClaim("EventCanCreate"));
+                options.AddPolicy("Event Viewer", x => x.RequireClaim("EventCanSeeDetails"));
+                options.AddPolicy("Events Viewer", x => x.RequireClaim("EventCanSeeAll"));
+                options.AddPolicy("Event Killer", x => x.RequireClaim("EventCanDelete"));
+                options.AddPolicy("Event Activator", x => x.RequireClaim("EventCanChangeStatus"));
                 // VISITORS
-                options.AddPolicy("Visitors Viewer", x => x.RequireClaim("CanAccessAllVisitors"));
+                options.AddPolicy("Visitors Viewer", x => x.RequireClaim("VisitorCanAccessAll"));
+                options.AddPolicy("Visitor Details", x => x.RequireClaim("VisitorCanAccessDetails"));
+                options.AddPolicy("Visitor Blocker", x => x.RequireClaim("VisitorCanBlock"));
+                options.AddPolicy("Visitor Killer", x => x.RequireClaim("VisitorCanDelete"));
+                options.AddPolicy("Visitor Editor", x => x.RequireClaim("VisitorCanEdit"));
                 // ADMIN
-                options.AddPolicy("Admins Viewer", x => x.RequireClaim("CanSeeAllAdmins"));
-                options.AddPolicy("Admin Editor", x => x.RequireClaim("CanEditAdmin"));
-                options.AddPolicy("Admin Creator", x => x.RequireClaim("CanCreateAdmin"));
-                options.AddPolicy("Admin Killer", x => x.RequireClaim("CanDeleteAdmin")); 
-                options.AddPolicy("Password Editor", x => {x.RequireClaim("CanChangeAdminPassword");});
-                options.AddPolicy("Claims Editor", x => x.RequireClaim("CanChangeClaims"));
+                options.AddPolicy("Admins Viewer", x => x.RequireClaim("AdminCanSeeAll"));
+                options.AddPolicy("Admin Editor", x => x.RequireClaim("AdminCanEdit"));
+                options.AddPolicy("Admin Creator", x => x.RequireClaim("AdminCanCreate"));
+                options.AddPolicy("Admin Killer", x => x.RequireClaim("AdminCanDelete")); 
+                options.AddPolicy("Password Editor", x => {x.RequireClaim("AdminCanChangePassword");});
+                options.AddPolicy("Claims Editor", x => x.RequireClaim("AdminCanChangeClaims"));
                 // PRODUCT
-                options.AddPolicy("Products Viewer", x => x.RequireClaim("CanSeeAllProducts"));
-                options.AddPolicy("Product Creator", x => x.RequireClaim("CanCreateEditProduct"));
-                options.AddPolicy("Product Killer", x => x.RequireClaim("CanDeleteProduct"));
+                options.AddPolicy("Products Viewer", x => x.RequireClaim("ProductCanSeeAll"));
+                options.AddPolicy("Product Creator", x => x.RequireClaim("ProductCanCreateEdit"));
+                options.AddPolicy("Product Killer", x => x.RequireClaim("ProductCanDelete"));
                 // TICKET
-                options.AddPolicy("Ticket Creator", x => x.RequireClaim("CanCreateEditTicket"));
-                options.AddPolicy("Ticket Killer", x => x.RequireClaim("CanDeleteTicket"));
-                options.AddPolicy("Tickets Viewer", x => x.RequireClaim("CanSeeAllTickets"));
+                options.AddPolicy("Ticket Creator", x => x.RequireClaim("TicketCanCreateEdit"));
+                options.AddPolicy("Ticket Killer", x => x.RequireClaim("TicketCanDelete"));
+                options.AddPolicy("Tickets Viewer", x => x.RequireClaim("TicketCanSeeAll"));
                 // Visitor Types
-                options.AddPolicy("VType Creator", x => x.RequireClaim("CanCreateEditVType"));
-                options.AddPolicy("VType Killer", x => x.RequireClaim("CanDeleteVType"));
-                options.AddPolicy("VTypes Viewer", x => x.RequireClaim("CanSeeAllVTypes"));
+                options.AddPolicy("VType Creator", x => x.RequireClaim("VTypeCanCreateEdit"));
+                options.AddPolicy("VType Killer", x => x.RequireClaim("VTypeCanDelete"));
+                options.AddPolicy("VTypes Viewer", x => x.RequireClaim("VTypeCanSeeAll"));
                 // TODOs
-                options.AddPolicy("Todo Viewer", x => x.RequireClaim("CanSeeToDoList"));
-                options.AddPolicy("Todo Creator", x => x.RequireClaim("CanAddTodo"));
-                options.AddPolicy("Todo EditorKiller", x => x.RequireClaim("CanEditDeleteTodo"));
+                options.AddPolicy("Todo Viewer", x => x.RequireClaim("TodoCanSeeAll"));
+                options.AddPolicy("Todo Creator", x => x.RequireClaim("TodoCanAdd"));
+                options.AddPolicy("Todo EditorKiller", x => x.RequireClaim("TodoCanEditDelete"));
                 // OWNER
-                options.AddPolicy("Is Owner", x => x.RequireClaim("IsOwner"));
-                options.AddPolicy("Owner's Menu", x => x.RequireClaim("CanSeeOwnersPage"));
-                options.AddPolicy("Owner's Dashboard", x => x.RequireClaim("CanSeeMainDashboard"));
+                options.AddPolicy("Is Owner", x => x.RequireClaim("Owner"));
+                options.AddPolicy("Owner's Menu", x => x.RequireClaim("OwnerCanSeeMenu"));
+                options.AddPolicy("Owner's Dashboard", x => x.RequireClaim("OwnerCanSeeDashboard"));
+                // orders
+                options.AddPolicy("Order Creator", x => x.RequireClaim("OrderCanCreate"));
+                options.AddPolicy("Order Canceler", x => x.RequireClaim("OrderCanCancel"));
+                options.AddPolicy("Order Viewer", x => x.RequireClaim("OrderCanSeeAll"));
             });
 
             services.AddMvc();

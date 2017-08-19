@@ -16,7 +16,7 @@ namespace GlobalEvent.Controllers
     public class ProductController : Controller
     {
         private readonly ApplicationDbContext _db;
-		 private readonly UserManager<ApplicationUser> _userManager;
+		private readonly UserManager<ApplicationUser> _userManager;
 
 		public ProductController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
@@ -37,20 +37,22 @@ namespace GlobalEvent.Controllers
             ViewBag.Products = await _db.Products
                 .Where(x => x.EID == ID)
                 .ToListAsync();
-
+            
+            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ID)).Name;
             ViewBag.ID = ID;
             return View();
         }
 
         [HttpGet]
         [Authorize(Policy="Product Creator")]
-        public IActionResult Add(int? ID)
+        public async Task<IActionResult> Add(int? ID)
         {
             if (ID == null) 
             {
                 return RedirectToAction("Events", "Owner");
             }
 
+            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ID)).Name;
             return View(new Product(){EID = (int)ID});
         }
 
@@ -92,7 +94,7 @@ namespace GlobalEvent.Controllers
             Product p = await _db.Products
                 .Where(x => x.ID == ID)
                 .FirstOrDefaultAsync();
-
+            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ID)).Name;
             return View(p);
         }
 
@@ -117,7 +119,7 @@ namespace GlobalEvent.Controllers
 
                 return RedirectToAction("Index", new { ID = p.EID });
             }
-
+            
             return RedirectToAction("Events", "Owner");
         }
 
@@ -129,7 +131,7 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Events", "Owner");
             }
-
+            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ID)).Name;
             return View(await _db.Products.FirstOrDefaultAsync(x => x.ID == ID));
         }
 
@@ -234,8 +236,7 @@ namespace GlobalEvent.Controllers
             // get all tickets for the event
             ViewBag.Tickets = await _db.Tickets.Where(x => x.EID == EID).ToListAsync();
             // get all ticket types for the event
-            ViewBag.Types = (await _db.Products.FirstOrDefaultAsync(x => x.ID == ID)).TTypes; //string
-           
+            ViewBag.Product = await _db.Products.FirstOrDefaultAsync(x => x.ID == ID); //string
             ViewBag.ID = (int)ID;
             ViewBag.EID = (int)EID;
 

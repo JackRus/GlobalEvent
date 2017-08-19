@@ -2,7 +2,7 @@
 
 <h1>ADD ToDo Item</h1>
 
-<form asp-action="Add" autocomplete="off">
+<form asp-action="Add" asp-route-url="Todo" autocomplete="off">
     <div class="form-group">
         <label asp-for="Task" class="control-label"></label>
         <input asp-for="Task" class="form-control"/>

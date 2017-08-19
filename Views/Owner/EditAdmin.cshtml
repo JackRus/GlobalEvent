@@ -58,7 +58,7 @@
             </div>
         </form>
     </div>
-    <div class="col-sm-6">
+    <div class="col-sm-6 text-center">
         <h2> USER Access </h2>
 
         @foreach(var c in ViewBag.Claims)
@@ -68,13 +68,40 @@
         }
         @if(await AuthorizationService.AuthorizeAsync(User, "Claims Editor"))
         {
-            <div class="text-center">
+            <div class="text-center m15-0">
                 <a asp-action="ChangeClaims" asp-controller="Owner" asp-route-ID="@Model.Id" class="btn mybtn bgBase">Edit</a>
             </div>
         }
     </div>
-
 </div>
+
+<div class="row text-center m20-0-20-0">
+    <h2> Admin's Logs</h2>
+</div>
+
+<table class="table table-hover">
+    <thead>
+        <tr>
+            <th>Log ID</th>
+            <th>Time</th>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach(var l in ViewBag.Logs)
+    {
+        <tr>
+            <td>@l.ID</td>
+            <td>@l.Time</td>
+            <td>@l.Date</td>
+            <td>@l.Type</td>
+            <td>@l.Description</td>
+        </tr>
+    }
+    </tbody>
+</table>
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }

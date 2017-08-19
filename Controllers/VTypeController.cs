@@ -38,19 +38,19 @@ namespace GlobalEvent.Controllers
 				.Where(x => x.EID == ID)
 				.ToListAsync();
 			ViewBag.ID = ID;
-
+			ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ID)).Name;
 			return View();
 		}
 
 		[HttpGet]
 		[Authorize(Policy = "VType Creator")]
-		public IActionResult Add(int? ID)
+		public async Task<IActionResult> Add(int? ID)
 		{
 			if (ID == null)
 			{
 				return RedirectToAction("Events", "Owner");
 			}
-
+			ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ID)).Name;
 			return View(new VType() { EID = (int)ID });
 		}
 
@@ -85,7 +85,7 @@ namespace GlobalEvent.Controllers
 			{
 				return RedirectToAction("Events", "Owner");
 			}
-
+			ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ID)).Name;
 			return View(await _db.Types.FirstOrDefaultAsync(x => x.ID == ID));
 		}
 
@@ -120,7 +120,7 @@ namespace GlobalEvent.Controllers
 			{
 				return RedirectToAction("Events");
 			}
-
+			ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ID)).Name;
 			return View(await _db.Types.FirstOrDefaultAsync(x => x.ID == ID));
 		}
 

@@ -1,6 +1,29 @@
 @model Visitor
 
 <h1>Visitor's details</h1> 
+<div class="text-center m20-0-20-0">
+    <a asp-action="Dashboard" asp-controller="Admin" class="btn mybtn bgBase">BACK</a>
+    <div class="dropdown inline">
+        
+		<button class="btn mybtn bgBro dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            ACTIONS
+            <span class="caret" style="vertical-align: super;"></span>
+        </button>
+
+        <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu2">
+            @if(await AuthorizationService.AuthorizeAsync(User, "Visitor Editor"))
+            {
+                <li><a asp-action="Edit" asp-controller="Admin" asp-route-id="@Model.ID">EDIT</a></li>
+				<li><a asp-action="Add" asp-controller="Request" asp-route-id="@Model.ID" >ADD REQUEST</a></li>
+				<li><a asp-action="Add" asp-controller="Note" asp-route-id="@Model.ID" >ADD NOTE </a></li>
+            }
+            @if(await AuthorizationService.AuthorizeAsync(User, "Visitor Killer"))
+            {
+                <li><a asp-action="Delete" asp-controller="Admin" asp-route-id="@Model.ID">DELETE</a></li>
+            }
+        </ul>
+    </div>
+</div>
 
 @if(ViewBag.Message != null)
 {
@@ -10,7 +33,7 @@
 		<a asp-action="Dashboard" class="btn mybtn bgBase">OK</a>
 	</div>
 }
-
+<br />
 <div class="text-center">
 	Check In: <div class="bulp @(Model.CheckIned ? "bgBase" : "bgGray")" style="vertical-align: bottom"></div>
 	Registration: <div class="bulp @(Model.Registered ? "bgBase" : "bgGray")" style="vertical-align: bottom"></div>
@@ -64,8 +87,6 @@
 				<br />
 			}
 
-
-				
 			</div>
 		</div>
 
@@ -74,7 +95,14 @@
 				Requests/Complaints
 			</div>
 			<div class="dash-section">
-			
+				@if(Model.Requests == null || Model.Requests.Count == 0)
+				{
+					<div>No Requests yet.</div>
+				}
+				else
+				{
+
+				}
 			</div>
 		</div>
 
@@ -83,55 +111,186 @@
 				Visitor's Notes
 			</div>
 			<div class="dash-section">
-
-			
+				@if(Model.Notes == null || Model.Notes.Count == 0)
+				{
+					<div>No Notes yet.</div>
+				}
+				else
+				{
+					
+				}
 			</div>
 		</div>
 </div>
 
- <!-- VISITOR"S LOGS -->
-<div class="row mar5">
-		
-@if(Model.Logs != null && Model.Logs.Count != 0)
+<!-- VISITOR'S NOTES -->
+<div class="row text-center m20-0-20-0">
+    <h2> Visitor's Notes</h2>
+</div>
+
+@if(Model.Notes != null && Model.Notes.Count != 0)
 {
 	<table class="table table-hover">
 		<thead>
-			<tr>
-				<th>Log ID</th>
+			<tr style="border-bottom: 2px solid gray;">
+				<th>ID</th>
+				<th>Time</th>
 				<th>Date</th>
-				<th>Time Begin / End</th>
-				<th>Stage</th>
-				<th>Description</th>
-				<th></th>
+				<th style="width: 40%;">Description</th>
+				<th>Admin</th>
+				<th>Important</th>
+				<th>Seen</th>
+				<th>Actions</th>
 			</tr>
 		</thead>
 		<tbody>
-		@foreach(var v in Model)
+
+		@foreach(var r in Model.Notes.OrderByDescending(x => x.ID))
 		{	
 			<tr>
-				<td>@v.ID</td>
-				<td>@v.Name</td>
-				<td>@v.Last</td>
-				<td>@v.RegistrationNumber</td>
-				<td>@v.OrderNumber</td>
-				<td>@v.Company</td>
-				<td>@v.Occupation</td>
-				<td>@v.Phone</td>
-				<td>
-					<div class="bulp @(v.CheckIned ? "bgBase" : "bgGray")"></div>
+				<td>@r.ID</td>
+				<td>@r.Time</td>
+				<td>@r.Date</td>
+				<td style="width: 40%;">@r.Description</td>
+				<td>@r.AdminName</td>
+				<td class="text-center">
+					<div class="bulp @(r.Important ? "bgRed" : "bgBase")"></div>
 				</td>
 				<td>
-					<div class="bulp @(v.Registered ? "bgBase" : "bgGray")"></div>
+					<div class="bulp @(r.SeenByAdmin ? "bgBase" : "bgRed")"></div>
 				</td>
 				<td>
-					<div class="bulp @(v.Blocked ? "bgRed" : "bgBase")"></div>
+					Actions
+				</td>
+
+			</tr>
+		}
+		</tbody>
+	</table>
+}
+else
+{
+	<div class="text-center">
+		No notes have been created yet.
+	</div>
+}
+
+<!-- VISITOR"S REQUESTS -->
+<div class="row text-center m20-0-20-0">
+    <h2> Visitor's Requests / Complaints</h2>
+</div>
+
+@if(Model.Requests != null && Model.Requests.Count != 0)
+{
+	<table class="table table-hover">
+		<thead>
+			<tr style="border-bottom: 2px solid gray;">
+				<th>ID</th>
+				<th>Time</th>
+				<th>Date</th>
+				<th style="width: 40%;">Description</th>
+				<th>Admin</th>
+				<th>Important</th>
+				<th>Seen</th>
+				<th>Solved</th>
+				<th style="width: auto; text-align: right;">Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+
+		@foreach(var r in Model.Requests.OrderByDescending(x => x.ID))
+		{	
+			<tr>
+				<td>@r.ID</td>
+				<td>@r.Time</td>
+				<td>@r.Date</td>
+				<td style="width: 40%;">@r.Description</td>
+				<td>@r.AdminName</td>
+				<td class="text-center">
+					<div class="bulp @(r.Important ? "bgRed" : "bgBase")"></div>
 				</td>
 				<td>
-					<a asp-action="ViewVisitor" asp-route-ID="@v.ID">Details</a>
+					<div class="bulp @(r.SeenByAdmin ? "bgBase" : "bgRed")"></div>
+				</td>
+				<td>
+					<div class="bulp @(r.Solved ? "bgBase" : "bgRed")"></div>
+				</td>
+				<td style="width: auto; text-align: right;">
+					
+				@if(await AuthorizationService.AuthorizeAsync(User, "Visitor Editor"))
+				{
+					<div class="dropdown">
+						<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
+						<span class="caret"></span></button>
+						<ul class="dropdown-menu dropdown-menu-right">
+								<li><a asp-action="Add" asp-controller="Request" asp-route-ID="@Model.ID">Add New</a></li>
+								<li><a asp-action="Edit" asp-controller="Request" asp-route-ID="@r.ID">Edit</a></li>
+								<li><a asp-action="Solved" asp-controller="Request" asp-route-ID="@r.ID">Mark as Solved </a></li>
+								<li><a asp-action="Important" asp-controller="Request" asp-route-ID="@r.ID">Change Importance</a></li>
+								<li><a asp-action="Seen" asp-controller="Request" asp-route-ID="@r.ID">Mark as Seen</a></li>
+								<li><a asp-action="Delete" asp-route-ID="@r.ID">Delete</a></li>
+						</ul>
+					</div>
+				}
+				else
+				{
+					<span>NO ACCESS</span>
+				}
+						
 				</td>
 			</tr>
 		}
 		</tbody>
 	</table>
+}
+else
+{
+	<div class="text-center">
+		No requests have been created yet.
+	</div>
+}
+ 
+<!-- VISITOR"S LOGS -->
+<div class="row text-center m20-0-20-0">
+    <h2> Visitor's Logs</h2>
+</div>
+
+@if(Model.Logs != null && Model.Logs.Count != 0)
+{
+	<table class="table table-hover">
+		<thead>
+			<tr style="border-bottom: 2px solid gray;">
+				<th>Log ID</th>
+				<th>Date</th>
+				<th>Time</th>
+				<th>Stage</th>
+				<th>Description</th>
+			</tr>
+		</thead>
+		<tbody>
+
+		@foreach(var l in Model.Logs.OrderByDescending(x => x.ID))
+		{	
+			<tr style="border-top: 2px solid gray;">
+				<td>@l.ID</td>
+				<td>@l.Time</td>
+				<td>@l.Date</td>
+				<td>@l.Type</td>
+				<td>@l.Action</td>			
+			</tr>
+			<tr style="border-bottom: 2px solid gray;">
+				<td colspan="100">
+					@l.CurrentState.Name @l.CurrentState.Last | @l.CurrentState.Email | @l.CurrentState.Phone @(l.CurrentState.Extention == null ? "" : $"/ { l.CurrentState.Extention} ")| @l.CurrentState.Company, @l.CurrentState.Occupation 
+				</td>	
+			</tr>
+		}
+		</tbody>
+	</table>
+}
+else
+{
+	<div class="text-center">
+		No logs have been created yet.
+	</div>
 }
 			

@@ -195,6 +195,19 @@ namespace GlobalEvent.Controllers
                 .Include(x => x.Orders)
 				.FirstOrDefaultAsync(x => x.ID == ID);
             
+            // Update orders
+            await Order.OrderUpdate(_db, e.ID);
+            await Event.Update(_db, e.ID);
+
+            // # of Visitors checkined
+            ViewBag.CheckIned = e.Visitors.Where(x => x.CheckIned).Count();
+            // # of visitors registered
+            ViewBag.Registered = e.Visitors.Where(x => x.Registered).Count();
+            
+            // All tickets
+            ViewBag.AllTickets = 0;
+            e.Tickets.ForEach(t => ViewBag.AllTickets += t.Limit);
+
             ViewBag.Message = message;
 			return View(e);
 		}
@@ -261,6 +274,9 @@ namespace GlobalEvent.Controllers
             a.Level = u.Level;
             a.Email = u.Email;
             a.Id = u.Id;
+
+            // all user logs
+            ViewBag.Logs = await _db.Logs.Where(x => x.AdminID == u.Id).ToListAsync();
             
             return View(a);
         }
@@ -332,7 +348,8 @@ namespace GlobalEvent.Controllers
                     }
                 }
             }
-            ViewBag.Properties = properties;
+            ViewBag.Properties = properties.OrderBy(x => x.Name);
+            ViewBag.AdminName = $"{u.Level}: {u.FirstName} {u.LastName}";
             
             // pass admin ID to a view
             ViewBag.AID = u.Id;

@@ -132,11 +132,10 @@ namespace GlobalEvent.Controllers
                 .Include(x => x.Notes)
                 .Include(x => x.Requests)
                 .Include(x => x.Logs)
+                    .ThenInclude(x => x.CurrentState)
                 .SingleOrDefaultAsync(x => x.ID == ID);
             
             return View(v);
         }
-
-
     }
 }

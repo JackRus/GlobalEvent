@@ -29,10 +29,23 @@
 		<tr>
 			<td>@u.FirstName</td>
 			<td>@u.LastName</td>
-			<td>@u.UserName</td>
+			@if(u.Level == "Owner")
+			{
+				<td>***********</td>
+			}
+			else
+			{
+				<td>@u.UserName</td>	
+			}
 			<td>@u.Level</td>
 			<td>TODO</td>
 			<td style="width: auto; text-align: right;">
+			@if(u.Level == "Owner")
+			{
+				<span> NO ACCESS </span>
+			}
+			else
+			{	
 				<div class="dropdown">
 					<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
 					<span class="caret"></span></button>
@@ -50,6 +63,7 @@
 					}
 					</ul>
 				</div>
+			}
 			</td> 
 		</tr>
 	}

@@ -11,6 +11,5 @@ namespace GlobalEvent.Models.AdminViewModels
         public string Occupation { get; set; } 
         public string Company { get; set; } 
         public int ParentID { get; set; }  // Log ID
-        //public string Type { get; set; } // Before or After
     }
 }

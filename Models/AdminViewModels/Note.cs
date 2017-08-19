@@ -15,7 +15,7 @@ namespace GlobalEvent.Models.AdminViewModels
         public Note()
         {
             this.Important = false;
-            this.SeenByAdmin = false;
+            this.SeenByAdmin = true;
         }
     }
 }

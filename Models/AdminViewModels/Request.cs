@@ -1,3 +1,5 @@
+using System;
+
 namespace GlobalEvent.Models.AdminViewModels
 {
     public class Request // Visitor's claims, requests
@@ -19,6 +21,8 @@ namespace GlobalEvent.Models.AdminViewModels
             this.Important = false;
             this.Solved = false;
             this.SeenByAdmin = false;
+            this.Date = DateTime.Now.ToString("yyyy-MM-dd");
+            this.Time = DateTime.Now.ToString("HH:mm");
         }
     }
 }
