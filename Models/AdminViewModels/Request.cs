@@ -14,7 +14,7 @@ namespace GlobalEvent.Models.AdminViewModels
         public string AdminName { get; set; }
         public string VType { get; set; }
         public int VID { get; set; } // visitor ID
-        public bool SeenByAdmin { get; set; }
+        public bool SeenByAdmin { get; set; } 
 
         public Request()
         {

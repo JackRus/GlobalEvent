@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using GlobalEvent.Models.VisitorViewModels;
 using Microsoft.AspNetCore.Identity;
 using GlobalEvent.Models;
+using GlobalEvent.Models.AdminViewModels;
 
 namespace GlobalEvent.Controllers
 {
@@ -29,7 +30,9 @@ namespace GlobalEvent.Controllers
         {
             Event e = await _db.Events
                 .Include(x => x.Tickets)
+                .Include(x => x.Products)
                 .Include(x => x.Visitors)
+                    .ThenInclude(x => x.Requests)
                 .FirstOrDefaultAsync(x => x.Status);
 
             // get active event
@@ -44,6 +47,12 @@ namespace GlobalEvent.Controllers
                 ViewBag.CheckIned = e.Visitors.Where(x => x.CheckIned).Count();
                 ViewBag.Registered = e.Visitors.Where(x => x.Registered).Count();
 
+                // select all requests for current event
+                ViewBag.Requests = new List<Request>();
+                foreach (var item in e.Visitors)
+                {
+                    ViewBag.Requests.AddRange(item.Requests);
+                }
                 
                 // All tickets
                 ViewBag.AllTickets = 0;
@@ -57,48 +66,45 @@ namespace GlobalEvent.Controllers
 
         [HttpGet]
         [Authorize(Policy="Visitors Viewer")]
-        public async Task<IActionResult> Search (string Name = null, string ID = null)
+        public async Task<IActionResult> Search (string ID = null)
         {
-            if (ID == null || Name == null) 
+            if (ID == null) 
             {
                 return RedirectToAction("Dashboard");
             }
 
-            List<Visitor> v = new List<Visitor>();
-            
             // get Active event id
             var EID = (await _db.Events.SingleOrDefaultAsync(x => x.Status)).ID;
-            if (Name == "ID")
+           
+            var parsed = 0;
+            int.TryParse(ID, out parsed);
+            List<Visitor> v = new List<Visitor>();
+            if (ID == "All")
             {
-                // find all matches
-                v = await _db.Visitors.Where(x => x.EID == EID && x.ID == int.Parse(ID)).ToListAsync();
+                v = await _db.Visitors.Where(x => x.EID == EID).ToListAsync();
             }
-            else if (Name == "Name")
+            else
             {
-                v = v = await _db.Visitors.Where(x => x.EID == EID && x.Name == ID).ToListAsync();
-            }
-            else if (Name == "Last")
-            {
-                v = v = await _db.Visitors.Where(x => x.EID == EID && x.Last == ID).ToListAsync();
-            }
-            else if (Name == "Order")
-            {
-                v = v = await _db.Visitors.Where(x => x.EID == EID && x.OrderNumber == ID).ToListAsync();
-            }
-            else if (Name == "RegNumber")
-            {
-                v = v = await _db.Visitors.Where(x => x.EID == EID && x.RegistrationNumber == ID).ToListAsync();
-            }
-            else if (Name == "Email")
-            {
-                v = v = await _db.Visitors.Where(x => x.EID == EID && x.Email == ID).ToListAsync();
+                v = await _db.Visitors
+                    .Where(x => x.EID == EID && (
+                        x.ID == parsed ||
+                        x.Name.ToUpper() == ID.ToUpper() ||
+                        x.Last.ToUpper() == ID.ToUpper() ||
+                        x.Email.ToUpper() == ID.ToUpper() ||
+                        x.Company.ToUpper() == ID.ToUpper() ||
+                        x.Occupation.ToUpper() == ID.ToUpper() ||
+                        x.OrderNumber == ID ||
+                        x.RegistrationNumber == ID
+                    )).ToListAsync();
             }
 
             // adding log
             var u = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(u.CreateLog("Search", $"Search by {Name}: {ID}"));
+            await _db.Logs.AddAsync(u.CreateLog("Search", $"Search value: {ID}"));
             await _db.SaveChangesAsync();
 
+            // passing search criteria 
+            ViewBag.Criteria = ID;
             if (v == null || v.Count == 0)
             {
                 ViewBag.Message = "No Visitors were found. Please try different search creteria or make sure you input is correct.";

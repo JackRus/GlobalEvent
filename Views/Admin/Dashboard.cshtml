@@ -1,70 +1,35 @@
 @model Event
 
-<h1> Admin DASHBOARD </h1>
+<h1> Admin's DASHBOARD </h1>
 
-<div class="text-center">
-	<a asp-action="Dashboard" class="btn mybtn bgBase">Refresh</a>
-	<a class="btn mybtn bgBro tog" data-id="search">SEARCH VISITOR</a>	
-</div>
-
-<div id="search" class="eye pad20 mar20 border">
-	<!-- BY ID -->
-	<div class="text-center m5-0"> 
-		<label class="label-admin">By ID</label> &nbsp
-		<input class="input-admin copy" type="number" data-id="VID"/>
-		<a asp-action="Search" asp-route-Name="ID" class="btn mybtn bgAccent" id="VID" style="vertical-align: top;">SEARCH</a>
-	</div>
-	
-	<!-- BY NAME -->
-	<div class="text-center m5-0-5-0">
-		<label class="label-admin">By Name</label> &nbsp
-		<input class="input-admin copy" type="text" data-id="Name"/>
-		<a asp-action="Search" asp-route-Name="Name" class="btn mybtn bgAccent" id="Name" style="vertical-align: top;">SEARCH</a>
-	</div>
-
-	<!-- BY LAST NAME -->
-	<div class="text-center m5-0-5-0">
-		<label class="label-admin">By Last Name</label> &nbsp
-		<input class="input-admin copy" type="text" data-id="Last"/>
-		<a asp-action="Search" asp-route-Name="Last" class="btn mybtn bgAccent" id="Last" style="vertical-align: top;">SEARCH</a>
-	</div>
-
-	<!-- BY ORDER # -->
-	<div class="text-center m5-0-5-0">
-		<label class="label-admin">By Order #</label> &nbsp
-		<input class="input-admin copy" type="number" data-id="Order"/>
-		<a asp-action="Search" asp-route-Name="Order" class="btn mybtn bgAccent" id="Order" style="vertical-align: top;">SEARCH</a>
-	</div>
-
-	<!-- BY Registration # -->
-	<div class="text-center m5-0-5-0">
-		<label class="label-admin">By Reg. #</label> &nbsp
-		<input class="input-admin copy" type="number" data-id="RegNumber"/>
-		<a asp-action="Search" asp-route-Name="RegNumber" class="btn mybtn bgAccent" id="RegNumber" style="vertical-align: top;">SEARCH</a>
-	</div>
-
-	<!-- BY Email -->
-	<div class="text-center m5-0-5-0">
-		<label class="label-admin">By Email</label> &nbsp
-		<input class="input-admin copy" type="email" data-id="Email"/>
-		<a asp-action="Search" asp-route-Name="Email" class="btn mybtn bgAccent" id="Email" style="vertical-align: top;">SEARCH</a>
-	</div>
-
-</div>
-
-@if(ViewBag.Message != null)
-{
-	<div id="tog" class="f-attention">@ViewBag.Message <br/>
-        <a class="btn mybtn-sm-red tog inline m5-0-5-0" data-id="tog">OK</a>
-    </div>
-}
 @if (ViewBag.Active)
 {
+	<div class="text-center">
+		<a asp-action="Dashboard" class="btn mybtn bgBase">Refresh</a>
+		<a class="btn mybtn bgBro tog" data-id="search">Search Visitor</a>	
+	</div>
+
+	<div id="search" class="eye pad20 mar20 border">
+		<!-- BY ID -->
+		<p class="text-center">Search by ID, First Name, Last Name, Order #, Reg. #, Company, Occupation</p>
+		<div class="text-center m5-0"> 
+			<input class="input-admin copy" data-id="ID"/>
+			<a asp-action="Search" asp-route-ID="" class="btn mybtn bgAccent" id="ID" style="vertical-align: top;">SEARCH</a>
+		</div>
+	</div>
+
+	@if(ViewBag.Message != null)
+	{
+		<div id="tog" class="f-attention">@ViewBag.Message <br/>
+			<a class="btn mybtn-sm-red tog inline m5-0-5-0" data-id="tog">OK</a>
+		</div>
+	}
+	
 	<div class="row mar5">
 		
 		<div class="col-sm-4 nopad">
 			<a asp-action="AddOrder" asp-controller="" asp-route-ID="@Model.ID" class="btn mybtn-admin bgBase">ADD ORDER</a>
-			<a asp-action="Index" asp-controller="Visitor" asp-route-ID="@Model.ID" class="btn mybtn-admin bgBase">All Visitors</a>
+			<a asp-action="Search" asp-controller="Admin" asp-route-ID="All" asp-route-Name="All" class="btn mybtn-admin bgBase">All Visitors</a>
 			<a asp-action="Index" asp-controller="Product" asp-route-ID="@Model.ID" class="btn mybtn-admin bgBase">All Products</a>
 			<a asp-action="Index" asp-controller="Ticket" asp-route-ID="@Model.ID" class="btn mybtn-admin bgBase">All Tickets</a>
 			<a asp-action="Index" asp-controller="VType" asp-route-ID="@Model.ID" class="btn mybtn-admin bgBase">All Guest Types</a>
@@ -104,35 +69,6 @@
 				<br />
 			</div>
 
-			<div class="dash-head tog" data-id="ticket">
-				TICKETS
-			</div>
-			<div class="dash-section" id="ticket">
-				<span class="dash-name">Types: </span> <br />
-				@foreach (Ticket t in @Model.Tickets)
-				{
-					<div> @t.Type - @t.Limit for $@t.Price </div>
-				}
-				<br />
-				<span class="dash-name">Attendance (CheckIn/Register/Sold): </span> <br />
-				@foreach (Ticket t in @Model.Tickets)
-				{
-					<div> @t.Type - @t.CheckIned / @t.Registered / @t.Sold </div>
-				}
-
-				<span class="dash-name">Tickets Sold: </span>
-				@Model.TicketsSold
-				<br />
-
-			</div>	
-
-			<div class="dash-head tog" data-id="request">
-				VISITORS REQUESTS
-			</div>
-			<div class="dash-section eye" id="request">
-				<span class="dash-name">Total Requests: </span>
-				0 
-			</div>
 		</div>
 		<div class="col-sm-4 nopad">
 			<div class="dash-head tog" data-id="visitor">
@@ -165,9 +101,102 @@
 				</div>
 
 			</div>	
+			<div class="dash-head tog" data-id="ticket">
+				TICKETS
+			</div>
+			<div class="dash-section eye" id="ticket">
+				<span class="dash-name">Types: </span> <br />
+				@foreach (Ticket t in @Model.Tickets)
+				{
+					<div> @t.Type - @t.Limit for $@t.Price </div>
+				}
+				<br />
+				<span class="dash-name">Attendance (CheckIn/Register/Sold): </span> <br />
+				@foreach (Ticket t in @Model.Tickets)
+				{
+					<div> @t.Type - @t.CheckIned / @t.Registered / @t.Sold </div>
+				}
+
+				<span class="dash-name">Tickets Sold: </span>
+				@Model.TicketsSold
+				<br />
+
+			</div>	
 		</div>
 	</div>
 
+	<!-- VISITOR"S REQUESTS -->
+	<div class="row text-center m20-0-20-0">
+		<h2> Visitors Requests / Complaints</h2>
+	</div>
+
+	@if(ViewBag.Requests != null && ViewBag.Requests.Count != 0)
+	{
+		<table class="table table-hover">
+			<thead>
+				<tr style="border-bottom: 2px solid gray;">
+					<th>ID</th>
+					<th>Time</th>
+					<th>Date</th>
+					<th style="width: 40%;">Description</th>
+					<th>Admin</th>
+					<th>Important</th>
+					<th>Seen</th>
+					<th>Solved</th>
+					<th style="width: auto; text-align: right;">Actions</th>
+				</tr>
+			</thead>
+			<tbody>
+
+			@foreach(var r in ViewBag.Requests)
+			{	
+				<tr>
+					<td>@r.ID</td>
+					<td>@r.Time</td>
+					<td>@r.Date</td>
+					<td style="width: 40%;">@r.Description</td>
+					<td>@r.AdminName</td>
+					<td class="text-center">
+						<div class="bulp @(r.Important ? "bgRed" : "bgBase")"></div>
+					</td>
+					<td>
+						<div class="bulp @(r.SeenByAdmin ? "bgBase" : "bgRed")"></div>
+					</td>
+					<td>
+						<div class="bulp @(r.Solved ? "bgBase" : "bgRed")"></div>
+					</td>
+					<td style="width: auto; text-align: right;">
+						
+					@if(await AuthorizationService.AuthorizeAsync(User, "Visitor Editor"))
+					{
+						<div class="dropdown">
+							<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
+							<span class="caret"></span></button>
+							<ul class="dropdown-menu dropdown-menu-right">
+									<li><a asp-action="Edit" asp-controller="Request" asp-route-ID="@r.ID">Edit</a></li>
+									<li><a asp-action="Status" asp-controller="Request" asp-route-ID="@r.ID" asp-route-Name="SOLVED">Change Solved </a></li>
+									<li><a asp-action="Status" asp-controller="Request" asp-route-ID="@r.ID" asp-route-Name="IMPORTANT">Change Importance</a></li>
+									<li><a asp-action="Status" asp-controller="Request" asp-route-ID="@r.ID" asp-route-Name="SEEN">Change Seen</a></li>
+									<li><a asp-action="Delete" asp-controller="Request" asp-route-ID="@r.ID">Delete</a></li>
+							</ul>
+						</div>
+					}
+					else
+					{
+						<span>NO ACCESS</span>
+					}		
+					</td>
+				</tr>
+			}
+			</tbody>
+		</table>
+	}
+	else
+	{
+		<div class="text-center">
+			No requests have been created yet.
+		</div>
+	}
 }
 else
 {

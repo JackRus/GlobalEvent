@@ -1,3 +1,5 @@
+using System;
+
 namespace GlobalEvent.Models.AdminViewModels
 {
 	public class Note
@@ -7,7 +9,7 @@ namespace GlobalEvent.Models.AdminViewModels
         public string Date { get; set; }
         public string Time { get; set; }
         public bool Important { get; set; } // important or not
-        public int AdminID { get; set; } // who made it
+        public string AdminID { get; set; } // who made it
         public string AdminName { get; set; }
         public int VID { get; set; }
         public bool SeenByAdmin { get; set; }
@@ -16,6 +18,10 @@ namespace GlobalEvent.Models.AdminViewModels
         {
             this.Important = false;
             this.SeenByAdmin = true;
+            this.Date = DateTime.Now.ToString("yyyy-MM-dd");
+            this.Time = DateTime.Now.ToString("HH:mm");
+            this.Important = false;
+            this.SeenByAdmin = false;
         }
     }
 }

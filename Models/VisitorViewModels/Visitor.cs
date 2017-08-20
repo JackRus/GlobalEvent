@@ -53,6 +53,8 @@ namespace GlobalEvent.Models.VisitorViewModels
 		[Required]
 		[RegularExpression(@"^[0-9a-zA-Z ]+$", ErrorMessage = "Contains non Alphanumeric characters.")]
 		public string Company { get; set; }
+
+
 		public int EID { get; set; }
 		public string TicketType { get; set; }
 

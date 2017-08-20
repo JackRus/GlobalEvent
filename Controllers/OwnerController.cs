@@ -268,17 +268,17 @@ namespace GlobalEvent.Controllers
             ViewBag.Claims = await _userManager.GetClaimsAsync(u);
             
             // copy data to a view model
-            EditAdmin a = new EditAdmin();
-            a.FirstName = u.FirstName;
-            a.LastName = u.LastName;
-            a.Level = u.Level;
-            a.Email = u.Email;
-            a.Id = u.Id;
+            EditAdmin ea = new EditAdmin();
+            ea.FirstName = u.FirstName;
+            ea.LastName = u.LastName;
+            ea.Level = u.Level;
+            ea.Email = u.Email;
+            ea.Id = u.Id;
 
             // all user logs
-            ViewBag.Logs = await _db.Logs.Where(x => x.AdminID == u.Id).ToListAsync();
+            ViewBag.Logs = await _db.Logs.Where(x => x.AdminID == u.Id).OrderByDescending(x => x.ID).ToListAsync();
             
-            return View(a);
+            return View(ea);
         }
 
         [HttpPost]

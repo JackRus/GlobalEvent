@@ -67,6 +67,21 @@ $(document).ready(function() {
 	$(":checkbox:checked").each(function() {
 		$("[data-id=" + $(this).attr('id') + "]").html('X').removeClass('true-false').addClass('true-false-checked');
 	}); 
+
+	// case insensetive text search	
+	$.expr[":"].contains = $.expr.createPseudo(function(arg) {
+		return function( elem ) {
+			return $(elem).text().toUpperCase().indexOf(arg.toUpperCase()) >= 0;
+		};
+	});
+
+	// highlight the serach results
+	$("td:contains('"+$('#highlight').html()+"')").each(function() {
+		if ($(this).text().toUpperCase() == $('#highlight').text().toUpperCase())
+		{
+			$(this).html('<span class="search-found">' + $(this).html() + '</span>');
+		}
+	});
 });
 
 /////////////////////
@@ -90,10 +105,19 @@ $("#ok").click(function(){
    $("#understood").removeClass("eye");
 });
 
+/////////////////////
+//  Search Visitors
+///////////////////// 
+
 $('.copy').on('change',function(){
 	var link = $('#'+$(this).data('id')).attr('href');
-	$('#'+$(this).data('id')).attr('href', link + '&ID=' + $(this).val()); 
-   //$('#'+$(this).data('id')).attr('asp-route-Name', $(this).data('name')); 
+	$('#'+$(this).data('id')).attr('href', link + '/' + $(this).val()); 
+});
+
+// highlight
+$("th:contains('ID')").each(function() {	
+	this.html('cool');
+	//this.html() = '<span class="search-found">' + $('#highlight').text() + '</span>';
 });
 
 /////////////////////

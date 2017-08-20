@@ -20,7 +20,6 @@ namespace GlobalEvent.Migrations
                     Last = table.Column<string>(nullable: true),
                     Name = table.Column<string>(nullable: true),
                     Occupation = table.Column<string>(nullable: true),
-                    ParentID = table.Column<int>(nullable: false),
                     Phone = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
@@ -36,13 +35,11 @@ namespace GlobalEvent.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     AdminID = table.Column<string>(nullable: true),
                     AdminName = table.Column<string>(nullable: true),
-                    Body = table.Column<string>(nullable: true),
                     Date = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: true),
                     Solved = table.Column<bool>(nullable: false),
-                    Status = table.Column<string>(nullable: true),
                     Time = table.Column<string>(nullable: true),
-                    Type = table.Column<string>(nullable: true),
-                    VID = table.Column<int>(nullable: false)
+                    Type = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -417,7 +414,7 @@ namespace GlobalEvent.Migrations
                 {
                     ID = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    AdminID = table.Column<int>(nullable: false),
+                    AdminID = table.Column<string>(nullable: true),
                     AdminName = table.Column<string>(nullable: true),
                     Date = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
