@@ -35,8 +35,10 @@ namespace GlobalEvent.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     AdminID = table.Column<string>(nullable: true),
                     AdminName = table.Column<string>(nullable: true),
+                    Assigned = table.Column<bool>(nullable: false),
                     Date = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
+                    ExpectedToBeSolved = table.Column<string>(nullable: true),
                     Solved = table.Column<bool>(nullable: false),
                     Time = table.Column<string>(nullable: true),
                     Type = table.Column<string>(nullable: true)
@@ -309,7 +311,8 @@ namespace GlobalEvent.Migrations
                     OwnerName = table.Column<string>(nullable: true),
                     OwnerPhone = table.Column<string>(nullable: true),
                     TicketType = table.Column<string>(nullable: true),
-                    Time = table.Column<string>(nullable: true)
+                    Time = table.Column<string>(nullable: true),
+                    VType = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {

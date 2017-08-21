@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using GlobalEvent.Models;
 using System.Reflection;
 using System.Security.Claims;
+using GlobalEvent.Models.AdminViewModels;
 
 namespace GlobalEvent.Controllers
 {
@@ -46,6 +47,7 @@ namespace GlobalEvent.Controllers
             Event e = await _db.Events
                 .Include(x => x.Tickets)
                 .Include(x => x.Visitors)
+                    .ThenInclude(x => x.Requests)
                 .Include(x => x.Products)
                 .FirstOrDefaultAsync(x => x.Status);
 
@@ -61,6 +63,13 @@ namespace GlobalEvent.Controllers
                 ViewBag.CheckIned = e.Visitors.Where(x => x.CheckIned).Count();
                 // # of visitors registered
                 ViewBag.Registered = e.Visitors.Where(x => x.Registered).Count();
+                
+                // select all requests for current event
+                ViewBag.Requests = new List<Request>();
+                foreach (var item in e.Visitors)
+                {
+                    ViewBag.Requests.AddRange(item.Requests);
+                }
                 
                 // All tickets
                 ViewBag.AllTickets = 0;

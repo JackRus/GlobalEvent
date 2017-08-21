@@ -180,6 +180,7 @@ namespace GlobalEvent.Controllers
 					return View("PreRegister");
 				}
 				v.TicketType = order.TicketType;
+				v.Type = order.VType;
 				return View(v);
 			}
 

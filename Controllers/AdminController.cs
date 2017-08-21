@@ -10,6 +10,7 @@ using GlobalEvent.Models.VisitorViewModels;
 using Microsoft.AspNetCore.Identity;
 using GlobalEvent.Models;
 using GlobalEvent.Models.AdminViewModels;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GlobalEvent.Controllers
 {
@@ -143,5 +144,50 @@ namespace GlobalEvent.Controllers
             
             return View(v);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> AddOrder (int? ID = null)
+        {
+            if (ID == null)
+            {
+                return RedirectToAction("Dashboard", "Admin");
+            }
+
+            AddOrder o = new AddOrder();
+            o.EID = (int)ID;
+            await o.CreateLists(_db);
+
+            return View(o);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddOrderOk (AddOrder o)
+        {  
+            if (!ModelState.IsValid)
+            {
+                return RedirectToAction("Dashboard", "Admin");
+            } 
+        
+            Order newO = new Order();
+            if (!(await o.CheckDuplicates(_db, newO)))
+            {
+                // adding log
+                var u = await _userManager.GetUserAsync(User);
+                await _db.Logs.AddAsync(u.CreateLog("Order", $"New Order: {newO.Number}. Reason: {o.Comment}"));
+                
+                Event e = await _db.Events.SingleOrDefaultAsync(x => x.ID == o.EID);
+
+                // update db
+                e.Orders.Add(newO);
+                _db.Events.Update(e);
+                await _db.SaveChangesAsync();
+            }
+            else
+            {
+                ViewBag.Message = "This Order already exist.";
+            }
+
+            return View(newO);
+        }  
     }
 }

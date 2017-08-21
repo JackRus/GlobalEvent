@@ -211,6 +211,10 @@ select:-webkit-autofill {
     color: blue;
 }
 
+textarea{
+    font-size: 1em!important;
+}
+
 .form-group {
     margin: 20px auto 10px auto;
     max-width: 400px;

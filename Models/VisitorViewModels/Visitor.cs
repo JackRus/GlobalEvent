@@ -83,7 +83,6 @@ namespace GlobalEvent.Models.VisitorViewModels
             this.Requests = new List<Request>();
             this.Notes = new List<Note>();
             this.Logs = new List<VisitorLog>();
-			this.Type = "Guest";
 			this.Blocked = false;
 			this.Deleted = false;
 		}

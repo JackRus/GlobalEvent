@@ -13,7 +13,7 @@ namespace GlobalEvent.Models.VisitorViewModels
 	public class Order
     {
         public int ID { get; set; }
-        public int Number { get; set; } 
+        public int Number { get; set; }
         public int Amount { get; set; }
         public bool Cancelled { get; set; }
         public int CheckedIn { get; set; }
@@ -22,11 +22,11 @@ namespace GlobalEvent.Models.VisitorViewModels
         public string OwnerEmail { get; set; }
         public string OwnerPhone { get; set; }
         public string Date { get; set; }     //date / time
-        public string Time { get; set; }  
+        public string Time { get; set; }
         public int EID { get; set; }   //date / time
         public string TicketType { get; set; }
-        //public string DirectUrl { get; set; }
-    
+        public string VType { get; set; }
+
         public Order()
         {
             this.Number = 0;
@@ -34,42 +34,44 @@ namespace GlobalEvent.Models.VisitorViewModels
             this.CheckedIn = 0;
             this.Full = false;
             this.Cancelled = false;
+            this.Date = DateTime.Now.ToString("yyyy-MM-dd");
+            this.Time = DateTime.Now.ToString("HH:mm");
         }
 
         public static async Task OrderUpdate(ApplicationDbContext _db, int EID)
         {
             Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == EID);
-            var url = "https://www.eventbriteapi.com/v3/events/" + e.EventbriteID + "/attendees/?token=" + e.HttpBase;
-            
+            var url = $"https://www.eventbriteapi.com/v3/events/{e.EventbriteID}/attendees/?token={e.HttpBase}";
+
             // get request to Eventbrite
             var text = new EBGet(url);
             // deserializing json to Atendee list.
             var visitors = JsonConvert.DeserializeObject<Attendees>(text.responseE);
 
             // finds the latest added order or 0
-            var lastOrder = _db.Orders.Count() == 0 ? 0 : _db.Orders.Last().Number;
+            var lastOrder = _db.Orders.Count() == 0 ? 0 : (await _db.Orders.MaxAsync(x => x.Number));
 
             // remove all existing orders
             var query = visitors.attendees
-                .Where(s => 
-                    Int32.Parse(s.order_id) > lastOrder 
-                    && !s.cancelled 
+                .Where(s =>
+                    Int32.Parse(s.order_id) > lastOrder
+                    && !s.cancelled
                     && !s.refunded)
                 .GroupBy(x => x.order_id)
-                .Select(y => new { 
-                    Number = y.Key, 
+                .Select(y => new {
+                    Number = y.Key,
                     Count = y.Count()})
                 .OrderBy(o => o.Number).ToList();
 
             var queryDelete = visitors.attendees
                 .Where(s => s.cancelled || s.refunded)
                 .GroupBy(x => x.order_id)
-                .Select(y => new { 
-                    Number = y.Key, 
+                .Select(y => new {
+                    Number = y.Key,
                     Count = y.Count()})
                 .OrderBy(o => o.Number).ToList();
-            
-            // create temporary container 
+
+            // create temporary container
             List<Order> orders = new List<Order>();
 
             // update orders
@@ -80,7 +82,7 @@ namespace GlobalEvent.Models.VisitorViewModels
                 {
                     Attendee attendee = visitors.attendees
                         .FirstOrDefault(x => x.order_id == a.Number);
-                    
+
                     var order = new Order();
                     order.Number = Int32.Parse(a.Number);
                     order.Amount = a.Count;
@@ -91,20 +93,27 @@ namespace GlobalEvent.Models.VisitorViewModels
                     order.Time = attendee.created.Substring(11,5);
                     order.TicketType = attendee.ticket_class_name;
                     orders.Add(order);
+                    order.VType = "Guest"; // default value
                 }
-                
-                e.Orders.AddRange(orders);
+
                 //update db
+                e.Orders.AddRange(orders);
                 _db.Events.Update(e);
 
                 // reset container
                 orders = new List<Order>();
-                
+
                 // collect refunded and cancelled
                 foreach(Order o in e.Orders)
+                {
                     foreach(var a in queryDelete)
+                    {
                         if (a.Number == o.Number.ToString())
+                        {
                             orders.Add(o);
+                        }
+                    }
+                }
 
                 // remove refunded and cancelled
                 _db.Orders.RemoveRange(orders);
@@ -123,4 +132,3 @@ namespace GlobalEvent.Models.VisitorViewModels
         }
     }
 }
-                   

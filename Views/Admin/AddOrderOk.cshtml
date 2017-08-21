@@ -1,0 +1,23 @@
+@model Order
+
+@{
+	Layout = "_NoBody";
+}
+
+<div class="row c-c pad10 text-center" style="width: 400px;">
+	<div class="text-center">
+		<h1 style="margin-top: 0px;">CONFIRMATION</h1>
+
+		@if(ViewBag.Message != null) 
+		{
+			<div id="tog" class="f-attention">@ViewBag.Message</div>
+		}
+
+		<h4>Order #: <strong>@Model.Number</strong></h4>
+		<h4>Quantity: @Model.Amount  </h4>
+		<h4>Ticket Type: @Model.TicketType </h4>
+		<h4>Visitor Type#: @Model.VType </h4>
+	</div>
+	<br />
+	<a asp-action="Dashboard" asp-controller="Admin" class="btn mybtn bgBase">OK</a>
+</div>

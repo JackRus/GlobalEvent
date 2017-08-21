@@ -5,8 +5,28 @@
 @if (ViewBag.Active)
 {
 	<div class="text-center">
-		<a asp-action="Dashboard" class="btn mybtn bgBase">Refresh</a>
-		<a class="btn mybtn bgBro tog" data-id="search">Search Visitor</a>	
+		<a class="btn mybtn bgBase tog" data-id="search">Search Visitor</a>
+		<div class="dropdown inline">
+	
+			<button class="btn mybtn bgBro dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				ACTIONS <span style="font-size: 0.9em;">&nbsp &#x25BC;</span>
+			</button>
+
+			<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu2">
+				@if(await AuthorizationService.AuthorizeAsync(User, "Visitor Editor"))
+				{
+					<li><a asp-action="AddOrder" asp-controller="Admin" asp-route-ID="@Model.ID">ADD ORDER</a></li>
+					<li><a asp-action="AddIssue" asp-controller="Admin" asp-route-ID="@Model.ID">ADD ISSUE</a></li>
+					<li role="separator" class="divider"></li>
+					<li><a asp-action="Search" asp-controller="Admin" asp-route-ID="All" asp-route-Name="All">All Visitors</a></li>
+					<li><a asp-action="Index" asp-controller="Product" asp-route-ID="@Model.ID">All Products</a></li>
+					<li><a asp-action="Index" asp-controller="Ticket" asp-route-ID="@Model.ID">All Tickets</a></li>
+					<li><a asp-action="Index" asp-controller="VType" asp-route-ID="@Model.ID">All Guest Types</a></li>
+					<li role="separator" class="divider"></li>
+					<li><a asp-action="Dashboard" asp-controller="Admin">Refresh</a></li>
+				}
+			</ul>
+		</div>
 	</div>
 
 	<div id="search" class="eye pad20 mar20 border">
@@ -28,15 +48,6 @@
 	<div class="row mar5">
 		
 		<div class="col-sm-4 nopad">
-			<a asp-action="AddOrder" asp-controller="" asp-route-ID="@Model.ID" class="btn mybtn-admin bgBase">ADD ORDER</a>
-			<a asp-action="Search" asp-controller="Admin" asp-route-ID="All" asp-route-Name="All" class="btn mybtn-admin bgBase">All Visitors</a>
-			<a asp-action="Index" asp-controller="Product" asp-route-ID="@Model.ID" class="btn mybtn-admin bgBase">All Products</a>
-			<a asp-action="Index" asp-controller="Ticket" asp-route-ID="@Model.ID" class="btn mybtn-admin bgBase">All Tickets</a>
-			<a asp-action="Index" asp-controller="VType" asp-route-ID="@Model.ID" class="btn mybtn-admin bgBase">All Guest Types</a>
-		</div>
-		
-
-		<div class="col-sm-4 nopad">
 			<div class="dash-head tog" data-id="event">
 				EVENT
 			</div>
@@ -57,30 +68,12 @@
 				@Model.Description
 			</div>
 
-			<div class="dash-head tog" data-id="product">
-				PRODUCTS / EVENTS
-			</div>
-			<div class="dash-section eye" id="product">
-				<span class="dash-name">Events: </span> <br />
-				@foreach (Product p in @Model.Products)
-				{
-					<div> @p.Name - @(p.Free ? "Free" : "Paid") - @p.DateStart, @p.TimeStart/@p.TimeEnd - @(p.Status ? "<span class='Base'>Active</span>" : "Inactive") </div>
-				}
-				<br />
-			</div>
-
 		</div>
 		<div class="col-sm-4 nopad">
 			<div class="dash-head tog" data-id="visitor">
 				VISITORS
 			</div>
 			<div class="dash-section" id="visitor">
-				<span class="dash-name">Types: </span> <br />
-				@foreach (VType v in @Model.Types)
-				{
-					<div> @v.Name - @(v.Free ? "Free" : "Paid") </div>
-				}
-				<br />
 				<span class="dash-name">Checked In: </span> @ViewBag.CheckIned out of @ViewBag.Registered <br />
 				
 				<div class="chart-base"> 
@@ -100,28 +93,35 @@
 					@(ViewBag.AllTickets != 0 ? Model.TicketsSold * 100 / ViewBag.AllTickets : 0)% </div>
 				</div>
 
-			</div>	
+			</div>
+
 			<div class="dash-head tog" data-id="ticket">
 				TICKETS
 			</div>
-			<div class="dash-section eye" id="ticket">
-				<span class="dash-name">Types: </span> <br />
-				@foreach (Ticket t in @Model.Tickets)
-				{
-					<div> @t.Type - @t.Limit for $@t.Price </div>
-				}
+			<div class="dash-section" id="ticket">
+				
 				<br />
 				<span class="dash-name">Attendance (CheckIn/Register/Sold): </span> <br />
 				@foreach (Ticket t in @Model.Tickets)
 				{
 					<div> @t.Type - @t.CheckIned / @t.Registered / @t.Sold </div>
 				}
-
-				<span class="dash-name">Tickets Sold: </span>
-				@Model.TicketsSold
-				<br />
-
 			</div>	
+		</div>
+		<div class="col-sm-4 nopad">	
+				
+
+			<div class="dash-head tog" data-id="product">
+				PRODUCTS / EVENTS
+			</div>
+			<div class="dash-section" id="product">
+				<span class="dash-name">Events: </span> <br />
+				@foreach (Product p in @Model.Products)
+				{
+					<div> @p.Name - @(p.Free ? "Free" : "Paid") - @p.DateStart, @p.TimeStart/@p.TimeEnd - @(p.Status ? "<span class='Base'>Active</span>" : "Inactive") </div>
+				}
+				<br />
+			</div>
 		</div>
 	</div>
 
