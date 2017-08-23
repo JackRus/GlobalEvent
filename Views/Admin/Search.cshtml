@@ -3,7 +3,7 @@
 <h1>Search Results</h1> 
 <h3> 
 	For: 
-	<span id="highlight" @ViewBag.Criteria>@ViewBag.Criteria</span> &nbsp &nbsp
+	<span id="highlight" class="bold">@ViewBag.Criteria</span> &nbsp &nbsp
 	<a class="btn mybtn bgBro tog" data-id="search" style="vertical-align: text-top;">New Search</a>	
 </h3>	
 
@@ -26,6 +26,11 @@
 	<div class="text-center">
 		<a asp-action="Dashboard" class="btn mybtn bgBase">OK</a>
 	</div>
+}
+
+@if(ViewBag.Partial != null)
+{
+	<div id="tog" class="f-info">@ViewBag.Partial</div>
 }
 
 @if(Model != null && Model.Count != 0)

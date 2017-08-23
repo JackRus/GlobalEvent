@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GlobalEvent.Data;
 using GlobalEvent.Models;
+using GlobalEvent.Models.EBViewModels;
 using GlobalEvent.Models.OwnerViewModels;
 using GlobalEvent.Models.VisitorViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -233,8 +234,11 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Events", "Owner");
             }
+            
+            await Ticket_Classes.UpdateEB(_db, (int)EID);
+            
             // get all tickets for the event
-            ViewBag.Tickets = await _db.Tickets.Where(x => x.EID == EID).ToListAsync();
+            ViewBag.Tickets = await _db.Tickets.Where(x => x.EID == EID).OrderBy(x => x.Type).ToListAsync();
             // get all ticket types for the event
             ViewBag.Product = await _db.Products.FirstOrDefaultAsync(x => x.ID == ID); //string
             ViewBag.ID = (int)ID;

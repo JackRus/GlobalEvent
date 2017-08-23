@@ -179,6 +179,13 @@ namespace GlobalEvent.Controllers
 					ViewBag.EID = v.EID;
 					return View("PreRegister");
 				}
+				else if (order.Cancelled)
+				{
+					ViewBag.Message = "This Order was cancelled.";
+					ViewBag.EID = v.EID;
+					return View("PreRegister");
+				}
+
 				v.TicketType = order.TicketType;
 				v.Type = order.VType;
 				return View(v);

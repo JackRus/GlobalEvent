@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using GlobalEvent.Data;
+using GlobalEvent.Models.EBViewModels;
 using GlobalEvent.Models.VisitorViewModels;
 using Microsoft.EntityFrameworkCore;
 
@@ -91,6 +92,8 @@ namespace GlobalEvent.Models.OwnerViewModels
 		public static async Task Update (ApplicationDbContext _db, int ID)
 		{
 
+			await Ticket_Classes.UpdateEB(_db, ID);
+			
 			Event e = await _db.Events
 				.Include(x => x.Tickets)
 				.Include(x => x.Types)

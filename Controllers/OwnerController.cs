@@ -41,7 +41,7 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy="Owner's Menu")]
+        [Authorize(Policy="Owner's Dashboard")]
         public async Task <IActionResult> Dashboard ()
         {
             Event e = await _db.Events
@@ -50,6 +50,8 @@ namespace GlobalEvent.Controllers
                     .ThenInclude(x => x.Requests)
                 .Include(x => x.Products)
                 .FirstOrDefaultAsync(x => x.Status);
+
+            ViewBag.Issues = await _db.Issues.ToListAsync();
 
             ViewBag.Active = e == null ? false : true;
             
@@ -66,10 +68,15 @@ namespace GlobalEvent.Controllers
                 
                 // select all requests for current event
                 ViewBag.Requests = new List<Request>();
+                ViewBag.NotSeen = 0;
+                ViewBag.Important = 0;
                 foreach (var item in e.Visitors)
                 {
                     ViewBag.Requests.AddRange(item.Requests);
+                    ViewBag.NotSeen += item.Requests.Where(x => !x.SeenByAdmin).Count();
+                    ViewBag.Important += item.Requests.Where(x => x.Important).Count();
                 }
+               
                 
                 // All tickets
                 ViewBag.AllTickets = 0;

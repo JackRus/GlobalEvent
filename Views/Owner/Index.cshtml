@@ -11,8 +11,11 @@
 
 <div class="row m20-0-20-0">
 	<div class="col-sm-6">
-		<a asp-action="Dashboard" class="btn i-block-owner">Dashboard</a>	
-		<br />
+		@if (await AuthorizationService.AuthorizeAsync(User, "Owner's Dashboard"))
+        {
+			<a asp-action="Dashboard" class="btn i-block-owner">Owner's Dashboard</a>	
+			<br />
+		}
 		<a asp-action="Events" class="btn i-block-owner">Events</a>
 		<br />	
 		<a asp-action="Admins" class="btn i-block-owner">Admins</a>

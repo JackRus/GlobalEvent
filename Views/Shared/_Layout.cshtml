@@ -30,21 +30,15 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    @if (await AuthorizationService.AuthorizeAsync(User, "Event Editor"))
+                    @if (await AuthorizationService.AuthorizeAsync(User, "Owner's Menu"))
                     {
                         <li><a asp-controller="Owner" asp-action="Index">Main Menu</a></li>
                     }
-
-                    @if (await AuthorizationService.AuthorizeAsync(User, "Owner's Dashboard"))
-                    {
-                        <li><a asp-controller="Owner" asp-action="Dashboard">Dashboard</a></li>
-                    }
-                    
                     @if (await AuthorizationService.AuthorizeAsync(User, "Todo Viewer"))
                     {
                         <li><a asp-controller="Todo" asp-action="Index">ToDo</a></li>
                     }
-                    <li><a asp-controller="Admin" asp-action="Dashboard">Admin's Dashboard</a></li>
+                    <li><a asp-controller="Admin" asp-action="Dashboard"> Dashboard</a></li>
                 </ul>
                 @await Html.PartialAsync("_LoginPartial")
             </div>

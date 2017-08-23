@@ -1,15 +1,16 @@
-@model AddOrder
+@model Order
 
-<h1>Add Order</h1>
+<h1>EDIT Order</h1>
 <h3> @ViewBag.Event </h3>
 
-@if(ViewBag.Message != null) {
-<div id="tog" class="f-attention">@ViewBag.Message <br/>
-	<a class="btn mybtn-sm-red tog inline m5-0-5-0" data-id="tog">OK</a>
-</div>
+@if(ViewBag.Message != null) 
+{
+	<div id="tog" class="f-attention">@ViewBag.Message <br/>
+		<a class="btn mybtn-sm-red tog inline m5-0-5-0" data-id="tog">OK</a>
+	</div>
 }
 
-<form asp-action="AddOrderOk" autocomplete="off">
+<form asp-action="EditOrder" asp-controller="Order" autocomplete="off">
 	<div class="row">
 		<div class="col-sm-6">
 			<div class="form-number-container">
@@ -18,35 +19,25 @@
 
 			<div class="form-group">
 				<label asp-for="VType" class="control-label"></label>
-				<select asp-for="VType" asp-items="Model.VTypes" class="form-control">
-					<option value="" hidden disabled selected>
-						Select Visitor Type &#x25BC;
-					</option>
-				</select>
-				<span asp-validation-for="VType" class="Red"></span>
+				<input asp-for="VType" readonly class="form-control" />
 			</div>
 
 			<div class="form-group">
 				<label asp-for="TicketType" class="control-label"></label>
-				<select asp-for="TicketType" asp-items="Model.Types" class="form-control">
-					<option value="" hidden disabled selected>
-						Select Ticket Type &#x25BC;
-					</option>
-				</select>
-				<span asp-validation-for="TicketType" class="Red"></span>
+				<input asp-for="TicketType" readonly class="form-control" />
 			</div>
 
 			<div class="form-group">
 				<label asp-for="Amount" class="control-label"></label>
-				<input asp-for="Amount" class="form-control" />
+				<input asp-for="Amount" readonly class="form-control" />
 				<span asp-validation-for="Amount" class="Red"></span>
 			</div>
 
 			<div class="form-group">
-				<label asp-for="Comment" class="control-label"></label>
-				<textarea asp-for="Comment" rows="7" class="form-control"></textarea>
-				<span asp-validation-for="Comment" class="Red"></span>
-			</div>
+                <label asp-for="Cancelled" class="control-label"></label>&nbsp
+                <span class="true-false" data-id="box1"></span>
+                <input asp-for="Cancelled" class="eye" id="box1"/> 
+            </div>
 		</div>
 
 		<div class="col-sm-6">
@@ -74,12 +65,12 @@
 			</div>
 			<!---->
 
-			<input asp-for="EID" value="@Model.EID" class="eye" />
+			<input asp-for="ID" value="@Model.ID" class="eye" />
 
 			<div class="form-group text-center">
-				<button type="submit" class="btn mybtn bgBase">CREATE</button>
+				<button type="submit" class="btn mybtn bgBase">SAVE</button>
 				<button type="reset" class="btn mybtn bgBro">RESET</button>
-				<a asp-action="Events" class="btn mybtn bgRed">CANCEL</a>
+				<a asp-action="Dashboard" asp-controller="Admin" class="btn mybtn bgRed">CANCEL</a>
 			</div>
 		</div>
 	</div>

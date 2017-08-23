@@ -16,6 +16,7 @@
                 <li><a asp-action="Edit" asp-controller="Admin" asp-route-id="@Model.ID">EDIT</a></li>
 				<li><a asp-action="Add" asp-controller="Request" asp-route-ID="@Model.ID">ADD REQUEST</a></li>
 				<li><a asp-action="Add" asp-controller="Note" asp-route-id="@Model.ID" >ADD NOTE </a></li>
+				<li><a asp-action="Add" asp-controller="Issue" asp-route-ID="@Model.ID" asp-route-EID="@Model.EID">ADD ISSUE</a></li>
             }
             @if(await AuthorizationService.AuthorizeAsync(User, "Visitor Killer"))
             {
@@ -35,18 +36,14 @@
 }
 <br />
 <div class="text-center">
-	Check In: <div class="bulp @(Model.CheckIned ? "bgBase" : "bgGray")" style="vertical-align: bottom"></div>
-	Registration: <div class="bulp @(Model.Registered ? "bgBase" : "bgGray")" style="vertical-align: bottom"></div>
-	Block: <div class="bulp @(Model.Blocked ? "bgRed" : "bgBase")" style="vertical-align: bottom"></div>
+	Check In: <div class="bulp @(Model.CheckIned ? "bgBase" : "bgGray")" style="vertical-align: bottom"></div> &nbsp
+	Registration: <div class="bulp @(Model.Registered ? "bgBase" : "bgGray")" style="vertical-align: bottom"></div> &nbsp
+	Block: <div class="bulp @(Model.Blocked ? "bgRed" : "bgBase")" style="vertical-align: bottom"></div> 
 </div>
-
-<div class="row mar5">
-		
-		<div class="col-sm-12 nopad">
-			<div class="dash-head tog" data-id="info">
-				Visitor's Info
-			</div>
-			<div class="dash-section" id="info">
+<br />
+<div class="dash-section">
+	<div class="row mar5">
+		<div class="col-sm-4 nopad">
 				<span class="dash-name">First Name: </span>
 				@Model.Name 
 				<br />
@@ -59,6 +56,8 @@
 				<span class="dash-name">Category: </span>
 				@Model.Type
 				<br />
+		</div>
+		<div class="col-sm-4 nopad">
 				<span class="dash-name">Registration #: </span>
 				@Model.RegistrationNumber
 				<br />
@@ -71,6 +70,8 @@
 				<span class="dash-name">Company: </span>
 				@Model.Company
 				<br />
+		</div>
+		<div class="col-sm-4 nopad">
 				<span class="dash-name">Occupation: </span>
 				@Model.Occupation
 				<br />
@@ -86,9 +87,8 @@
 				@Model.BlockReason
 				<br />
 			}
-
-			</div>
 		</div>
+	</div>
 </div>
 
 <!-- VISITOR'S NOTES -->

@@ -81,6 +81,10 @@ $(document).ready(function() {
 		{
 			$(this).html('<span class="search-found">' + $(this).html() + '</span>');
 		}
+		if ($(".f-info").text() != "")
+		{
+			$(this).html('<span class="search-found">' + $(this).html() + '</span>');
+		}
 	});
 });
 
@@ -115,10 +119,10 @@ $('.copy').on('change',function(){
 });
 
 // highlight
-$("th:contains('ID')").each(function() {	
-	this.html('cool');
+//$("th:contains('ID')").each(function() {	
+//	this.html('cool');
 	//this.html() = '<span class="search-found">' + $('#highlight').text() + '</span>';
-});
+//});
 
 /////////////////////
 //    Check-Box

@@ -97,6 +97,25 @@ namespace GlobalEvent.Controllers
                         x.OrderNumber == ID ||
                         x.RegistrationNumber == ID
                     )).ToListAsync();
+                
+                // partial match
+                if (v == null || v.Count == 0)
+                {
+                    v = await _db.Visitors
+                        .Where(x => x.EID == EID && (
+                            x.Name.ToUpper().Contains(ID.ToUpper()) ||
+                            x.Last.ToUpper().Contains(ID.ToUpper()) ||
+                            x.Email.ToUpper().Contains(ID.ToUpper()) ||
+                            x.Company.ToUpper().Contains(ID.ToUpper()) ||
+                            x.Occupation.ToUpper().Contains(ID.ToUpper()) ||
+                            x.OrderNumber.Contains(ID) ||
+                            x.RegistrationNumber.Contains(ID)
+                        )).ToListAsync();
+                    if (v != null || v.Count != 0)
+                    {
+                        ViewBag.Partial = "The exact match wasn't found. Please see below partially matching records.";
+                    }
+                }
             }
 
             // adding log
@@ -108,7 +127,7 @@ namespace GlobalEvent.Controllers
             ViewBag.Criteria = ID;
             if (v == null || v.Count == 0)
             {
-                ViewBag.Message = "No Visitors were found. Please try different search creteria or make sure you input is correct.";
+                ViewBag.Message = "No records were found. Please try different search creteria or make sure your input is correct.";
             }
             return View(v);
         }
@@ -143,51 +162,6 @@ namespace GlobalEvent.Controllers
                 .SingleOrDefaultAsync(x => x.ID == ID);
             
             return View(v);
-        }
-
-        [HttpGet]
-        public async Task<IActionResult> AddOrder (int? ID = null)
-        {
-            if (ID == null)
-            {
-                return RedirectToAction("Dashboard", "Admin");
-            }
-
-            AddOrder o = new AddOrder();
-            o.EID = (int)ID;
-            await o.CreateLists(_db);
-
-            return View(o);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> AddOrderOk (AddOrder o)
-        {  
-            if (!ModelState.IsValid)
-            {
-                return RedirectToAction("Dashboard", "Admin");
-            } 
-        
-            Order newO = new Order();
-            if (!(await o.CheckDuplicates(_db, newO)))
-            {
-                // adding log
-                var u = await _userManager.GetUserAsync(User);
-                await _db.Logs.AddAsync(u.CreateLog("Order", $"New Order: {newO.Number}. Reason: {o.Comment}"));
-                
-                Event e = await _db.Events.SingleOrDefaultAsync(x => x.ID == o.EID);
-
-                // update db
-                e.Orders.Add(newO);
-                _db.Events.Update(e);
-                await _db.SaveChangesAsync();
-            }
-            else
-            {
-                ViewBag.Message = "This Order already exist.";
-            }
-
-            return View(newO);
-        }  
+        } 
     }
 }

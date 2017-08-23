@@ -130,5 +130,13 @@ namespace GlobalEvent.Models.VisitorViewModels
             _db.Orders.Update(o);
             await _db.SaveChangesAsync();
         }
+
+        public void CopyInfo (Order o)
+        {
+            this.OwnerName = o.OwnerName;
+            this.OwnerEmail = o.OwnerEmail;
+            this.OwnerPhone = o.OwnerPhone;
+            this.Cancelled = o.Cancelled;
+        }
     }
 }

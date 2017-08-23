@@ -75,7 +75,7 @@ namespace GlobalEvent.Controllers
                     _logger.LogInformation(1, "User logged in.");
 
                     // log
-                    var user = await _userManager.GetUserAsync(User);
+                    var user = await _userManager.FindByNameAsync(model.Email);
                     await _db.Logs.AddAsync(user.CreateLog("Log In", "User Loged In"));
                     await _db.SaveChangesAsync();
 

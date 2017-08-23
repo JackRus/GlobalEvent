@@ -29,40 +29,70 @@
 		<tr>
 			<td>@u.FirstName</td>
 			<td>@u.LastName</td>
-			@if(u.Level == "Owner")
+			@if (u.Level == "Owner")
 			{
-				<td>***********</td>
+				@if (await AuthorizationService.AuthorizeAsync(User, "Is Owner"))
+				{
+					<td>@u.UserName</td>
+				}
+				else
+				{
+					<span>*********</span>
+				}	
 			}
 			else
 			{
-				<td>@u.UserName</td>	
+				<td>@u.UserName</td>
 			}
 			<td>@u.Level</td>
 			<td>TODO</td>
 			<td style="width: auto; text-align: right;">
-			@if(u.Level == "Owner")
+			@if (u.Level == "Owner")
 			{
-				<span> NO ACCESS </span>
+				@if (await AuthorizationService.AuthorizeAsync(User, "Is Owner"))
+				{
+					<div class="dropdown">
+						<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
+						<span class="caret"></span></button>
+						
+						<ul class="dropdown-menu dropdown-menu-right">
+						@if(await AuthorizationService.AuthorizeAsync(User, "Admin Editor"))
+						{
+
+							<li><a asp-action="EditAdmin" asp-route-ID="@u.Id">Edit</a></li>
+							<li><a asp-action="Lock" asp-route-ID="@u.Id">Lock</a></li>
+						}
+						@if(await AuthorizationService.AuthorizeAsync(User, "Admin Killer"))
+						{
+							<li><a asp-action="DeleteUser" asp-controller="Account" asp-route-ID="@u.Id">Delete</a></li>
+						}
+						</ul>
+					</div>
+				}
+				else
+				{
+					<span> NO ACCESS </span>
+				}
 			}
 			else
 			{	
 				<div class="dropdown">
-					<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
-					<span class="caret"></span></button>
-					
-					<ul class="dropdown-menu dropdown-menu-right">
-					@if(await AuthorizationService.AuthorizeAsync(User, "Admin Editor"))
-					{
+						<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
+						<span class="caret"></span></button>
+						
+						<ul class="dropdown-menu dropdown-menu-right">
+						@if(await AuthorizationService.AuthorizeAsync(User, "Admin Editor"))
+						{
 
-						<li><a asp-action="EditAdmin" asp-route-ID="@u.Id">Edit</a></li>
-						<li><a asp-action="Lock" asp-route-ID="@u.Id">Lock</a></li>
-					}
-					@if(await AuthorizationService.AuthorizeAsync(User, "Admin Killer"))
-					{
-						<li><a asp-action="DeleteUser" asp-controller="Account" asp-route-ID="@u.Id">Delete</a></li>
-					}
-					</ul>
-				</div>
+							<li><a asp-action="EditAdmin" asp-route-ID="@u.Id">Edit</a></li>
+							<li><a asp-action="Lock" asp-route-ID="@u.Id">Lock</a></li>
+						}
+						@if(await AuthorizationService.AuthorizeAsync(User, "Admin Killer"))
+						{
+							<li><a asp-action="DeleteUser" asp-controller="Account" asp-route-ID="@u.Id">Delete</a></li>
+						}
+						</ul>
+					</div>
 			}
 			</td> 
 		</tr>

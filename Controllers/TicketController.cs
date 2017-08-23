@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using GlobalEvent.Data;
 using GlobalEvent.Models;
+using GlobalEvent.Models.EBViewModels;
 using GlobalEvent.Models.OwnerViewModels;
 using GlobalEvent.Models.VisitorViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -32,6 +33,8 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Events", "Owner");
             }
 
+            await Ticket_Classes.UpdateEB(_db, (int)ID);
+            
             // extrats event with the matching ID
             ViewBag.Tickets = await _db.Tickets
                 .Where(x => x.EID == ID)
@@ -87,8 +90,9 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Events", "Owner");
             }
 
-            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ID)).Name;
-            return View(await _db.Tickets.FirstOrDefaultAsync(x => x.ID == ID));
+            var t = await _db.Tickets.FirstOrDefaultAsync(x => x.ID == ID);
+            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == t.EID)).Name;
+            return View(t);
         }
 
         [HttpPost]
@@ -118,9 +122,9 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Events", "Owner");
             }
-
-            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ID)).Name;
-            return View(await _db.Tickets.FirstOrDefaultAsync(x => x.ID == ID));
+            var t = await _db.Tickets.FirstOrDefaultAsync(x => x.ID == ID);
+            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == t.EID)).Name;
+            return View(t);
         }
 
         [HttpPost]

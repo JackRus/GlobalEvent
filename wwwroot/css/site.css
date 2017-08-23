@@ -923,3 +923,7 @@ td.line-space {
 .search-found {
     background-color: #EAF112;
 }
+
+.bold {
+    font-weight: bold;
+}

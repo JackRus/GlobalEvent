@@ -1,12 +1,6 @@
 @model Event
 
-<h1> DASHBOARD</h1>
-<h3> @Model.Name </h3>
-
-<div class="text-center">
-	<a asp-action="Dashboard" class="btn mybtn bgBase">Refresh</a>
-	<a asp-action="ViewEvent" asp-route-ID="@Model.ID" class="btn mybtn bgBro">Edit</a>
-</div>
+<h1> OWNER'S DASHBOARD</h1>
 
 @if(ViewBag.Message != null)
 {
@@ -16,6 +10,39 @@
 }
 @if (ViewBag.Active)
 {
+	<h3> @Model.Name </h3>
+
+	<!-- buttons -->
+	<div class="text-center">
+		<a asp-action="Dashboard" class="btn mybtn bgBase">Refresh</a>
+		<div class="dropdown inline">
+			<button class="btn mybtn bgBro dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+				Actions <span style="font-size: 0.7em;">&nbsp &#x25BC;</span>
+			</button>
+			<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu2">
+				<li><a asp-action="Add" asp-controller="Issue" asp-route-EID="@Model.ID">ADD ISSUE</a></li>
+				@if(await AuthorizationService.AuthorizeAsync(User, "Event Editor"))
+				{
+					<li><a asp-action="EditEvent" asp-route-id="@Model.ID">EDIT</a></li>
+					<li><a asp-action="ViewEvent" asp-route-ID="@Model.ID">VIEW DETAILS</a></li>
+				}
+				@if(await AuthorizationService.AuthorizeAsync(User, "Tickets Viewer"))
+				{
+					<li><a asp-action="Index" asp-controller="Ticket" asp-route-id="@Model.ID" >MANAGE TICKETS</a></li>
+				}
+				@if(await AuthorizationService.AuthorizeAsync(User, "Products Viewer"))
+				{
+					<li><a asp-action="Index" asp-controller="Product" asp-route-id="@Model.ID" >MANAGE PRODUCTS</a></li>
+				}
+				@if(await AuthorizationService.AuthorizeAsync(User, "VTypes Viewer"))
+				{
+					<li><a asp-action="Index" asp-controller="VType" asp-route-id="@Model.ID" >MANAGE VISITOR TYPES</a></li>
+				}
+			</ul>
+		</div>
+	</div>
+	<!-- end of buttons -->
+
 	<div class="row mar5">
 		
 		<div class="col-sm-4 nopad">
@@ -110,7 +137,16 @@
 				<span class="dash-name">Events: </span> <br />
 				@foreach (Product p in @Model.Products)
 				{
-					<div> @p.Name - @(p.Free ? "Free" : "Paid") - @p.DateStart, @p.TimeStart/@p.TimeEnd - @(p.Status ? "<span class='Base'>Active</span>" : "Inactive") </div>
+					<div> @p.Name - @(p.Free ? "Free" : "Paid") - @p.DateStart, @p.TimeStart/@p.TimeEnd - 
+						@if (p.Status)
+						{
+							<span class='Base'>Active</span>
+						}
+						else
+						{
+							<span class='Red'>Inactive</span> 
+						}
+					</div>
 				}
 				<br />
 			</div>
@@ -147,17 +183,98 @@
 			</div>
 			<div class="dash-section">
 				<span class="dash-name">Total Requests: </span>
-				0 
+				@ViewBag.Requests.Count 
+				<br />
+				<span class="dash-name">Not Seen: </span>
+				@ViewBag.NotSeen
+				<br />
+				<span class="dash-name">Important: </span>
+				@ViewBag.Important
+				<br />
 			</div>
+			
 		</div>
 	</div>
 }
 else
 {
 	<div class="row pad10 text-center">
-		<div class="f-attention">You have no ACTIVE event yet!
-		</div>
+		<div class="f-attention">You have no ACTIVE event yet!</div>
 		<br />
 		<a asp-action="Index" asp-controller="Owner" class="btn mybtn bgBase">OK</a>
 	</div>
 }
+
+<!-- ALL ISSUES -->
+<div class="row text-center m20-0-20-0">
+	<h2> ALL ISSUES </h2>
+</div>
+
+@if(ViewBag.Issues != null && ViewBag.Issues.Count != 0)
+{
+	<table class="table table-hover">
+		<thead>
+			<tr style="border-bottom: 2px solid gray;">
+				<th>ID</th>
+				<th>Time</th>
+				<th>Date</th>
+				<th>Type</th>
+				<th style="width: 40%;">Description</th>
+				<th>Due Date</th>
+				<th>Admin</th>
+				<th>Assigned</th>
+				<th>Solved</th>
+				<th style="width: auto; text-align: right;">Actions</th>
+			</tr>
+		</thead>
+		<tbody>
+
+		@foreach(var r in ViewBag.Requests)
+		{	
+			<tr>
+				<td>@r.ID</td>
+				<td>@r.Time</td>
+				<td>@r.Date</td>
+				<td>@r.Type</td>
+				<td style="width: 40%;">@r.Description</td>
+				<td>@r.ExpectedToBeSolved</td>
+				<td>@r.AdminName</td>
+				<td>
+					<div class="bulp @(r.Assigned ? "bgBase" : "bgRed")"></div>
+				</td>
+				<td>
+					<div class="bulp @(r.Solved ? "bgBase" : "bgRed")"></div>
+				</td>
+				<td style="width: auto; text-align: right;">
+					TODO
+				<!-- @if(await AuthorizationService.AuthorizeAsync(User, "Issue Editor"))
+				{
+					<div class="dropdown">
+						<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
+						<span class="caret"></span></button>
+						<ul class="dropdown-menu dropdown-menu-right">
+								<li><a asp-action="Edit" asp-controller="Request" asp-route-ID="@r.ID">Edit</a></li>
+								<li><a asp-action="Status" asp-controller="Request" asp-route-ID="@r.ID" asp-route-Name="SOLVED">Change Solved </a></li>
+								<li><a asp-action="Status" asp-controller="Request" asp-route-ID="@r.ID" asp-route-Name="IMPORTANT">Change Importance</a></li>
+								<li><a asp-action="Status" asp-controller="Request" asp-route-ID="@r.ID" asp-route-Name="SEEN">Change Seen</a></li>
+								<li><a asp-action="Delete" asp-controller="Request" asp-route-ID="@r.ID">Delete</a></li>
+						</ul>
+					</div>
+				}
+				else
+				{
+					<span>NO ACCESS</span>
+				}		 -->
+				</td>
+			</tr>
+		}
+		</tbody>
+	</table>
+}
+else
+{
+	<div class="text-center">
+		No requests have been created yet.
+	</div>
+}
+
