@@ -1,4 +1,10 @@
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
+using GlobalEvent.Data;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace GlobalEvent.Models.OwnerViewModels
 {
@@ -22,6 +28,15 @@ namespace GlobalEvent.Models.OwnerViewModels
         {
             this.Limited = false;
             this.Free = false;
+        }
+
+        public static async Task<List<SelectListItem>> GenerateTypes(ApplicationDbContext db, int? EID)
+        {
+            var vTypes = await db.Types.Where(x => x.EID == EID).ToListAsync();
+            var list = new List<SelectListItem>();
+            vTypes.ForEach(x => list.Add(new SelectListItem { Value = x.Name, Text = x.Name }));
+
+            return list;
         }
     }
 }

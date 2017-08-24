@@ -26,7 +26,6 @@ namespace GlobalEvent.Controllers
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
-        private readonly ILogger _logger;
         private readonly string _externalCookieScheme;
 
         public AccountController(
@@ -35,14 +34,13 @@ namespace GlobalEvent.Controllers
             IOptions<IdentityCookieOptions> identityCookieOptions,
             IEmailSender emailSender,
             ISmsSender smsSender,
-            ILoggerFactory loggerFactory, ApplicationDbContext db)
+            ApplicationDbContext db)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _externalCookieScheme = identityCookieOptions.Value.ExternalCookieAuthenticationScheme;
             _emailSender = emailSender;
             _smsSender = smsSender;
-            _logger = loggerFactory.CreateLogger<AccountController>();
             _db = db;
         }
 
@@ -54,7 +52,6 @@ namespace GlobalEvent.Controllers
         {
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.Authentication.SignOutAsync(_externalCookieScheme);
-
             ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
@@ -72,13 +69,12 @@ namespace GlobalEvent.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation(1, "User logged in.");
-
-                    // log
+                    // ==> LOG
                     var user = await _userManager.FindByNameAsync(model.Email);
                     await _db.Logs.AddAsync(user.CreateLog("Log In", "User Loged In"));
-                    await _db.SaveChangesAsync();
+                    // ==> END OF LOG
 
+                    await _db.SaveChangesAsync();
                     return RedirectToLocal(returnUrl);
                 }
                 if (result.RequiresTwoFactor)
@@ -87,8 +83,6 @@ namespace GlobalEvent.Controllers
                 }
                 if (result.IsLockedOut)
                 {
-                    _logger.LogWarning(2, "User account locked out.");
-                    
                     // log
                     var user = await _userManager.GetUserAsync(User);
                     await _db.Logs.AddAsync(user.CreateLog("Log In", "User account locked out"));
@@ -133,24 +127,22 @@ namespace GlobalEvent.Controllers
             {
                 var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FirstName = model.FirstName, LastName = model.LastName, Level = model.Level };
                 var result = await _userManager.CreateAsync(user, model.Password);
-                var u = await _userManager.FindByEmailAsync(model.Email);
-                
-                // Adding All Claims
-                var properties = new Claims().GetType().GetProperties().ToList();
-                foreach(var item in properties)
-                {
-                    await _userManager.AddClaimAsync(u, new Claim(item.Name, ""));
-                }
-                
-                // log
-                await _db.Logs.AddAsync(u.CreateLog("Register", $"Owner's initial registration"));
-                await _db.SaveChangesAsync();
-
                 // LogIn
                 if (result.Succeeded)
                 {
+                    var u = await _userManager.FindByEmailAsync(model.Email);
+                
+                    // Adding All Claims
+                    var properties = new Claims().GetType().GetProperties().ToList();
+                    foreach(var item in properties)
+                    {
+                        await _userManager.AddClaimAsync(u, new Claim(item.Name, ""));
+                    }
+
+                    // log
+                    await _db.Logs.AddAsync(u.CreateLog("Register", $"Owner's initial registration"));
+                    await _db.SaveChangesAsync();
                     await _signInManager.SignInAsync(u, isPersistent: false);
-                    _logger.LogInformation(3, "Owner's profile was created.");
                     return RedirectToAction("Index", "Owner");
                 }
                 AddErrors(result);
@@ -185,16 +177,14 @@ namespace GlobalEvent.Controllers
                 var result = await _userManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
-                    _logger.LogInformation(3, "Owner/Manager created a new account with password.");
-
-                    // log for creator
+                    // ==> LOG for creator
                     var creator = await _userManager.GetUserAsync(User);
                     await _db.Logs.AddAsync(creator.CreateLog("Create User", $"{model.Level.ToUpper()}: {model.FirstName} {model.LastName}, was created"));
                     
-                    // log for created user
+                    // ==> LOG for created user
                     await _db.Logs.AddAsync(user.CreateLog("Create User", $"{model.Level.ToUpper()} created by {creator.Level}: {creator.FirstName} {creator.LastName}"));
-                    await _db.SaveChangesAsync();
 
+                    await _db.SaveChangesAsync();
                     return RedirectToAction("Admins", "Owner");
                 }
                 AddErrors(result);
@@ -245,13 +235,13 @@ namespace GlobalEvent.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
-            // log
+            // ==> LOG
             var user = await _userManager.GetUserAsync(User);
             await _db.Logs.AddAsync(user.CreateLog("Log Out", "User Loged Out"));
             await _db.SaveChangesAsync();
+            // ==> END OF LOG
             
             await _signInManager.SignOutAsync();
-            _logger.LogInformation(4, "User logged out.");
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
@@ -289,7 +279,6 @@ namespace GlobalEvent.Controllers
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false);
             if (result.Succeeded)
             {
-                _logger.LogInformation(5, "User logged in with {Name} provider.", info.LoginProvider);
                 return RedirectToLocal(returnUrl);
             }
             if (result.RequiresTwoFactor)
@@ -333,7 +322,6 @@ namespace GlobalEvent.Controllers
                     if (result.Succeeded)
                     {
                         await _signInManager.SignInAsync(user, isPersistent: false);
-                        _logger.LogInformation(6, "User created an account using {Name} provider.", info.LoginProvider);
                         return RedirectToLocal(returnUrl);
                     }
                 }
@@ -544,7 +532,6 @@ namespace GlobalEvent.Controllers
             }
             if (result.IsLockedOut)
             {
-                _logger.LogWarning(7, "User account locked out.");
                 return View("Lockout");
             }
             else

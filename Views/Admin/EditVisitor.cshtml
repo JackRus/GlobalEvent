@@ -1,0 +1,118 @@
+@model EditVisitor
+
+<form asp-action="EditVisitor" asp-controller="Admin" autocomplete="off">
+	<h1 class="text-center">EDIT VISITOR</h1>
+	<h3>@ViewBag.Event</h3>
+	@if(ViewBag.Message != null)
+	{
+		<br /> 
+		<div class="f-attention">
+			<span>@ViewBag.Message </span>
+		</div>
+	}
+	<br />
+	<div class="row"></a> 
+		<div class="col-sm-6">
+			<div class="form-number-container">
+				<span class="form-number">1</span> Personal info
+			</div>
+			
+			<div class="form-group">
+				<label asp-for="Type" class="control-label"></label>
+				<select asp-for="Type" asp-items="Model.Types" class="form-control">
+					<option value="@Model.Type" hidden disabled selected>
+						@Model.Type &#x25BC;
+					</option>
+				</select>
+				<span asp-validation-for="Type" class="Red"></span>
+			</div>
+
+			<div class="form-group">
+				<label asp-for="TicketType" class="control-label"></label>
+				<select asp-for="TicketType" asp-items="Model.Tickets" class="form-control">
+					<option value="@Model.TicketType" hidden disabled selected>
+						@Model.TicketType &#x25BC;
+					</option>
+				</select>
+				<span asp-validation-for="TicketType" class="Red"></span>
+			</div>
+
+			<div class="form-group">
+				<label asp-for="Name" class="control-label"></label>
+				<input asp-for="Name" class="form-control"/>
+				<span asp-validation-for="Name" class="Red"></span>
+			</div>
+
+			<div class="form-group">
+				<label asp-for="Last" class="control-label"></label>
+				<input asp-for="Last" class="form-control"/>
+				<span asp-validation-for="Last" class="Red"></span>
+			</div>	
+		</div>
+		
+		<div class="col-sm-6">
+			<div class="form-number-container">
+				<span class="form-number">2</span> Company info
+			</div>
+
+			<div class="form-group">
+				<label asp-for="Company" class="control-label"></label>
+				<input asp-for="Company" class="form-control"/>
+				<span asp-validation-for="Company" class="Red"></span>
+			</div>
+
+			<div class="form-group">
+				<label asp-for="Occupation" class="control-label"></label>
+				<input asp-for="Occupation" class="form-control"/>
+				<span asp-validation-for="Occupation" class="Red"></span>
+			</div>
+
+			<div class="form-group">
+				<label asp-for="Email" class="control-label"></label>
+				<input asp-for="Email" class="form-control"/>
+				<span asp-validation-for="Email" class="Red"></span>
+			</div>
+
+			<!--Phone-->
+			<div class="form-group" style="max-width: 400px;">
+				<div class="row" style="margin: 0px;">
+					<div class="col-xs-8 nopad nomar">
+						<label asp-for="Phone" class="control-label"></label>
+						<input asp-for="Phone" class="form-control" />
+					</div>
+					<!-- extentition -->
+					<div class="col-xs-4 nomar" style="padding: 0px 0px 0px 5px;">
+						<label asp-for="Extention" class="control-label"></label>
+						<input asp-for="Extention" class="form-control" />
+					</div>
+					<span asp-validation-for="Phone" class="Red"></span>
+					<span asp-validation-for="Extention" class="Red"></span>	
+				</div>
+			</div>
+			<!---->
+
+			<div class="form-group">
+                <label asp-for="Blocked" class="control-label"></label>&nbsp
+                <span class="true-false" data-id="box1"></span>
+                <input asp-for="Blocked" class="eye" id="box1"/>
+			</div>
+
+			<div class="form-group">
+                <label asp-for="BlockReason" class="control-label"></label>
+                <textarea asp-for="BlockReason" class="form-control"></textarea>
+				<span asp-validation-for="BlockReason" class="Red"></span>
+			</div>
+
+			<input asp-for="ID" value="@Model.ID" class="eye"/>
+
+			<div class="form-group">
+				<a asp-action="ViewVisitor" asp-controller="Admin" asp-route-ID="@Model.ID" class="btn mybtn bgRed">CANCEL</a>
+			<button type="submit" class="btn mybtn bgBase">SAVE</button>
+			
+		</div>
+	</div>
+</form>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

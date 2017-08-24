@@ -296,7 +296,7 @@ label {
     width: auto;
     padding-left: 10px;
     padding-right: 10px;
-    height: 30px;
+    height: 28px;
     text-align: center;
     line-height: 30px;
     color: #fff;
@@ -924,6 +924,15 @@ td.line-space {
     background-color: #EAF112;
 }
 
+.search-found-partial {
+    background-color: #8fe1fb;
+}
+
 .bold {
     font-weight: bold;
+}
+
+.about {
+    font-size: 1.1em;
+    text-align: justify;
 }

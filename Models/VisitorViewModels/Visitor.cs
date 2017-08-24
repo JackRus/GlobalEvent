@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Threading.Tasks;
 using GlobalEvent.Data;
 using GlobalEvent.Models.AdminViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace GlobalEvent.Models.VisitorViewModels
 {
@@ -132,6 +134,49 @@ namespace GlobalEvent.Models.VisitorViewModels
             vl.Time = DateTime.Now.ToString("HH:mm");
 
 			this.Logs.Add(vl);
+		}
+
+		public static async Task<List<Visitor>> Search(string ID, ApplicationDbContext db)
+		{
+			var v = new List<Visitor>();
+			// get Active event id
+            var EID = (await db.Events.SingleOrDefaultAsync(x => x.Status)).ID;
+            var parsed = 0;
+            int.TryParse(ID, out parsed);
+            if (ID == "All")
+            {
+                v = await db.Visitors.Where(x => x.EID == EID).ToListAsync();
+            }
+            else
+            {
+                v = await db.Visitors
+                    .Where(x => x.EID == EID && (
+                        x.ID == parsed ||
+                        x.Name.ToUpper() == ID.ToUpper() ||
+                        x.Last.ToUpper() == ID.ToUpper() ||
+                        x.Email.ToUpper() == ID.ToUpper() ||
+                        x.Company.ToUpper() == ID.ToUpper() ||
+                        x.Occupation.ToUpper() == ID.ToUpper() ||
+                        x.OrderNumber == ID ||
+                        x.RegistrationNumber == ID
+                    )).ToListAsync();
+                
+                // partial match
+                if (v == null || v.Count == 0)
+                {
+                    v = await db.Visitors
+                        .Where(x => x.EID == EID && (
+                            x.Name.ToUpper().Contains(ID.ToUpper()) ||
+                            x.Last.ToUpper().Contains(ID.ToUpper()) ||
+                            x.Email.ToUpper().Contains(ID.ToUpper()) ||
+                            x.Company.ToUpper().Contains(ID.ToUpper()) ||
+                            x.Occupation.ToUpper().Contains(ID.ToUpper()) ||
+                            x.OrderNumber.Contains(ID) ||
+                            x.RegistrationNumber.Contains(ID)
+                        )).ToListAsync();
+                }
+            }		
+			return v;
 		}
 	}
 }

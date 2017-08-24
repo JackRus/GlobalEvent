@@ -1,31 +1,45 @@
-@model Note
+@model Issue
 
-<h1>EDIT Note</h1> 
-<h3> Visitor: @ViewBag.Visitor.Name @ViewBag.Visitor.Last </h3>
+<h1>EDIT Issue</h1> 
+<h3> ID: @Model.ID </h3>
 
-<form asp-action="Edit" asp-controller="Note" asp-route-VID="@ViewBag.Visitor.ID" autocomplete="off">
+<form asp-action="Edit" asp-controller="Issue" autocomplete="off">
             <div class="form-group">
                 <label asp-for="Description" class="control-label"></label>
-                <textarea asp-for="Description" class="form-control" rows="8" wrap="soft"></textarea>
+                <textarea asp-for="Description" value="@Model.Description" class="form-control" rows="8" wrap="soft"></textarea>
             </div>
 
             <div class="form-group text-center">
-                <label asp-for="Important" class="control-label"></label>&nbsp
+                <label asp-for="Assigned" class="control-label"></label>&nbsp
                 <span class="true-false" data-id="box1"></span>
-                <input asp-for="Important" class="eye" id="box1"/> &nbsp &nbsp &nbsp
+                <input asp-for="Assigned" class="eye" id="box1"/> &nbsp &nbsp &nbsp
 
-				<label asp-for="SeenByAdmin" class="control-label"></label>&nbsp
+				<label asp-for="Solved" class="control-label"></label>&nbsp
                 <span class="true-false" data-id="box2"></span>
-                <input asp-for="SeenByAdmin" class="eye" id="box2"/>
+                <input asp-for="Solved" class="eye" id="box2"/>
             </div>
 
-			<input asp-for="ID" value="@Model.ID" class="eye" />
-			
-			<br />
+            <div class="form-group">
+				<label asp-for="Type" class="control-label"></label>
+				<select asp-for="Type" asp-items="ViewBag.List" class="form-control">
+					<option value="@Model.Type" hidden disabled selected>
+						@Model.Type &#x25BC;
+					</option>
+				</select>
+				<span asp-validation-for="Type" class="Red"></span>
+			</div>
+            
+            <div class="form-group">
+                <label asp-for="ExpectedToBeSolved" class="control-label"></label>
+                <input asp-for="ExpectedToBeSolved" type="date" class="form-control" />
+            </div>
+
+            <input asp-for="ID" value="@Model.ID" class="eye"/>
+
             <div class="form-group text-center">
                 <button type="submit" class="btn mybtn bgBase">SAVE</button>
                 <button type="reset" class="btn mybtn bgBro">RESET</button>
-                <a asp-action="ViewVisitor" asp-controller="Admin" asp-route-ID="@ViewBag.Visitor.ID" class="btn mybtn bgRed">CANCEL</a>
+                <a asp-action="Dashboard" asp-controller="Admin" class="btn mybtn bgRed">CANCEL</a>
             </div>
 </form>
 

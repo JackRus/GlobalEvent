@@ -26,8 +26,8 @@ namespace GlobalEvent.Controllers
             _userManager = userManager;
         }
 
-
-        public async Task<IActionResult> Dashboard ()
+        [HttpGet]
+        public async Task<IActionResult> Dashboard (string message = null)
         {
             Event e = await _db.Events
                 .Include(x => x.Tickets)
@@ -40,28 +40,13 @@ namespace GlobalEvent.Controllers
             ViewBag.Active = e == null ? false : true;
             if (ViewBag.Active)
             {
-                // Update orders
-                await Order.OrderUpdate(_db, e.ID);
                 await Event.Update(_db, e.ID);
-
-                // Visitors
                 ViewBag.CheckIned = e.Visitors.Where(x => x.CheckIned).Count();
                 ViewBag.Registered = e.Visitors.Where(x => x.Registered).Count();
-
-                // select all requests for current event
-                ViewBag.Requests = new List<Request>();
-                foreach (var item in e.Visitors)
-                {
-                    ViewBag.Requests.AddRange(item.Requests);
-                }
-                
-                // All tickets
-                ViewBag.AllTickets = 0;
-                foreach (Ticket t in e.Tickets)
-                {
-                    ViewBag.AllTickets += t.Limit;
-                }
+                ViewBag.Requests = e.GetAllRequests();
+                ViewBag.AllTickets = e.Tickets.Select(x => x.Limit).Sum();
             }
+            ViewBag.Message = message;
             return View(e);
         }
 
@@ -71,60 +56,17 @@ namespace GlobalEvent.Controllers
         {
             if (ID == null) 
             {
-                return RedirectToAction("Dashboard");
+                return RedirectToAction("Dashboard", "Admin", new {message = "Search couldn't be performed."});
             }
+            List<Visitor> v = await Visitor.Search(ID, _db);
 
-            // get Active event id
-            var EID = (await _db.Events.SingleOrDefaultAsync(x => x.Status)).ID;
-           
-            var parsed = 0;
-            int.TryParse(ID, out parsed);
-            List<Visitor> v = new List<Visitor>();
-            if (ID == "All")
-            {
-                v = await _db.Visitors.Where(x => x.EID == EID).ToListAsync();
-            }
-            else
-            {
-                v = await _db.Visitors
-                    .Where(x => x.EID == EID && (
-                        x.ID == parsed ||
-                        x.Name.ToUpper() == ID.ToUpper() ||
-                        x.Last.ToUpper() == ID.ToUpper() ||
-                        x.Email.ToUpper() == ID.ToUpper() ||
-                        x.Company.ToUpper() == ID.ToUpper() ||
-                        x.Occupation.ToUpper() == ID.ToUpper() ||
-                        x.OrderNumber == ID ||
-                        x.RegistrationNumber == ID
-                    )).ToListAsync();
-                
-                // partial match
-                if (v == null || v.Count == 0)
-                {
-                    v = await _db.Visitors
-                        .Where(x => x.EID == EID && (
-                            x.Name.ToUpper().Contains(ID.ToUpper()) ||
-                            x.Last.ToUpper().Contains(ID.ToUpper()) ||
-                            x.Email.ToUpper().Contains(ID.ToUpper()) ||
-                            x.Company.ToUpper().Contains(ID.ToUpper()) ||
-                            x.Occupation.ToUpper().Contains(ID.ToUpper()) ||
-                            x.OrderNumber.Contains(ID) ||
-                            x.RegistrationNumber.Contains(ID)
-                        )).ToListAsync();
-                    if (v != null || v.Count != 0)
-                    {
-                        ViewBag.Partial = "The exact match wasn't found. Please see below partially matching records.";
-                    }
-                }
-            }
-
-            // adding log
+            // ==> LOG
             var u = await _userManager.GetUserAsync(User);
             await _db.Logs.AddAsync(u.CreateLog("Search", $"Search value: {ID}"));
+            // ==> END OF LOG
             await _db.SaveChangesAsync();
+            ViewBag.Criteria = ID == "All" ? "All Visitors" : ID;
 
-            // passing search criteria 
-            ViewBag.Criteria = ID;
             if (v == null || v.Count == 0)
             {
                 ViewBag.Message = "No records were found. Please try different search creteria or make sure your input is correct.";
@@ -134,34 +76,49 @@ namespace GlobalEvent.Controllers
 
         [HttpGet]
         [Authorize(Policy="Visitors Viewer")]
-        public async Task <IActionResult> ListAll ()
-        {
-            // get Active event id
-            var EID = (await _db.Events.SingleOrDefaultAsync(x => x.Status)).ID;
-            
-            // get all visitors for active event
-            List<Visitor> v = await _db.Visitors.Where(x => x.EID == EID).ToListAsync(); 
-            return View(v);
-        }
-
-
-        [HttpGet]
-        [Authorize(Policy="Visitors Viewer")]
         public async Task <IActionResult> ViewVisitor (int? ID)
         {
             if (ID == null)
             {
-                return RedirectToAction("Dashboard", "Admin");
+                return RedirectToAction("Dashboard", "Admin", new {message = "Request couldn't be executed."});
             }
 
-            Visitor v = await _db.Visitors
-                .Include(x => x.Notes)
-                .Include(x => x.Requests)
-                .Include(x => x.Logs)
-                    .ThenInclude(x => x.CurrentState)
-                .SingleOrDefaultAsync(x => x.ID == ID);
-            
+            Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ID);
+            var d = JackLib.PropertiesTypes(v);
+            if (v == null)
+            {
+                return RedirectToAction("Dashboard", "Admin", new {message = "Visitor couldn't be found. Please, try again."});
+            }
             return View(v);
         } 
+
+
+        [HttpGet]
+        [Authorize(Policy="Visitor Editor")]
+        public async Task <IActionResult> EditVisitor (int? ID)
+        {
+            if (ID == null)
+            {
+                return RedirectToAction("Dashboard", "Admin", new {message = "Couldn't access the visitor."});
+            }
+    
+            EditVisitor ev = new EditVisitor();
+            await ev.SetValues(_db, (int)ID);
+            return View(ev);
+        }
+
+
+        [HttpPost]
+        [Authorize(Policy="Visitor Editor")]
+        public IActionResult EditVisitor (Visitor v)
+        {
+            // if (ModelState.IsValid)
+            // {
+                
+            // }
+
+            return RedirectToAction("ViewVisitor", "Admin");
+        }
+
     }
 }

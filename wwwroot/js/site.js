@@ -81,9 +81,9 @@ $(document).ready(function() {
 		{
 			$(this).html('<span class="search-found">' + $(this).html() + '</span>');
 		}
-		if ($(".f-info").text() != "")
+		else if (~$(this).text().toUpperCase().indexOf($('#highlight').text().toUpperCase()))
 		{
-			$(this).html('<span class="search-found">' + $(this).html() + '</span>');
+			$(this).html($(this).text().toUpperCase().replace($('#highlight').text().toUpperCase(), ('<span class="search-found">' + $('#highlight').text().toUpperCase()  + '</span>')))	
 		}
 	});
 });

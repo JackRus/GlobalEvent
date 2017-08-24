@@ -24,7 +24,7 @@ namespace GlobalEvent.Controllers
 
         [HttpGet]
         [Authorize(Policy="Todo Viewer")]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             // get all active todos
             ViewBag.Todos = _db.ToDos
@@ -33,10 +33,11 @@ namespace GlobalEvent.Controllers
                 .ToList();
 
             // get completed todos
-            ViewBag.Done = _db.ToDos
+            ViewBag.Done = await _db.ToDos
                 .Where(x => x.Done)
-                .OrderBy(x => x.Deadline)
-                .ToList();
+                .OrderByDescending(x => x.Deadline)
+                .Take(50)
+                .ToListAsync();
             return View();
         }
 

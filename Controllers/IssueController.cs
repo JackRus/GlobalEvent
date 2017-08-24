@@ -25,116 +25,125 @@ namespace GlobalEvent.Controllers
             _userManager = userManager;
         }
 
+        // GET ADD
         [HttpGet]
         public IActionResult Add(int? ID, int? EID)
         {
             Issue i = new Issue();
-            i.InitiateDescription(ID, EID);
+            i.InitiateDescription(ID, EID); // based on the info provided
             ViewBag.List = Issue.GenerateTypes();
             return View(i);
         }
         
+        /// POST ADD
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Add (Issue i)
         {
-            if (string.IsNullOrEmpty(i.Description))
+            var result = $"Could't add Issue record.";
+            if (!string.IsNullOrEmpty(i.Description))
             {
-                return RedirectToAction("Dashboard", "Admin");
+                ///    LOG     ///
+                var user = await _userManager.GetUserAsync(User);
+                await _db.Logs.AddAsync(user.CreateLog("Issue", $"Issue: \"{i.Description}\", was CREATED"));
+                /// END OF LOG ///
+
+                i.Complete(user);
+                await _db.Issues.AddAsync(i);   
+                await _db.SaveChangesAsync();
+                result = $"Issue record \"{i.Description}\" was created.";
             }
-     
-            ///    LOG     ///
-            var user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(user.CreateLog("Issue", $"Issue: \"{i.Description}\", was CREATED"));
-            /// END OF LOG ///
-
-            Issue newI = new Issue();
-            newI.CopyInfo(i);
-            newI.AdminID = user.Id;
-            newI.AdminName = $"{user.FirstName} {user.LastName}";
-
-            await _db.Issues.AddAsync(newI);   
-            await _db.SaveChangesAsync();
-
-            return RedirectToAction("");
+            return RedirectToAction("Dashboard", "Admin", new {message = result});
         }
 
-        // [HttpPost]
-        // [AutoValidateAntiforgeryToken]
-        // public async Task<IActionResult> Edit (Issue n)
-        // {
-        //     if (string.IsNullOrEmpty(n.Description) || n.ID == 0)
-        //     {
-        //         return RedirectToAction("Dashboard", "Admin");
-        //     }
-
-        //     Issue nOld = await _db.Issues.FirstOrDefaultAsync(x => x.ID == n.ID);
-        //     nOld.Description = n.Description;
-        //     nOld.SeenByAdmin = n.SeenByAdmin;
-        //     nOld.Important = n.Important;
-        //     _db.Issues.Update(nOld);
-
-        //     ///    LOG     ///
-        //     var user = await _userManager.GetUserAsync(User);
-        //     await _db.Logs.AddAsync(user.CreateLog("Issue", $"Issue: \"{n.Description}\" for VID: {n.VID}, was EDITED"));
-        //     /// END OF LOG ///
-
-        //     await _db.SaveChangesAsync();
-        //     return RedirectToAction("ViewVisitor", "Admin", new {ID = nOld.VID});
-        // }
-
-        // [HttpGet]
-        // public async Task<IActionResult> Delete (int? ID)
-        // {
-        //     if (ID == null) 
-        //     {
-        //         return RedirectToAction("Dashboard", "Admin");
-        //     }
-
-        //     Issue n = await _db.Issues.FirstOrDefaultAsync(x => x.ID == ID);
-        //     _db.Issues.Remove(n);
-
-        //     ///    LOG     ///
-        //     var user = await _userManager.GetUserAsync(User);
-        //     await _db.Logs.AddAsync(user.CreateLog("Issue", $"Issue: \"{n.Description}\" for VID: {n.VID}, was DELETED"));
-        //     /// END OF LOG ///
-
-        //     await _db.SaveChangesAsync();
-        //     return RedirectToAction("ViewVisitor", "Admin", new {ID = n.VID});
-        // }
-
-        // [HttpGet]
-        // public async Task<IActionResult> Status (int? ID, string Name = null)
-        // {
-        //     if (ID == null || Name == null)
-        //     {
-        //         return RedirectToAction("Dashboard", "Admin");
-        //     }
-
-        //     // get Issue by ID
-        //     Issue n = await _db.Issues.FirstOrDefaultAsync(x => x.ID == ID);
+        // GET EDIT
+        [HttpGet]
+        [AutoValidateAntiforgeryToken]
+        public async Task<IActionResult> Edit (int? ID)
+        {
+            if (ID == null)
+            {
+                return RedirectToAction("Dashboard", "Admin", new {message = $"Could't access Issue record."});
+            }
             
-        //     switch (Name)
-        //     {
-        //         case "SEEN": 
-        //             n.SeenByAdmin = n.SeenByAdmin ? false : true;
-        //             break;
-        //         case "IMPORTANT": 
-        //             n.Important = n.Important ? false : true;
-        //             break;
-        //         default: 
-        //             break;
-        //     }
+            ViewBag.List = Issue.GenerateTypes();
+            Issue i = await _db.Issues.SingleOrDefaultAsync(x => x.ID == ID);
+            return View(i);
+        }
+        
+        // POST EDIT
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        public async Task<IActionResult> Edit (Issue i)
+        {
+            var result = $"Could't edit Issue record.";
+            if (ModelState.IsValid)
+            {
+                Issue oldI = await _db.Issues.FirstOrDefaultAsync(x => x.ID == i.ID);
+                oldI.CopyInfo(i);
+                _db.Issues.Update(oldI);
 
-        //     _db.Issues.Update(n);
+                // ===> LOG
+                var user = await _userManager.GetUserAsync(User);
+                await _db.Logs.AddAsync(user.CreateLog("Issue", $"Issue: \"{i.Description}\", was EDITED"));
+                // ===> END OF LOG
 
-        //     ///    LOG     ///
-        //     var user = await _userManager.GetUserAsync(User);
-        //     await _db.Logs.AddAsync(user.CreateLog("Issue", $"Issue: \"{n.Description}\" for VID: {n.VID}, feild {Name} was changed"));
-        //     /// END OF LOG ///
+                await _db.SaveChangesAsync();
+                result = $"Issue record was edited.";
+            }
 
-        //     await _db.SaveChangesAsync();
-        //     return RedirectToAction("ViewVisitor", "Admin", new {ID = n.VID});
-        // }
+            return RedirectToAction("Dashboard", "Admin", new {message = result});
+        }
+
+        // GET DELETE
+        [HttpGet]
+        public async Task<IActionResult> Delete (int? ID)
+        {
+            var result = $"Could't delete Issue record.";
+            if (ID != null) 
+            {
+                Issue i = await _db.Issues.SingleOrDefaultAsync(x => x.ID == ID);
+                _db.Issues.Remove(i);
+
+                ///    LOG     ///
+                var user = await _userManager.GetUserAsync(User);
+                await _db.Logs.AddAsync(user.CreateLog("Issue", $"Issue: \"{i.Description}\", was DELETED"));
+                /// END OF LOG ///
+
+                await _db.SaveChangesAsync();
+                result = $"Issue record \"{i.Description}\" was deleted.";
+            }
+            
+            return RedirectToAction("Dashboard", "Admin", new {message = result});
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Status (int? ID, string Name = null)
+        {
+            var result = $"Could't change \"{Name}\" value.";
+
+            if (ID != null && Name != null)
+            {
+                Issue i = await _db.Issues.FirstOrDefaultAsync(x => x.ID == ID);
+                if (Name == "Solved")
+                {
+                    i.Solved = i.Solved ? false : true;
+                }
+                else if (Name == "Assigned")
+                {
+                    i.Assigned = i.Assigned ? false : true;
+                }
+                _db.Issues.Update(i);
+
+                // ==> LOG
+                var user = await _userManager.GetUserAsync(User);
+                await _db.Logs.AddAsync(user.CreateLog("Issue", $"Issue: \"{i.Description}\", feild {Name} was changed."));
+                // ==> END OF LOG
+
+                await _db.SaveChangesAsync();
+                result = $"Value of \"{Name}\" was changed.";
+            }
+            return RedirectToAction("Dashboard", "Admin", new {message = result});
+        }
 	}
 }

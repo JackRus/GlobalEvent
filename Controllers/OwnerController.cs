@@ -51,7 +51,9 @@ namespace GlobalEvent.Controllers
                 .Include(x => x.Products)
                 .FirstOrDefaultAsync(x => x.Status);
 
-            ViewBag.Issues = await _db.Issues.ToListAsync();
+            ViewBag.Issues = await _db.Issues
+                .OrderBy(x => x.ExpectedToBeSolved)
+                .ToListAsync();
 
             ViewBag.Active = e == null ? false : true;
             
@@ -61,9 +63,7 @@ namespace GlobalEvent.Controllers
                 await Order.OrderUpdate(_db, e.ID);
                 await Event.Update(_db, e.ID);
 
-                // # of Visitors checkined
                 ViewBag.CheckIned = e.Visitors.Where(x => x.CheckIned).Count();
-                // # of visitors registered
                 ViewBag.Registered = e.Visitors.Where(x => x.Registered).Count();
                 
                 // select all requests for current event
@@ -76,7 +76,6 @@ namespace GlobalEvent.Controllers
                     ViewBag.NotSeen += item.Requests.Where(x => !x.SeenByAdmin).Count();
                     ViewBag.Important += item.Requests.Where(x => x.Important).Count();
                 }
-               
                 
                 // All tickets
                 ViewBag.AllTickets = 0;
@@ -122,9 +121,11 @@ namespace GlobalEvent.Controllers
             {
                 _db.Events.Add(e);
 
-                // log
+                // ==> LOG
                 var user = await _userManager.GetUserAsync(User);
                 await _db.Logs.AddAsync(user.CreateLog("Event", $"Event: {e.Name}, was created"));
+                // ==> END OF LOG
+
                 // save changes
                 await _db.SaveChangesAsync();
                 return RedirectToAction("Events", new { message = "The Event was successfully created."});
@@ -292,7 +293,7 @@ namespace GlobalEvent.Controllers
             ea.Id = u.Id;
 
             // all user logs
-            ViewBag.Logs = await _db.Logs.Where(x => x.AdminID == u.Id).OrderByDescending(x => x.ID).ToListAsync();
+            ViewBag.Logs = await _db.Logs.Where(x => x.AdminID == u.Id).OrderByDescending(x => x.ID).Take(100).ToListAsync();
             
             return View(ea);
         }
@@ -407,6 +408,17 @@ namespace GlobalEvent.Controllers
             await _db.SaveChangesAsync();
 
             return RedirectToAction("EditAdmin", "Owner", new {ID = ID});
+        }
+
+        public async Task<IActionResult> Attention ()
+        {
+            ViewBag.Requests = await _db.Requests.Where(x => !x.Solved && !x.SeenByAdmin).OrderBy(x => x.Important).ThenBy(x => x.Date).ThenBy(x => x.Time).ToListAsync();
+
+            ViewBag.Issues = await _db.Issues.Where(x => !x.Solved && !x.Assigned).OrderBy(x => x.ExpectedToBeSolved).ThenBy(x => x.Date).ThenBy(x => x.Time).ToListAsync();
+
+            ViewBag.Notes = await _db.Notes.Where(x => !x.SeenByAdmin).OrderBy(x => x.Important).ThenBy(x => x.Date).ThenBy(x => x.Time).ToListAsync();
+  
+            return View();
         }
 	}
 }

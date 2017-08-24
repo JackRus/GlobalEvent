@@ -32,13 +32,10 @@ namespace GlobalEvent.Models.AdminViewModels
 			this.Solved = false;
         }
 
-		public void CopyInfo(Issue i)
+		public void Complete(ApplicationUser user)
 		{
-			this.Description = i.Description;
-			this.Assigned = i.Assigned;
-			this.ExpectedToBeSolved = i.ExpectedToBeSolved;
-			this.Solved = i.Solved;
-			this.Type = i.Type;
+			this.AdminID = user.Id;
+            this.AdminName = $"{user.FirstName} {user.LastName}";
 		}
 
 		public void InitiateDescription(int? ID, int? EID)
@@ -65,6 +62,15 @@ namespace GlobalEvent.Models.AdminViewModels
                 new SelectListItem {Value = "Security", Text = "Security"},
                 new SelectListItem {Value = "Other", Text = "Other"}
             };
+		}
+
+		public void CopyInfo(Issue i)
+		{
+			this.Description = i.Description;
+			this.Solved = i.Solved;
+			this.Type = i.Type;
+			this.Assigned = i.Assigned;
+			this.ExpectedToBeSolved = i.ExpectedToBeSolved;
 		}
     }
 }
