@@ -9,13 +9,12 @@ namespace GlobalEvent.Models.OwnerViewModels
     public class EditAdmin
     {
         [Required]
-        [EmailAddress]
+        [RegularExpression(@"^[0-9a-zA-z]+@[0-9a-zA-z]+.[a-zA-z]+$", ErrorMessage = "Not a valid email.")]
         [Display(Name = "Email")]
         public string Email { get; set; }
 
         [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
         [DataType(DataType.Password)]
-        [Display(Name = "Password")]
         public string Password { get; set; }
 
         [DataType(DataType.Password)]
@@ -25,10 +24,17 @@ namespace GlobalEvent.Models.OwnerViewModels
         public string Id { get; set; }
 
         [Required]
+        [Display(Name = "First Name")]
         public string FirstName { get; set; }
+        
         [Required]
+        [Display(Name = "Last Name")]
         public string LastName { get; set; }
-        [Required] // Determines the access level for the user: owner, manager, admin
+        
+        [Required] 
+        // Determines the access level for the user: owner, manager, admin
+        // Doesn't affect the actual level
+        [Display(Name = "Access level")]
         public string Level { get; set; }
     }
 }

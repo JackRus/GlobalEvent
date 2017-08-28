@@ -3,9 +3,11 @@ using System.Linq;
 using System.Threading.Tasks;
 using GlobalEvent.Data;
 using GlobalEvent.Models;
+using GlobalEvent.Models.AdminViewModels;
 using GlobalEvent.Models.OwnerViewModels;
 using GlobalEvent.Models.VisitorViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -17,13 +19,15 @@ namespace GlobalEvent.Controllers
 	public class VTypeController : Controller
 	{
 		private readonly ApplicationDbContext _db;
-		private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private string _id;
 
-		public VTypeController(UserManager<ApplicationUser> userManager, ApplicationDbContext context)
-		{
-			_db = context;
-			_userManager = userManager;
-		}
+		public VTypeController (UserManager<ApplicationUser> userManager, ApplicationDbContext context, IHttpContextAccessor http)
+        {
+            _db = context;
+            _userManager = userManager;
+            _id = _userManager.GetUserId(http.HttpContext.User);
+        }
 
 		[HttpGet]
 		[Authorize(Policy = "VTypes Viewer")]
@@ -34,11 +38,10 @@ namespace GlobalEvent.Controllers
 				return RedirectToAction("Events", "Owner");
 			}
 
-			ViewBag.VTypes = await _db.Types
-				.Where(x => x.EID == ID)
-				.ToListAsync();
+			ViewBag.VTypes = await _db.Types.Where(x => x.EID == ID).ToListAsync();
 			ViewBag.ID = ID;
 			ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ID)).Name;
+			
 			return View();
 		}
 
@@ -66,11 +69,7 @@ namespace GlobalEvent.Controllers
 				Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == v.EID);
 				e.Types.Add(v);
 				_db.Events.Update(e);
-				///    LOG     ///
-				var user = await _userManager.GetUserAsync(User);
-				await _db.Logs.AddAsync(user.CreateLog("VType", $"Visitor Type: {v.Name}, was CREATED"));
-				/// END OF LOG ///
-				await _db.SaveChangesAsync();
+				await _db.Logs.AddAsync(await Log.New("VType", $"Visitor Type: {v.Name}, was CREATED", _id, _db));
 
 				return RedirectToAction("Index", new { ID = v.EID });
 			}
@@ -101,11 +100,8 @@ namespace GlobalEvent.Controllers
 				Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == v.EID);
 				e.Types.Add(v);
 				_db.Events.Update(e);
-				///    LOG     ///
-				var user = await _userManager.GetUserAsync(User);
-				await _db.Logs.AddAsync(user.CreateLog("VType", $"Visitor Type: {v.Name}, was COPIED"));
-				/// END OF LOG ///
-				await _db.SaveChangesAsync();
+				await _db.Logs.AddAsync(await Log.New("VType", $"Visitor Type: {v.Name}, was COPIED", _id, _db));
+
 				return RedirectToAction("Index", new { ID = v.EID });
 			}
 
@@ -132,11 +128,7 @@ namespace GlobalEvent.Controllers
 			if (ModelState.IsValid)
 			{
 				_db.Types.Update(v);
-				///    LOG     ///
-				var user = await _userManager.GetUserAsync(User);
-				await _db.Logs.AddAsync(user.CreateLog("VType", $"Visitor Type: {v.Name}, was EDITED"));
-				/// END OF LOG ///
-				await _db.SaveChangesAsync();
+				await _db.Logs.AddAsync(await Log.New("VType", $"Visitor Type: {v.Name}, was EDITED", _id, _db));
 
 				return RedirectToAction("Index", new { ID = v.EID });
 			}
@@ -168,11 +160,7 @@ namespace GlobalEvent.Controllers
 			// extrats event with the matching ID
 			VType v = await _db.Types.FirstOrDefaultAsync(x => x.ID == ID);
 			_db.Types.Remove(v);
-			///    LOG     ///
-			var user = await _userManager.GetUserAsync(User);
-			await _db.Logs.AddAsync(user.CreateLog("VType", $"Visitor Type: {v.Name}, was DELETED"));
-			/// END OF LOG ///
-			await _db.SaveChangesAsync();
+			await _db.Logs.AddAsync(await Log.New("VType", $"Visitor Type: {v.Name}, was DELETED", _id, _db));
 
 			return RedirectToAction("Index", new { ID = v.EID });
 		}
@@ -186,10 +174,7 @@ namespace GlobalEvent.Controllers
 				return RedirectToAction("Events", "Owner");
 			}
 
-			// confirmation page
-			Event e = await _db.Events
-				.Include(x => x.Types)
-				.FirstOrDefaultAsync(x => x.ID == ID);
+			Event e = await _db.Events.Include(x => x.Types).FirstOrDefaultAsync(x => x.ID == ID);
 
 			return View(e);
 		}
@@ -206,11 +191,7 @@ namespace GlobalEvent.Controllers
 
 			// delete all Products for a specific event
 			_db.Types.RemoveRange(_db.Types.Where(x => x.EID == ID));
-            ///    LOG     ///
-            var user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(user.CreateLog("VType", $"All Visitor Types for Event ID: {ID}, were DELETED"));
-            /// END OF LOG ///
-			await _db.SaveChangesAsync();
+            await _db.Logs.AddAsync(await Log.New("VType", $"All Visitor Types for Event ID: {ID}, were DELETED", _id, _db));
 
 			return RedirectToAction("Index", new { ID = ID });
 		}

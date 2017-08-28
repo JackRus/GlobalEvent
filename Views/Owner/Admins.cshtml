@@ -1,4 +1,4 @@
-<h1>APP ADMINS MANAGEMENT</h1>
+<h1>ADMINS MANAGEMENT</h1>
 
 <div class="text-center">
 @if(await AuthorizationService.AuthorizeAsync(User, "Admin Creator"))
@@ -37,7 +37,7 @@
 				}
 				else
 				{
-					<span>*********</span>
+					<td><span>*********</span></td>
 				}	
 			}
 			else
@@ -49,7 +49,11 @@
 			<td style="width: auto; text-align: right;">
 			@if (u.Level == "Owner")
 			{
-				@if (await AuthorizationService.AuthorizeAsync(User, "Is Owner"))
+				@if (true)
+				{
+					<span> NO ACCESS </span>
+				}
+				else if (await AuthorizationService.AuthorizeAsync(User, "Is Owner"))
 				{
 					<div class="dropdown">
 						<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
@@ -59,7 +63,7 @@
 						@if(await AuthorizationService.AuthorizeAsync(User, "Admin Editor"))
 						{
 
-							<li><a asp-action="EditAdmin" asp-route-ID="@u.Id">Edit</a></li>
+							<li><a asp-action="EditAdmin" asp-route-ID="@u.Id">View/Edit</a></li>
 							<li><a asp-action="Lock" asp-route-ID="@u.Id">Lock</a></li>
 						}
 						@if(await AuthorizationService.AuthorizeAsync(User, "Admin Killer"))
@@ -76,23 +80,25 @@
 			}
 			else
 			{	
+				@if((await AuthorizationService.AuthorizeAsync(User, "Admin Editor")) || (await AuthorizationService.AuthorizeAsync(User, "Admin Killer")))
+				{
 				<div class="dropdown">
 						<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
 						<span class="caret"></span></button>
 						
 						<ul class="dropdown-menu dropdown-menu-right">
-						@if(await AuthorizationService.AuthorizeAsync(User, "Admin Editor"))
-						{
+						
 
-							<li><a asp-action="EditAdmin" asp-route-ID="@u.Id">Edit</a></li>
+							<li><a asp-action="EditAdmin" asp-route-ID="@u.Id">View/Edit</a></li>
 							<li><a asp-action="Lock" asp-route-ID="@u.Id">Lock</a></li>
-						}
-						@if(await AuthorizationService.AuthorizeAsync(User, "Admin Killer"))
-						{
 							<li><a asp-action="DeleteUser" asp-controller="Account" asp-route-ID="@u.Id">Delete</a></li>
-						}
 						</ul>
 					</div>
+				}
+				else
+				{
+					<span> NO ACCESS </span>
+				}
 			}
 			</td> 
 		</tr>

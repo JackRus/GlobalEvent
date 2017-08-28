@@ -1,13 +1,18 @@
 @model Visitor
 
 <h1>Visitor's details</h1> 
+@if(Model.Deleted || Model.Blocked)
+{
+	<div class="f-attention f1-5">THIS VISITOR WAS @(Model.Deleted ? "DELETED" : "BLOCKED").
+	</div>
+}
+
 <div class="text-center m20-0-20-0">
     <a asp-action="Dashboard" asp-controller="Admin" class="btn mybtn bgBase">BACK</a>
     <div class="dropdown inline">
         
 		<button class="btn mybtn bgBro dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-            ACTIONS
-            <span class="caret" style="vertical-align: super;"></span>
+            Actions <span class="f0-7">&nbsp &#x25BC;</span>
         </button>
 
         <ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu2">
@@ -17,10 +22,16 @@
 				<li><a asp-action="Add" asp-controller="Request" asp-route-ID="@Model.ID">ADD REQUEST</a></li>
 				<li><a asp-action="Add" asp-controller="Note" asp-route-id="@Model.ID" >ADD NOTE </a></li>
 				<li><a asp-action="Add" asp-controller="Issue" asp-route-ID="@Model.ID" asp-route-EID="@Model.EID">ADD ISSUE</a></li>
+				<li role="separator" class="divider"></li>
             }
             @if(await AuthorizationService.AuthorizeAsync(User, "Visitor Killer"))
             {
-                <li><a asp-action="Delete" asp-controller="Admin" asp-route-id="@Model.ID">DELETE</a></li>
+                @if(!Model.Deleted){
+				<li><a asp-action="DeleteVisitor" asp-controller="Admin" asp-route-id="@Model.ID">DELETE</a></li>
+				}
+				else{
+				<li><a asp-action="Reinstate" asp-controller="Admin" asp-route-id="@Model.ID">REINSTATE</a></li>
+				}
             }
         </ul>
     </div>
@@ -89,7 +100,7 @@
 
 <!-- VISITOR'S NOTES -->
 <div class="row text-center m20-0-20-0">
-    <h2> Visitor's Notes</h2>
+    <h2> Admin's Notes</h2>
 </div>
 
 @if(Model.Notes != null && Model.Notes.Count != 0)
@@ -104,7 +115,7 @@
 				<th>Admin</th>
 				<th>Important</th>
 				<th>Seen</th>
-				<th>Actions</th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -127,8 +138,7 @@
 				@if(await AuthorizationService.AuthorizeAsync(User, "Visitor Editor"))
 				{
 					<div class="dropdown">
-						<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
-						<span class="caret"></span></button>
+						<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions &nbsp &#x25BC;</button>
 						<ul class="dropdown-menu dropdown-menu-right">
 								<li><a asp-action="Add" asp-controller="Note" asp-route-ID="@Model.ID">Add New</a></li>
 								<li><a asp-action="Edit" asp-controller="Note" asp-route-ID="@r.ID">Edit</a></li>
@@ -173,7 +183,7 @@ else
 				<th>Important</th>
 				<th>Seen</th>
 				<th>Solved</th>
-				<th style="width: auto; text-align: right;">Actions</th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -200,8 +210,7 @@ else
 				@if(await AuthorizationService.AuthorizeAsync(User, "Visitor Editor"))
 				{
 					<div class="dropdown">
-						<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
-						<span class="caret"></span></button>
+						<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions &nbsp &#x25BC;</button>
 						<ul class="dropdown-menu dropdown-menu-right">
 								<li><a asp-action="Add" asp-controller="Request" asp-route-ID="@Model.ID">Add New</a></li>
 								<li><a asp-action="Edit" asp-controller="Request" asp-route-ID="@r.ID">Edit</a></li>
@@ -250,18 +259,21 @@ else
 
 		@foreach(var l in Model.Logs.OrderByDescending(x => x.ID))
 		{	
-			<tr style="border-top: 2px solid gray;">
+			<tr style="border-top: 2px solid gray;" class="@(l.Type == "ADMIN" ? "bgAttention" : "")">
 				<td>@l.ID</td>
 				<td>@l.Time</td>
 				<td>@l.Date</td>
 				<td>@l.Type</td>
 				<td>@l.Action</td>			
 			</tr>
-			<tr style="border-bottom: 2px solid gray;">
-				<td colspan="100">
-					@l.CurrentState.Name @l.CurrentState.Last | @l.CurrentState.Email | @l.CurrentState.Phone @(l.CurrentState.Extention == null ? "" : $"/ { l.CurrentState.Extention} ")| @l.CurrentState.Company, @l.CurrentState.Occupation 
-				</td>	
-			</tr>
+			@if(l.CurrentState != null)
+			{
+				<tr style="border-bottom: 2px solid gray;">
+					<td colspan="100">
+						@l.CurrentState.Name @l.CurrentState.Last | @l.CurrentState.Email | @l.CurrentState.Phone @(l.CurrentState.Extention == null ? "" : $"/ { l.CurrentState.Extention} ")| @l.CurrentState.Company, @l.CurrentState.Occupation 
+					</td>	
+				</tr>
+			}
 		}
 		</tbody>
 	</table>

@@ -9,6 +9,6 @@ namespace GlobalEvent.Models.AdminViewModels
         public string Phone { get; set; }   
         public string Extention { get; set; }
         public string Occupation { get; set; } 
-        public string Company { get; set; } // Log ID
+        public string Company { get; set; }
     }
 }

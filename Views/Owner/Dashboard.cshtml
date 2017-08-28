@@ -119,12 +119,12 @@
 		<div class="dash-section">
 			<span class="dash-name">Events: </span> <br /> 
 			@foreach (Product p in @Model.Products) {
-			<div> @p.Name - @(p.Free ? "Free" : "Paid") - @p.DateStart, @p.TimeStart/@p.TimeEnd - 
-				@if (p.Status) {
-				<span class='Base'>Active</span> } 
-				else {
-				<span class='Red'>Inactive</span> }
-			</div>
+				<div> @p.Name - @(p.Free ? "Free" : "Paid") - @p.DateStart, @p.TimeStart/@p.TimeEnd - 
+					@if (p.Status) {
+					<span class='Base'>Active</span> } 
+					else {
+					<span class='Red'>Inactive</span> }
+				</div>
 			}
 			<br />
 		</div>
@@ -175,62 +175,188 @@
 </div>
 }
 
-<!-- ALL ISSUES -->
-<div class="row text-center m20-0-20-0">
-	<h2> ALL ISSUES </h2>
+<!-- ALL Requests -->
+<div class="row text-center m20-0-20-0 tog" data-id="requests">
+	<h2> ALL Requests </h2>
 </div>
 
-@if(ViewBag.Issues != null && ViewBag.Issues.Count != 0) {
-<table class="table table-hover">
+@if(ViewBag.Requests != null && ViewBag.Requests.Count != 0) {
+<table class="table table-hover" id="requests">
 	<thead>
 		<tr style="border-bottom: 2px solid gray;">
 			<th>ID</th>
 			<th>Time</th>
 			<th>Date</th>
-			<th>Type</th>
 			<th style="width: 40%;">Description</th>
-			<th>Due Date</th>
 			<th>Admin</th>
-			<th>Assigned</th>
+			<th>Important</th>
+			<th>Seen</th>
 			<th>Solved</th>
-			<th style="width: auto; text-align: right;">Actions</th>
+			<th></th>
 		</tr>
 	</thead>
 	<tbody>
 
-		@foreach(var i in ViewBag.Issues) {
-		<tr>
-			<td>@i.ID</td>
-			<td>@i.Time</td>
-			<td>@i.Date</td>
-			<td>@i.Type</td>
-			<td style="width: 40%;">@i.Description</td>
-			<td>@i.ExpectedToBeSolved</td>
-			<td>@i.AdminName</td>
-			<td class="text-center">
-				<div class="bulp @(i.Assigned ? " bgBase " : "bgRed ")"></div>
-			</td>
-			<td class="text-center">
-				<div class="bulp @(i.Solved ? " bgBase " : "bgRed ")"></div>
-			</td>
-			<td style="width: auto; text-align: right;">	
-				<div class="dropdown">
-					<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
-					<span class="caret"></span></button>
-					<ul class="dropdown-menu dropdown-menu-right">
-						<li><a asp-action="Edit" asp-controller="Issue" asp-route-ID="@i.ID">Edit</a></li>
-						<li><a asp-action="Status" asp-controller="Issue" asp-route-ID="@i.ID" asp-route-Name="Solved">Change Solved</a></li>
-						<li><a asp-action="Status" asp-controller="Issue" asp-route-ID="@i.ID" asp-route-Name="Assigned">Change Assigned</a></li>
-						<li><a asp-action="Delete" asp-controller="Issue" asp-route-ID="@i.ID">Delete</a></li>
-					</ul>
-				</div>		
-			</td>
-		</tr>
-		}
+	@foreach(var r in ViewBag.Requests)
+	{	
+	<tr>
+		<td>@r.ID</td>
+		<td>@r.Time</td>
+		<td>@r.Date</td>
+		<td style="width: 40%;">@r.Description</td>
+		<td>@r.AdminName</td>
+		<td class="text-center">
+			<div class="bulp @(r.Important ? "bgRed" : "bgBase")"></div>
+		</td>
+		<td>
+			<div class="bulp @(r.SeenByAdmin ? "bgBase" : "bgRed")"></div>
+		</td>
+		<td>
+			<div class="bulp @(r.Solved ? "bgBase" : "bgRed")"></div>
+		</td>
+		<td style="width: auto; text-align: right;">
+			<div class="dropdown">
+				<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions &nbsp &#x25BC;</button>
+				<ul class="dropdown-menu dropdown-menu-right">
+					<li><a asp-action="ViewVisitor" asp-controller="Admin" asp-route-ID="@r.ID">View Info</a></li>
+					<li><a asp-action="Edit" asp-controller="Request" asp-route-ID="@r.ID">Edit</a></li>
+					<li><a asp-action="Status" asp-controller="Request" asp-route-ID="@r.ID" asp-route-Name="SOLVED">Change Solved </a></li>
+					<li><a asp-action="Status" asp-controller="Request" asp-route-ID="@r.ID" asp-route-Name="IMPORTANT">Change Importance</a></li>
+					<li><a asp-action="Status" asp-controller="Request" asp-route-ID="@r.ID" asp-route-Name="SEEN">Change Seen</a></li>
+					<li><a asp-action="Delete" asp-controller="Request" asp-route-ID="@r.ID">Delete</a></li>
+				</ul>
+			</div>		
+		</td>
+	</tr>
+	}
 	</tbody>
 </table>
-} else {
-<div class="text-center">
-	No issues have been created yet.
-</div>
+} 
+else 
+{
+<h4 class="text-center">
+	No Requests have been created yet.
+</h4>
 }
+
+<!-- Blocked Visitors -->
+<div class="row text-center m20-0-20-0 tog" data-id="blocked">
+	<h2> BLOCKED Visitors </h2>
+</div>
+
+@if(ViewBag.Blocked != null && ViewBag.Blocked.Count != 0)
+{
+	<table class="table table-hover" id="blocked">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>First Name</th>
+				<th>Last Name</th>
+				<th>Reg. Number</th>
+				<th>Order Number</th>
+				<th>Company</th>
+				<th>Ocupation</th>
+				<th>Phone #</th>
+				<th>Chk</th>
+				<th>Reg</th>
+				<th>Blk</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+		@foreach(var v in ViewBag.Blocked)
+		{	
+			<tr>
+				<td>@v.ID</td>
+				<td>@v.Name</td>
+				<td>@v.Last</td>
+				<td>@v.RegistrationNumber</td>
+				<td>@v.OrderNumber</td>
+				<td>@v.Company</td>
+				<td>@v.Occupation</td>
+				<td>@v.Phone</td>
+				<td>
+					<div class="bulp @(v.CheckIned ? "bgBase" : "bgGray") block"></div>
+				</td>
+				<td>
+					<div class="bulp @(v.Registered ? "bgBase" : "bgGray") block"></div>
+				</td>
+				<td>
+					<div class="bulp @(v.Blocked ? "bgRed" : "bgBase") block"></div>
+				</td>
+				<td>
+					<a asp-action="ViewVisitor" asp-controller="Admin" asp-route-ID="@v.ID">Details</a>
+				</td>
+			</tr>
+		}
+		</tbody>
+	</table>
+}
+else
+{
+	<div class="text-center">
+		This Event has no blocked users yet.
+	</div>
+}
+
+<!-- Blocked Visitors -->
+<div class="row text-center m20-0-20-0 tog" data-id="deleted">
+	<h2> Deleted Visitors </h2>
+</div>
+
+@if(ViewBag.Deleted != null && ViewBag.Deleted.Count != 0)
+{
+	<table class="table table-hover" id="deleted">
+		<thead>
+			<tr>
+				<th>ID</th>
+				<th>First Name</th>
+				<th>Last Name</th>
+				<th>Reg. Number</th>
+				<th>Order Number</th>
+				<th>Company</th>
+				<th>Ocupation</th>
+				<th>Phone #</th>
+				<th>Chk</th>
+				<th>Reg</th>
+				<th>Blk</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+		@foreach(var v in ViewBag.Deleted)
+		{	
+			<tr>
+				<td>@v.ID</td>
+				<td>@v.Name</td>
+				<td>@v.Last</td>
+				<td>@v.RegistrationNumber</td>
+				<td>@v.OrderNumber</td>
+				<td>@v.Company</td>
+				<td>@v.Occupation</td>
+				<td>@v.Phone</td>
+				<td>
+					<div class="bulp @(v.CheckIned ? "bgBase" : "bgGray") block"></div>
+				</td>
+				<td>
+					<div class="bulp @(v.Registered ? "bgBase" : "bgGray") block"></div>
+				</td>
+				<td>
+					<div class="bulp @(v.Blocked ? "bgRed" : "bgBase") block"></div>
+				</td>
+				<td>
+					<a asp-action="ViewVisitor" asp-controller="Admin" asp-route-ID="@v.ID">Details</a>
+				</td>
+			</tr>
+		}
+		</tbody>
+	</table>
+}
+else
+{
+	<h4 class="text-center">
+		This Event has no deleted users yet.
+	</h4>
+}
+<br />
+<br />

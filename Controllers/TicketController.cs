@@ -3,25 +3,30 @@ using System.Linq;
 using System.Threading.Tasks;
 using GlobalEvent.Data;
 using GlobalEvent.Models;
+using GlobalEvent.Models.AdminViewModels;
 using GlobalEvent.Models.EBViewModels;
 using GlobalEvent.Models.OwnerViewModels;
 using GlobalEvent.Models.VisitorViewModels;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace GlobalEvent.Controllers
 {
+    [Authorize]
     public class TicketController : Controller
     {
         private readonly ApplicationDbContext _db;
-		private readonly UserManager<ApplicationUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private string _id;
 
-		public TicketController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+		public TicketController (UserManager<ApplicationUser> userManager, ApplicationDbContext context, IHttpContextAccessor http)
         {
             _db = context;
             _userManager = userManager;
+            _id = _userManager.GetUserId(http.HttpContext.User);
         }
 
         [HttpGet]
@@ -34,12 +39,7 @@ namespace GlobalEvent.Controllers
             }
 
             await Ticket_Classes.UpdateEB(_db, (int)ID);
-            
-            // extrats event with the matching ID
-            ViewBag.Tickets = await _db.Tickets
-                .Where(x => x.EID == ID)
-                .ToListAsync();
-
+            ViewBag.Tickets = await _db.Tickets.Where(x => x.EID == ID).ToListAsync();
             ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ID)).Name;
             ViewBag.ID = (int)ID;
             return View();
@@ -71,13 +71,11 @@ namespace GlobalEvent.Controllers
                 Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == t.EID);
                 e.Tickets.Add(t);
                 _db.Events.Update(e);
+                await _db.Logs.AddAsync(await Log.New("Ticket", $"Ticket: {t.Type}, was CREATED", _id, _db));
 
-                var user = await _userManager.GetUserAsync(User);
-                await _db.Logs.AddAsync(user.CreateLog("Ticket", $"Ticket: {t.Type}, was CREATED"));
-                await _db.SaveChangesAsync();
-                
                 return RedirectToAction("Index", new { ID = t.EID });
             }
+
             return RedirectToAction("Events", "Owner");
         }
 
@@ -103,14 +101,11 @@ namespace GlobalEvent.Controllers
             if (ModelState.IsValid)
             {
                 _db.Tickets.Update(t);
-                
-                ///    LOG     ///
-                var user = await _userManager.GetUserAsync(User);
-                await _db.Logs.AddAsync(user.CreateLog("Ticket", $"Ticket: {t.Type}, was EDITED"));
-                /// END OF LOG ///
-                await _db.SaveChangesAsync();
+                await _db.Logs.AddAsync(await Log.New("Ticket", $"Ticket: {t.Type}, was EDITED", _id, _db));
+
                 return RedirectToAction("Index", new { ID = t.EID });
             }
+
             return RedirectToAction("Events", "Owner");
         }
 
@@ -122,7 +117,7 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Events", "Owner");
             }
-            var t = await _db.Tickets.FirstOrDefaultAsync(x => x.ID == ID);
+            var t = await _db.Tickets.SingleOrDefaultAsync(x => x.ID == ID);
             ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == t.EID)).Name;
             return View(t);
         }
@@ -136,18 +131,14 @@ namespace GlobalEvent.Controllers
             t.ID = 0;
             if (ModelState.IsValid)
             {
-                // update and save changes
                 Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == t.EID);
                 e.Tickets.Add(t);
                 _db.Events.Update(e);
-                ///    LOG     ///
-                var user = await _userManager.GetUserAsync(User);
-                await _db.Logs.AddAsync(user.CreateLog("Ticket", $"Ticket: {t.Type}, was COPIED"));
-                /// END OF LOG ///
-                await _db.SaveChangesAsync();
+                await _db.Logs.AddAsync(await Log.New("Ticket", $"Ticket: {t.Type}, was COPIED", _id, _db));
 
                 return RedirectToAction("Index", new { ID = t.EID });
             }
+
             return RedirectToAction("Events", "Owner");
         }
 
@@ -172,14 +163,9 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Events", "Owner");
             }
 
-            // extrats event with the matching ID
             Ticket t = await _db.Tickets.FirstOrDefaultAsync(x => x.ID == ID);
             _db.Tickets.Remove(t);
-            ///    LOG     ///
-            var user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(user.CreateLog("Ticket", $"Ticket: {t.Type}, was DELETED"));
-            /// END OF LOG ///
-            await _db.SaveChangesAsync();
+            await _db.Logs.AddAsync(await Log.New("Ticket", $"Ticket: {t.Type}, was DELETED", _id, _db));
 
             return RedirectToAction("Index", new { ID = t.EID });
         }
@@ -193,10 +179,7 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Events", "Owner");
             }
 
-            // confirmation page
-            Event e = await _db.Events
-                .Include(x => x.Tickets)
-                .FirstOrDefaultAsync(x => x.ID == ID);
+            Event e = await _db.Events.Include(x => x.Tickets).FirstOrDefaultAsync(x => x.ID == ID);
 
             return View(e);
         }
@@ -210,13 +193,8 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Events", "Owner");
             }
 
-            // delete all tickets for a specific event and save changes
             _db.Tickets.RemoveRange(_db.Tickets.Where(x => x.EID == ID));
-            ///    LOG     ///
-            var user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(user.CreateLog("Ticket", $"All Tickets for Event ID: {ID}, were DELETED"));
-            /// END OF LOG ///
-            await _db.SaveChangesAsync();
+            await _db.Logs.AddAsync(await Log.New("Ticket", $"All Tickets for Event ID: {ID}, were DELETED", _id, _db));
 
             return RedirectToAction("Index", new { ID = ID });
         }

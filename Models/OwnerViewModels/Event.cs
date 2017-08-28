@@ -144,5 +144,25 @@ namespace GlobalEvent.Models.OwnerViewModels
 			return list;
 		}
 
+		public async Task<Event> CopyValues (ApplicationDbContext _db)
+		{
+			Event eOld = await _db.Events.FirstOrDefaultAsync(x => x.ID == this.ID);
+            
+            // updating the event's data
+            eOld.Name = this.Name;
+            eOld.DateStart = this.DateStart;
+            eOld.DateEnd = this.DateEnd;
+            eOld.TimeStart = this.TimeStart;
+            eOld.TimeEnd = this.TimeEnd;
+            eOld.Free = this.Free;
+            eOld.RevPlan = this.RevPlan;
+            eOld.Archived = this.Archived;
+            eOld.HttpBase = this.HttpBase;
+            eOld.EventbriteID = this.EventbriteID;
+            eOld.TicketLink = this.TicketLink;
+            eOld.Description = this.Description; 
+            
+			return eOld;
+		}	
 	}
 }

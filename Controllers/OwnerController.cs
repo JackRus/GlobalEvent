@@ -12,6 +12,7 @@ using GlobalEvent.Models;
 using System.Reflection;
 using System.Security.Claims;
 using GlobalEvent.Models.AdminViewModels;
+using Microsoft.AspNetCore.Http;
 
 namespace GlobalEvent.Controllers
 {
@@ -20,11 +21,13 @@ namespace GlobalEvent.Controllers
     {
 		private readonly ApplicationDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
+        private string _id;
 
-		public OwnerController (UserManager<ApplicationUser> userManager, ApplicationDbContext context)
+		public OwnerController (UserManager<ApplicationUser> userManager, ApplicationDbContext context, IHttpContextAccessor http)
         {
             _db = context;
             _userManager = userManager;
+            _id = _userManager.GetUserId(http.HttpContext.User);
         }
 
         [Authorize(Policy="Owner's Menu")]
@@ -51,8 +54,8 @@ namespace GlobalEvent.Controllers
                 .Include(x => x.Products)
                 .FirstOrDefaultAsync(x => x.Status);
 
-            ViewBag.Issues = await _db.Issues
-                .OrderBy(x => x.ExpectedToBeSolved)
+            ViewBag.Requests = await _db.Requests
+                .OrderBy(x => x.ID)
                 .ToListAsync();
 
             ViewBag.Active = e == null ? false : true;
@@ -77,6 +80,11 @@ namespace GlobalEvent.Controllers
                     ViewBag.Important += item.Requests.Where(x => x.Important).Count();
                 }
                 
+                ViewBag.Blocked = await _db.Visitors
+                    .Where(x => x.Blocked && x.EID == e.ID).ToListAsync();
+                ViewBag.Deleted = await _db.Visitors
+                    .Where(x => x.Deleted && x.EID == e.ID).ToListAsync();
+
                 // All tickets
                 ViewBag.AllTickets = 0;
                 e.Tickets.ForEach(t => ViewBag.AllTickets += t.Limit);
@@ -120,14 +128,8 @@ namespace GlobalEvent.Controllers
             if (ModelState.IsValid)
             {
                 _db.Events.Add(e);
+                await _db.Logs.AddAsync(await Log.New("Event", $"Event: {e.Name}, was created", _id, _db));
 
-                // ==> LOG
-                var user = await _userManager.GetUserAsync(User);
-                await _db.Logs.AddAsync(user.CreateLog("Event", $"Event: {e.Name}, was created"));
-                // ==> END OF LOG
-
-                // save changes
-                await _db.SaveChangesAsync();
                 return RedirectToAction("Events", new { message = "The Event was successfully created."});
             }
             return RedirectToAction("Events", new { message = "Event wasn't created. Something went wrong. Please try again."});
@@ -155,22 +157,7 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Events", new { message = "Something went wrong. Please try again."});
             }
             
-            Event eOld = await _db.Events.FirstOrDefaultAsync(x => x.ID == e.ID);
-            
-            // updating the event's data
-            eOld.Name = e.Name;
-            eOld.DateStart = e.DateStart;
-            eOld.DateEnd = e.DateEnd;
-            eOld.TimeStart = e.TimeStart;
-            eOld.TimeEnd = e.TimeEnd;
-            eOld.Free = e.Free;
-            eOld.RevPlan = e.RevPlan;
-            eOld.Archived = e.Archived;
-            eOld.HttpBase = e.HttpBase;
-            eOld.EventbriteID = e.EventbriteID;
-            eOld.TicketLink = e.TicketLink;
-            eOld.Description = e.Description; 
-            
+            Event eOld = await e.CopyValues(_db);
             if (!eOld.Status 
                 && e.Status 
                 && await _db.Events.AnyAsync(x => x.Status))
@@ -182,15 +169,8 @@ namespace GlobalEvent.Controllers
             {
                 eOld.Status = e.Status;
             }
-
-            // saving changes
-            _db.Events.Update(eOld);
-
-            // log
-            var user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(user.CreateLog("Event", $"Event: {eOld.Name}, was EDITED"));
-
-            await _db.SaveChangesAsync();
+            _db.Events.Update(eOld);        
+            await _db.Logs.AddAsync(await Log.New("Event", $"Event: {eOld.Name}, was EDITED", _id, _db));
 
             return RedirectToAction("ViewEvent", new { ID = eOld.ID, message = ViewBag.Message });
         }
@@ -215,13 +195,8 @@ namespace GlobalEvent.Controllers
             // Update orders
             await Order.OrderUpdate(_db, e.ID);
             await Event.Update(_db, e.ID);
-
-            // # of Visitors checkined
             ViewBag.CheckIned = e.Visitors.Where(x => x.CheckIned).Count();
-            // # of visitors registered
             ViewBag.Registered = e.Visitors.Where(x => x.Registered).Count();
-            
-            // All tickets
             ViewBag.AllTickets = 0;
             e.Tickets.ForEach(t => ViewBag.AllTickets += t.Limit);
 
@@ -251,14 +226,8 @@ namespace GlobalEvent.Controllers
             }
 
             Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == ID);
-            
-            // save changes
             _db.Events.Remove(e);
-
-            // log
-            var user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(user.CreateLog("Event", $"Event: {e.Name}, was DELETED"));
-            await _db.SaveChangesAsync();
+            await _db.Logs.AddAsync(await Log.New("Event", $"Event: {e.Name}, was DELETED", _id, _db));
 
             return RedirectToAction("Events");
         }
@@ -318,8 +287,8 @@ namespace GlobalEvent.Controllers
 
             // logs
             var user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(user.CreateLog("Edit User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, was EDITED"));
-            await _db.Logs.AddAsync(u.CreateLog("Edit User", $"User was EDITED by {user.FirstName} {user.LastName}"));
+            await _db.Logs.AddAsync(await Log.New("Edit User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, was EDITED", _id, _db));
+            await _db.Logs.AddAsync(await Log.New("Edit User", $"User was EDITED by {user.FirstName} {user.LastName}", _id, _db));
 
             // change password if new one is provided
             if (!string.IsNullOrEmpty(a.Password) 
@@ -329,11 +298,10 @@ namespace GlobalEvent.Controllers
                 await _userManager.RemovePasswordAsync(u);
                 await _userManager.AddPasswordAsync(u, a.Password); 
 
-                // logs
-                await _db.Logs.AddAsync(user.CreateLog("Edit User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, PASSWORD was changed"));
-                await _db.Logs.AddAsync(u.CreateLog("Edit User", $"Password was changed by {user.FirstName} {user.LastName}"));
+                await _db.Logs.AddAsync(await Log.New("Edit User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, PASSWORD was changed", _id, _db));
+                await _db.Logs.AddAsync(await Log.New("Edit User", $"Password was changed by {user.FirstName} {user.LastName}", _id, _db));
             }
-            await _db.SaveChangesAsync();
+
             return RedirectToAction("Admins", "Owner");
         }
 
@@ -349,8 +317,6 @@ namespace GlobalEvent.Controllers
             Claims c = new Claims();
             // get properties for Claims
             var properties = c.GetType().GetProperties().ToList();
-            
-            // get existing claims
             var u = await _userManager.FindByIdAsync(ID);
             var hasClaims = await _userManager.GetClaimsAsync(u);
             
@@ -367,8 +333,6 @@ namespace GlobalEvent.Controllers
             }
             ViewBag.Properties = properties.OrderBy(x => x.Name);
             ViewBag.AdminName = $"{u.Level}: {u.FirstName} {u.LastName}";
-            
-            // pass admin ID to a view
             ViewBag.AID = u.Id;
             
             return View(c);
@@ -403,13 +367,14 @@ namespace GlobalEvent.Controllers
 
             // logs
             var user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(user.CreateLog("Edit User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, CLAIMS were changed"));
-            await _db.Logs.AddAsync(u.CreateLog("Edit User", $"User's CLAIMS were changed by {user.FirstName} {user.LastName}"));
-            await _db.SaveChangesAsync();
+            await _db.Logs.AddAsync(await Log.New("Edit User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, CLAIMS were changed", _id, _db));
+            await _db.Logs.AddAsync(await Log.New("Edit User", $"User's CLAIMS were changed by {user.FirstName} {user.LastName}", _id, _db));
 
             return RedirectToAction("EditAdmin", "Owner", new {ID = ID});
         }
 
+        [HttpGet]
+        [Authorize(Policy = "Owner's Menu")]
         public async Task<IActionResult> Attention ()
         {
             ViewBag.Requests = await _db.Requests.Where(x => !x.Solved && !x.SeenByAdmin).OrderBy(x => x.Important).ThenBy(x => x.Date).ThenBy(x => x.Time).ToListAsync();

@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace GlobalEvent.Models.VisitorViewModels
 {
-	public class Visitor
+	public class Visitor 
 	{
 		public int ID { get; set; }
         [Display(Name = "Attendee")]
@@ -17,7 +17,7 @@ namespace GlobalEvent.Models.VisitorViewModels
 
 		[Required]
 		[Display(Name = "First Name")]
-		[RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "Contains non Alphabetic characters.")]
+		[RegularExpression(@"^[a-zA-Z'- ]+$", ErrorMessage = "Contains non Alphabetic characters.")]
 		public string Name { get; set; }
 
 		[Required]
@@ -100,31 +100,21 @@ namespace GlobalEvent.Models.VisitorViewModels
 			v.RegTime = DateTime.Now.ToString("HH:mm");
 		}
 
-		public void AddLog (string stage, string description)
-		{
-			VisitorLog vl = new VisitorLog();
-
-			vl.Type = stage;
-            vl.Action = description;
-            vl.VID = this.ID;
-            vl.Date = DateTime.Now.ToString("yyyy-MM-dd");
-            vl.Time = DateTime.Now.ToString("HH:mm");
-			this.Logs.Add(vl);
-		}
-
-		public void AddLog (string stage, string description, bool change)
+		public void AddLog (string stage, string description, bool change = false)
 		{
 			VisitorLog vl = new VisitorLog();
 			
 			if (change) // if chnages need to be saved
 			{
-				vl.CurrentState.Name = this.Name;
-				vl.CurrentState.Last = this.Last;
-				vl.CurrentState.Company = this.Company;
-				vl.CurrentState.Phone = this.Phone;
-				vl.CurrentState.Email = this.Email;
-				vl.CurrentState.Extention = this.Extention;
-				vl.CurrentState.Occupation = this.Occupation;
+				vl.CurrentState = new Change();
+				JackLib.CopyValues(this, vl.CurrentState);
+				// vl.CurrentState.Name = this.Name;
+				// vl.CurrentState.Last = this.Last;
+				// vl.CurrentState.Company = this.Company;
+				// vl.CurrentState.Phone = this.Phone;
+				// vl.CurrentState.Email = this.Email;
+				// vl.CurrentState.Extention = this.Extention;
+				// vl.CurrentState.Occupation = this.Occupation;
 			}
 			
 			vl.Type = stage;
@@ -138,18 +128,18 @@ namespace GlobalEvent.Models.VisitorViewModels
 
 		public static async Task<List<Visitor>> Search(string ID, ApplicationDbContext db)
 		{
-			var v = new List<Visitor>();
+			var list = new List<Visitor>();
 			// get Active event id
             var EID = (await db.Events.SingleOrDefaultAsync(x => x.Status)).ID;
             var parsed = 0;
             int.TryParse(ID, out parsed);
-            if (ID == "All")
+            if (ID == "All Visitors")
             {
-                v = await db.Visitors.Where(x => x.EID == EID).ToListAsync();
+                list = await db.Visitors.Where(x => x.EID == EID).ToListAsync();
             }
             else
             {
-                v = await db.Visitors
+                list = await db.Visitors
                     .Where(x => x.EID == EID && (
                         x.ID == parsed ||
                         x.Name.ToUpper() == ID.ToUpper() ||
@@ -162,9 +152,9 @@ namespace GlobalEvent.Models.VisitorViewModels
                     )).ToListAsync();
                 
                 // partial match
-                if (v == null || v.Count == 0)
+                if (list == null || list.Count == 0)
                 {
-                    v = await db.Visitors
+                    list = await db.Visitors
                         .Where(x => x.EID == EID && (
                             x.Name.ToUpper().Contains(ID.ToUpper()) ||
                             x.Last.ToUpper().Contains(ID.ToUpper()) ||
@@ -176,7 +166,22 @@ namespace GlobalEvent.Models.VisitorViewModels
                         )).ToListAsync();
                 }
             }		
-			return v;
+			return list;
+		}
+
+		public async Task<Visitor> CopyValues(ApplicationDbContext db)
+		{
+			// get the existing visitor
+			var oldV = await db.Visitors.FirstOrDefaultAsync(x => x.RegistrationNumber == this.RegistrationNumber); 
+
+			oldV.Name = this.Name;
+			oldV.Last = this.Last;
+			oldV.Company = this.Company;
+			oldV.Occupation = this.Occupation;
+			oldV.Phone = this.Phone;
+			oldV.Extention = this.Extention;
+			oldV.Email = this.Email;			
+			return oldV;
 		}
 	}
 }

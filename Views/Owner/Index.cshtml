@@ -31,7 +31,10 @@
 			{
 				<a class="btn mybtn-sm-base px60 tog" data-id="todo-add" style="vertical-align: text-bottom;">ADD</a>
 			}
-			<a asp-action="Index" asp-controller="Todo" class="btn mybtn-sm-bro px60" style="vertical-align: text-bottom;">Show All</a>
+			@if(await AuthorizationService.AuthorizeAsync(User, "Todo Viewer"))
+			{
+				<a asp-action="Index" asp-controller="Todo" class="btn mybtn-sm-bro px60" style="vertical-align: text-bottom;">Show All</a>
+			}
 		</div>
 
 		<div id="todo-add" class="eye m20-0-20-0">

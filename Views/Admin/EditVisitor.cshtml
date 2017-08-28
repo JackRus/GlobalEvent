@@ -11,7 +11,7 @@
 		</div>
 	}
 	<br />
-	<div class="row"></a> 
+	<div class="row">
 		<div class="col-sm-6">
 			<div class="form-number-container">
 				<span class="form-number">1</span> Personal info
@@ -48,11 +48,17 @@
 				<input asp-for="Last" class="form-control"/>
 				<span asp-validation-for="Last" class="Red"></span>
 			</div>	
+
+			<div class="form-group">
+				<label asp-for="Occupation" class="control-label"></label>
+				<input asp-for="Occupation" class="form-control"/>
+				<span asp-validation-for="Occupation" class="Red"></span>
+			</div>
 		</div>
 		
 		<div class="col-sm-6">
 			<div class="form-number-container">
-				<span class="form-number">2</span> Company info
+				<span class="form-number">2</span> Contact Info
 			</div>
 
 			<div class="form-group">
@@ -60,13 +66,7 @@
 				<input asp-for="Company" class="form-control"/>
 				<span asp-validation-for="Company" class="Red"></span>
 			</div>
-
-			<div class="form-group">
-				<label asp-for="Occupation" class="control-label"></label>
-				<input asp-for="Occupation" class="form-control"/>
-				<span asp-validation-for="Occupation" class="Red"></span>
-			</div>
-
+			
 			<div class="form-group">
 				<label asp-for="Email" class="control-label"></label>
 				<input asp-for="Email" class="form-control"/>
@@ -99,16 +99,19 @@
 
 			<div class="form-group">
                 <label asp-for="BlockReason" class="control-label"></label>
-                <textarea asp-for="BlockReason" class="form-control"></textarea>
+                <textarea asp-for="BlockReason" rows="3" class="form-control"></textarea>
 				<span asp-validation-for="BlockReason" class="Red"></span>
 			</div>
 
 			<input asp-for="ID" value="@Model.ID" class="eye"/>
 
-			<div class="form-group">
-				<a asp-action="ViewVisitor" asp-controller="Admin" asp-route-ID="@Model.ID" class="btn mybtn bgRed">CANCEL</a>
-			<button type="submit" class="btn mybtn bgBase">SAVE</button>
-			
+			<div class="form-group text-center">
+				@if(!Model.Deleted)
+				{
+					<button type="submit" class="btn mybtn bgBase">SAVE</button>
+				}
+				<a asp-action="ViewVisitor" asp-controller="Admin" asp-route-ID="@Model.ID" class="btn mybtn bgRed">CANCEL</a>		
+			</div>
 		</div>
 	</div>
 </form>

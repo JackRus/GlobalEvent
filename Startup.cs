@@ -13,6 +13,7 @@ using GlobalEvent.Data;
 using GlobalEvent.Models;
 using GlobalEvent.Services;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Http;
 
 namespace GlobalEvent
 {
@@ -47,6 +48,7 @@ namespace GlobalEvent
             services.AddIdentity<ApplicationUser, IdentityRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddAuthorization(options => {
                 // EVENTS
@@ -86,7 +88,7 @@ namespace GlobalEvent
                 options.AddPolicy("Todo Creator", x => x.RequireClaim("TodoCanAdd"));
                 options.AddPolicy("Todo EditorKiller", x => x.RequireClaim("TodoCanEditDelete"));
                 // OWNER
-                options.AddPolicy("Is Owner", x => x.RequireClaim("Owner"));
+                options.AddPolicy("Is Owner", x => x.RequireClaim("OwnerCanDoExtra"));
                 options.AddPolicy("Owner's Menu", x => x.RequireClaim("OwnerCanSeeMenu"));
                 options.AddPolicy("Owner's Dashboard", x => x.RequireClaim("OwnerCanSeeDashboard"));
                 // orders
@@ -108,7 +110,7 @@ namespace GlobalEvent
                 options.Password.RequireLowercase = true;
 
                 // Lockout settings
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(10);
                 options.Lockout.MaxFailedAccessAttempts = 5;
 
                 // Cookie settings

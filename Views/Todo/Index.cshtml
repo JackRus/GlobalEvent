@@ -41,22 +41,23 @@
 					<td>@t.EID</td>
 					<td>@t.Comments</td>
 					<td style="width: auto; text-align: right;">
+					@if((await AuthorizationService.AuthorizeAsync(User, "Todo EditorKiller")) || (await AuthorizationService.AuthorizeAsync(User, "Todo Creator")))
+					{
 						<div class="dropdown">
 							<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
-							<span class="caret"></span></button>
+							 &nbsp &#x25BC;</button>
 							<ul class="dropdown-menu dropdown-menu-right">
-							@if(await AuthorizationService.AuthorizeAsync(User, "Todo EditorKiller"))
-							{
 								<li><a asp-action="Done" asp-route-ID="@t.ID">Mark As Done</a></li>
 								<li><a asp-action="Edit" asp-route-ID="@t.ID">Edit</a></li>
 								<li><a asp-action="Delete" asp-route-ID="@t.ID">Delete</a></li>
-							}
-							@if(await AuthorizationService.AuthorizeAsync(User, "Todo Creator"))
-							{
 								<li><a asp-action="Copy" asp-route-ID="@t.ID">Copy</a></li>
-							}
 							</ul>
 						</div>
+					}
+					else 
+					{
+						<span>No Access</span>
+					}
 					</td>
 				</tr>
 				<tr style="height: 4px;">
@@ -96,21 +97,22 @@
 					<td>@t.EID</td>
 					<td>@t.Comments</td>
 					<td class="text-right">
+					@if((await AuthorizationService.AuthorizeAsync(User, "Todo EditorKiller")) || (await AuthorizationService.AuthorizeAsync(User, "Todo Creator")))
+					{
 						<div class="dropdown">
 							<button class="btn mybtn-sm-actions bgGray" type="button" data-toggle="dropdown">Actions
-							<span class="caret"></span></button>
+							 &nbsp &#x25BC;</button>
 							<ul class="dropdown-menu dropdown-menu-right">
-							@if(await AuthorizationService.AuthorizeAsync(User, "Todo EditorKiller"))
-							{
 								<li><a asp-action="Edit" asp-route-ID="@t.ID">Edit</a></li>
 								<li><a asp-action="Delete" asp-route-ID="@t.ID">Delete</a></li>
-							}
-							@if(await AuthorizationService.AuthorizeAsync(User, "Todo Creator"))
-							{
 								<li><a asp-action="Copy" asp-route-ID="@t.ID">Copy</a></li>
-							}
 							</ul>
 						</div>
+					}
+					else 
+					{
+						<span>No Access</span>
+					}
 					</td>
 				</tr>
 				<tr style="height: 4px;">

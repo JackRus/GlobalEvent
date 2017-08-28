@@ -1,186 +1,37 @@
 @model Claims
 @using System.Reflection
-
-<h1> User's access</h1>
+@{
+	bool check = false;
+	string name = " ";
+}
+<h1> Admin's access</h1>
 <h3> @ViewBag.AdminName </h3>
 
 <form asp-action="ChangeClaims" asp-controller="Owner" asp-route-ID="@ViewBag.AID" autocomplete="off">
 
-<div class="events-number-container" style="border-bottom: 1px solid #3cb371;">
-    <span class="events-number bgBase">Event</span>
-</div>
-<div>
-	@foreach(var c in ViewBag.Properties)
-	{
-		@if(c.Name.StartsWith("Event"))
-		{
-			<div class="form-group inline" style="margin-right: 30px;">
-					<label class="control-label" for="@c.Name">@c.Name</label>&nbsp
-					
-					<span class="true-false" data-id="@c.Name"></span>
-					
-					<input class="eye" @(c.GetValue(Model, null) == false ? "" : "checked") data-val="true" data-val-required="The @c.Name Event field is required." id="@c.Name" name="@c.Name" type="checkbox" value="true" />
-			</div>
-		}
+@foreach(var c in ViewBag.Properties)
+{
+	check = c.Name.StartsWith(name) ? true : false;
+	@if(!check)
+	{	
+		name = c.Name.Substring(0, c.Name.IndexOf("C"));
+		<div class="events-number-container" style="border-bottom: 1px solid #3cb371;">
+			<span class="events-number bgBase">@name</span>
+		</div>
+		check = true;
 	}
-</div>
-
-<div class="events-number-container" style="border-bottom: 1px solid #3cb371;">
-    <span class="events-number bgBase">Visitor</span>
-</div>
-<div>
-	@foreach(var c in ViewBag.Properties)
+	@if(c.Name.StartsWith(name))
 	{
-		@if(c.Name.StartsWith("Visitor"))
-		{
-			<div class="form-group inline" style="margin-right: 30px;">
-					<label class="control-label" for="@c.Name">@c.Name</label>&nbsp
-					
-					<span class="true-false" data-id="@c.Name"></span>
-					
-					<input class="eye" @(c.GetValue(Model, null) == false ? "" : "checked") data-val="true" data-val-required="The @c.Name Event field is required." id="@c.Name" name="@c.Name" type="checkbox" value="true" />
-			</div>
-		}
+		<div class="form-group inline" style="margin-right: 30px;">
+			<label class="control-label" for="@c.Name">
+				@(Regex.Replace(c.Name.Replace(name, ""), @"(\B[A-Z]+?(?=[A-Z][^A-Z])|\B[A-Z]+?(?=[^A-Z]))", " $1"))
+			</label>&nbsp
+			<span class="true-false" data-id="@c.Name"></span>
+			
+			<input class="eye" @(c.GetValue(Model, null) == false ? "" : "checked") data-val="true" data-val-required="The @c.Name Event field is required." id="@c.Name" name="@c.Name" type="checkbox" value="true" />
+		</div>
 	}
-</div>
-
-<div class="events-number-container" style="border-bottom: 1px solid #3cb371;">
-    <span class="events-number bgBase">Product</span>
-</div>
-<div>
-	@foreach(var c in ViewBag.Properties)
-	{
-		@if(c.Name.StartsWith("Product"))
-		{
-			<div class="form-group inline" style="margin-right: 30px;">
-					<label class="control-label" for="@c.Name">@c.Name</label>&nbsp
-					
-					<span class="true-false" data-id="@c.Name"></span>
-					
-					<input class="eye" @(c.GetValue(Model, null) == false ? "" : "checked") data-val="true" data-val-required="The @c.Name Event field is required." id="@c.Name" name="@c.Name" type="checkbox" value="true" />
-			</div>
-		}
-	}
-</div>
-
-
-<div class="events-number-container" style="border-bottom: 1px solid #3cb371;">
-    <span class="events-number bgBase">Ticket</span>
-</div>
-<div>
-	@foreach(var c in ViewBag.Properties)
-	{
-		@if(c.Name.StartsWith("Ticket"))
-		{
-			<div class="form-group inline" style="margin-right: 30px;">
-					<label class="control-label" for="@c.Name">@c.Name</label>&nbsp
-					
-					<span class="true-false" data-id="@c.Name"></span>
-					
-					<input class="eye" @(c.GetValue(Model, null) == false ? "" : "checked") data-val="true" data-val-required="The @c.Name Event field is required." id="@c.Name" name="@c.Name" type="checkbox" value="true" />
-			</div>
-		}
-	}
-</div>
-
-
-<div class="events-number-container" style="border-bottom: 1px solid #3cb371;">
-    <span class="events-number bgBase">VType</span>
-</div>
-<div>
-	@foreach(var c in ViewBag.Properties)
-	{
-		@if(c.Name.StartsWith("VType"))
-		{
-			<div class="form-group inline" style="margin-right: 30px;">
-					<label class="control-label" for="@c.Name">@c.Name</label>&nbsp
-					
-					<span class="true-false" data-id="@c.Name"></span>
-					
-					<input class="eye" @(c.GetValue(Model, null) == false ? "" : "checked") data-val="true" data-val-required="The @c.Name Event field is required." id="@c.Name" name="@c.Name" type="checkbox" value="true" />
-			</div>
-		}
-	}
-</div>
-
-<div class="events-number-container" style="border-bottom: 1px solid #3cb371;">
-    <span class="events-number bgBase">Order</span>
-</div>
-<div>
-	@foreach(var c in ViewBag.Properties)
-	{
-		@if(c.Name.StartsWith("Order"))
-		{
-			<div class="form-group inline" style="margin-right: 30px;">
-					<label class="control-label" for="@c.Name">@c.Name</label>&nbsp
-					
-					<span class="true-false" data-id="@c.Name"></span>
-					
-					<input class="eye" @(c.GetValue(Model, null) == false ? "" : "checked") data-val="true" data-val-required="The @c.Name Event field is required." id="@c.Name" name="@c.Name" type="checkbox" value="true" />
-			</div>
-		}
-	}
-</div>
-
-
-<div class="events-number-container" style="border-bottom: 1px solid #3cb371;">
-    <span class="events-number bgBase">Admin</span>
-</div>
-<div>
-	@foreach(var c in ViewBag.Properties)
-	{
-		@if(c.Name.StartsWith("Admin"))
-		{
-			<div class="form-group inline" style="margin-right: 30px;">
-					<label class="control-label" for="@c.Name">@c.Name</label>&nbsp
-					
-					<span class="true-false" data-id="@c.Name"></span>
-					
-					<input class="eye" @(c.GetValue(Model, null) == false ? "" : "checked") data-val="true" data-val-required="The @c.Name Event field is required." id="@c.Name" name="@c.Name" type="checkbox" value="true" />
-			</div>
-		}
-	}
-</div>
-
-
-<div class="events-number-container" style="border-bottom: 1px solid #3cb371;">
-    <span class="events-number bgBase">Todo</span>
-</div>
-<div>
-	@foreach(var c in ViewBag.Properties)
-	{
-		@if(c.Name.StartsWith("Todo"))
-		{
-			<div class="form-group inline" style="margin-right: 30px;">
-					<label class="control-label" for="@c.Name">@c.Name</label>&nbsp
-					
-					<span class="true-false" data-id="@c.Name"></span>
-					
-					<input class="eye" @(c.GetValue(Model, null) == false ? "" : "checked") data-val="true" data-val-required="The @c.Name Event field is required." id="@c.Name" name="@c.Name" type="checkbox" value="true" />
-			</div>
-		}
-	}
-</div>
-
-<div class="events-number-container" style="border-bottom: 1px solid #3cb371;">
-    <span class="events-number bgBase">Owner</span>
-</div>
-<div>
-	@foreach(var c in ViewBag.Properties)
-	{
-		@if(c.Name.StartsWith("Owner"))
-		{
-			<div class="form-group inline" style="margin-right: 30px;">
-					<label class="control-label" for="@c.Name">@c.Name</label>&nbsp
-					
-					<span class="true-false" data-id="@c.Name"></span>
-					
-					<input class="eye" @(c.GetValue(Model, null) == false ? "" : "checked") data-val="true" data-val-required="The @c.Name Event field is required." id="@c.Name" name="@c.Name" type="checkbox" value="true" />
-			</div>
-		}
-	}
-</div>
-
+}
 	<div class="text-center form-group">
 		<button type="submit" class="btn mybtn bgBase">Save</button>
 		<a asp-action="EditAdmin" asp-controller="Owner" asp-route-ID="@ViewBag.AID" class="btn mybtn bgRed">Cancel</a>

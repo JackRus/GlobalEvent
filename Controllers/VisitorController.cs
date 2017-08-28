@@ -51,7 +51,6 @@ namespace GlobalEvent.Controllers
 				return RedirectToAction("Menu", "Home", new { EID = v.EID});
 			}
 
-			// get visitor by reg #
 			var newV = await _db.Visitors.FirstOrDefaultAsync(x => x.RegistrationNumber == v.RegistrationNumber);
 
 			if (newV != null)
@@ -81,14 +80,12 @@ namespace GlobalEvent.Controllers
 			}
 			
 			var v = await _db.Visitors.FirstOrDefaultAsync(x => x.RegistrationNumber == number);
-			
 			if (v == null || v.CheckIned)
 			{
 				ViewBag.Message = "Something went wrong. Please try again.";
 				return RedirectToAction("Menu", "Home", new { EID = EID });
 			}
 			
-			// update and save changges
 			v.CheckIned = true;
 			v.AddLog("Check In", "Check-In Completed. Tag Printed", true);
 			_db.Visitors.Update(v);
@@ -127,18 +124,7 @@ namespace GlobalEvent.Controllers
 			{
 				return RedirectToAction("Menu", "Home", new {EID = v.EID});
 			}
-			// get the existing visitor
-			var oldV = await _db.Visitors.FirstOrDefaultAsync(x => x.RegistrationNumber == v.RegistrationNumber); 
-
-			oldV.Name = v.Name;
-			oldV.Last = v.Last;
-			oldV.Company = v.Company;
-			oldV.Occupation = v.Occupation;
-			oldV.Phone = v.Phone;
-			oldV.Extention = v.Extention;
-			oldV.Email = v.Email;
-
-			// update visitor
+			Visitor oldV = await v.CopyValues(_db);
 			oldV.AddLog("Check In", "Edition Completed", true);
 			_db.Visitors.Update(oldV);
 			await _db.SaveChangesAsync();
@@ -169,8 +155,7 @@ namespace GlobalEvent.Controllers
 				return RedirectToAction("Welcome", "Home");
 			}
 
-			var order = await _db.Orders
-				.SingleOrDefaultAsync(x => x.Number.ToString() == v.OrderNumber);
+			var order = await _db.Orders.SingleOrDefaultAsync(x => x.Number.ToString() == v.OrderNumber);
 			if (order != null)
             {
 				if (order.Full)

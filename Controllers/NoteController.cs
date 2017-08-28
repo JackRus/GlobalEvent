@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using GlobalEvent.Models;
 using GlobalEvent.Models.VisitorViewModels;
+using Microsoft.AspNetCore.Http;
 
 namespace GlobalEvent.Controllers
 {
@@ -16,11 +17,13 @@ namespace GlobalEvent.Controllers
     {
 		private readonly ApplicationDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
+        private string _id;
 
-		public NoteController (UserManager<ApplicationUser> userManager, ApplicationDbContext context)
+		public NoteController (UserManager<ApplicationUser> userManager, ApplicationDbContext context, IHttpContextAccessor http)
         {
             _db = context;
             _userManager = userManager;
+            _id = _userManager.GetUserId(http.HttpContext.User);
         }
 
         [HttpGet]
@@ -43,20 +46,16 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Dashboard", "Admin");
             }
-
-            ///    LOG     ///
+            
             var user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(user.CreateLog("Note", $"Note: \"{n.Description}\" for VID: {n.VID}, was CREATED"));
-            /// END OF LOG ///
-
             n.AdminID = user.Id;
             n.AdminName = $"{user.FirstName} {user.LastName}";
 
-            // update visitor + add Notes to db
             Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == n.VID);
             v.Notes.Add(n);
             _db.Visitors.Update(v);
-            await _db.SaveChangesAsync();
+            await _db.Logs.AddAsync(await Log.New("Note", $"Note: \"{n.Description}\" for VID: {n.VID}, was CREATED", _id, _db));
+            
             return RedirectToAction("ViewVisitor", "Admin", new {ID = n.VID});
         }
 
@@ -79,20 +78,11 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Dashboard", "Admin");
             }
+            var VID = await n.CopyValues(_db);
 
-            Note nOld = await _db.Notes.FirstOrDefaultAsync(x => x.ID == n.ID);
-            nOld.Description = n.Description;
-            nOld.SeenByAdmin = n.SeenByAdmin;
-            nOld.Important = n.Important;
-            _db.Notes.Update(nOld);
+            await _db.Logs.AddAsync(await Log.New("Note", $"Note: \"{n.Description}\" for VID: {n.VID}, was EDITED", _id, _db));
 
-            ///    LOG     ///
-            var user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(user.CreateLog("Note", $"Note: \"{n.Description}\" for VID: {n.VID}, was EDITED"));
-            /// END OF LOG ///
-
-            await _db.SaveChangesAsync();
-            return RedirectToAction("ViewVisitor", "Admin", new {ID = nOld.VID});
+            return RedirectToAction("ViewVisitor", "Admin", new {ID = VID});
         }
 
         [HttpGet]
@@ -105,13 +95,8 @@ namespace GlobalEvent.Controllers
 
             Note n = await _db.Notes.FirstOrDefaultAsync(x => x.ID == ID);
             _db.Notes.Remove(n);
+            await _db.Logs.AddAsync(await Log.New("Note", $"Note: \"{n.Description}\" for VID: {n.VID}, was DELETED", _id, _db));
 
-            ///    LOG     ///
-            var user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(user.CreateLog("Note", $"Note: \"{n.Description}\" for VID: {n.VID}, was DELETED"));
-            /// END OF LOG ///
-
-            await _db.SaveChangesAsync();
             return RedirectToAction("ViewVisitor", "Admin", new {ID = n.VID});
         }
 
@@ -123,29 +108,10 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin");
             }
 
-            // get Note by ID
             Note n = await _db.Notes.FirstOrDefaultAsync(x => x.ID == ID);
-            
-            switch (Name)
-            {
-                case "SEEN": 
-                    n.SeenByAdmin = n.SeenByAdmin ? false : true;
-                    break;
-                case "IMPORTANT": 
-                    n.Important = n.Important ? false : true;
-                    break;
-                default: 
-                    break;
-            }
+            n.UpdateValues(Name, _db);
+            await _db.Logs.AddAsync(await Log.New("Note", $"Note: \"{n.Description}\" for VID: {n.VID}, feild {Name} was changed", _id, _db));
 
-            _db.Notes.Update(n);
-
-            ///    LOG     ///
-            var user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(user.CreateLog("Note", $"Note: \"{n.Description}\" for VID: {n.VID}, feild {Name} was changed"));
-            /// END OF LOG ///
-
-            await _db.SaveChangesAsync();
             return RedirectToAction("ViewVisitor", "Admin", new {ID = n.VID});
         }
 	}

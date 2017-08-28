@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using GlobalEvent.Data;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GlobalEvent.Models.AdminViewModels
@@ -8,8 +9,10 @@ namespace GlobalEvent.Models.AdminViewModels
 	public class Issue // any issues (tech, organizational etc.)
 	{
 		public int ID { get; set; }
+		
 		[Required]
 		public string Description { get; set; } // description, text-area
+		
 		[Required]
 		[Display(Name="Issue Type")]
 		public string Type { get; set; } // issue type
@@ -71,6 +74,19 @@ namespace GlobalEvent.Models.AdminViewModels
 			this.Type = i.Type;
 			this.Assigned = i.Assigned;
 			this.ExpectedToBeSolved = i.ExpectedToBeSolved;
+		}
+
+		public void UpdateValues(string Name, ApplicationDbContext db)
+		{
+			if (Name == "Solved")
+			{
+				this.Solved = !this.Solved;
+			}
+			else if (Name == "Assigned")
+			{
+				this.Assigned = !this.Assigned;
+			}
+			db.Issues.Update(this);
 		}
     }
 }

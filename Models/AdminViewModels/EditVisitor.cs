@@ -12,17 +12,15 @@ namespace GlobalEvent.Models.AdminViewModels
     public class EditVisitor
     {
         public int ID { get; set; }
-        [Display(Name = "Attendee")]
+        [Display(Name = "Visitor Type")]
 		public string Type { get; set; } // type of the visitor Guest// exibitor//stuff
 
 		[Required]
 		[Display(Name = "First Name")]
-		[RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "Contains non Alphabetic characters.")]
 		public string Name { get; set; }
 
 		[Required]
 		[Display(Name = "Last Name")]
-		[RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "Contains non Alphabetic characters.")]
 		public string Last { get; set; }
 
 		[Required]
@@ -36,19 +34,22 @@ namespace GlobalEvent.Models.AdminViewModels
 		public string Phone { get; set; }
 
 		[Display(Name = "Ext. (optional)")]
-		[RegularExpression(@"^[0-9]+$", ErrorMessage = "Only digits are allowed in Extention.")]
+		[RegularExpression(@"^[0-9]{1,6}$", ErrorMessage = "Only digits are allowed.")]
 		public string Extention { get; set; }
 
 		[Required]
-		[RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "Contains non Alphabetic characters.")]
+		[RegularExpression(@"^[a-zA-Z-' ]+$", ErrorMessage = "Contains non Alphabetic characters.")]
 		public string Occupation { get; set; }
 
 		[Required]
-		[RegularExpression(@"^[0-9a-zA-Z ]+$", ErrorMessage = "Contains non Alphanumeric characters.")]
+		[RegularExpression(@"^[0-9a-zA-Z-' ]+$", ErrorMessage = "Contains non Alphanumeric characters.")]
 		public string Company { get; set; }
 
+		[Display(Name = "Ticket Type")]
 		public string TicketType { get; set; }
 		public bool Blocked { get; set; }
+		
+		[Display(Name = "Block Reason")]
 		public string BlockReason { get; set; }
 		public bool Deleted { get; set; }
 
@@ -67,7 +68,7 @@ namespace GlobalEvent.Models.AdminViewModels
         public async Task SetValues(ApplicationDbContext db, int ID)
         {
             Visitor v = await db.Visitors.SingleOrDefaultAsync(x => x.ID == ID);
-            JackLib.SetValues(v, this);
+            JackLib.CopyValues(v, this);
         
             this.Event = (await db.Events.SingleOrDefaultAsync(x => x.ID == v.EID)).Name;
             Types = await VType.GenerateTypes(db, v.EID);

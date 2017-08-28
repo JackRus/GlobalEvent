@@ -10,7 +10,7 @@ using GlobalEvent.Models.VisitorViewModels;
 using Microsoft.AspNetCore.Identity;
 using GlobalEvent.Models;
 using GlobalEvent.Models.AdminViewModels;
-using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.AspNetCore.Http;
 
 namespace GlobalEvent.Controllers
 {
@@ -19,14 +19,17 @@ namespace GlobalEvent.Controllers
     {
         private readonly ApplicationDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
+        private string _id;
 
-		public AdminController (ApplicationDbContext context, UserManager<ApplicationUser> userManager)
+		public AdminController (UserManager<ApplicationUser> userManager, ApplicationDbContext context, IHttpContextAccessor http)
         {
             _db = context;
             _userManager = userManager;
+            _id = _userManager.GetUserId(http.HttpContext.User);
         }
 
         [HttpGet]
+        [Authorize(Policy="Visitors Viewer")]
         public async Task<IActionResult> Dashboard (string message = null)
         {
             Event e = await _db.Events
@@ -58,24 +61,20 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Dashboard", "Admin", new {message = "Search couldn't be performed."});
             }
+
             List<Visitor> v = await Visitor.Search(ID, _db);
-
-            // ==> LOG
-            var u = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(u.CreateLog("Search", $"Search value: {ID}"));
-            // ==> END OF LOG
-            await _db.SaveChangesAsync();
-            ViewBag.Criteria = ID == "All" ? "All Visitors" : ID;
-
+            await _db.Logs.AddAsync(await Log.New("Search", $"Search value: {ID}", _id, _db));
+            ViewBag.ID = ID;
             if (v == null || v.Count == 0)
             {
                 ViewBag.Message = "No records were found. Please try different search creteria or make sure your input is correct.";
             }
+
             return View(v);
         }
 
         [HttpGet]
-        [Authorize(Policy="Visitors Viewer")]
+        [Authorize(Policy="Visitor Details")]
         public async Task <IActionResult> ViewVisitor (int? ID)
         {
             if (ID == null)
@@ -83,12 +82,17 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin", new {message = "Request couldn't be executed."});
             }
 
-            Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ID);
-            var d = JackLib.PropertiesTypes(v);
+            Visitor v = await _db.Visitors
+                .Include(x => x.Requests)
+                .Include(x => x.Notes)
+                .Include(x => x.Logs)
+                    .ThenInclude(x => x.CurrentState)
+                .SingleOrDefaultAsync(x => x.ID == ID);
+
             if (v == null)
             {
                 return RedirectToAction("Dashboard", "Admin", new {message = "Visitor couldn't be found. Please, try again."});
-            }
+            }   
             return View(v);
         } 
 
@@ -110,15 +114,89 @@ namespace GlobalEvent.Controllers
 
         [HttpPost]
         [Authorize(Policy="Visitor Editor")]
-        public IActionResult EditVisitor (Visitor v)
+        public async Task<IActionResult> EditVisitor (EditVisitor ev)
         {
-            // if (ModelState.IsValid)
-            // {
-                
-            // }
+            if (ModelState.IsValid)
+            {
+                var v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ev.ID);
+                var u = await _userManager.GetUserAsync(User); 
 
-            return RedirectToAction("ViewVisitor", "Admin");
+                if (!v.Blocked && ev.Blocked)
+                {
+                    v.AddLog("ADMIN", $"BLOCKED BY {u.Level}: {u.FirstName} {u.LastName}");
+                }
+                else if (v.Blocked && !ev.Blocked)
+                {
+                    v.AddLog("ADMIN", $"UNBLOCKED BY {u.Level}: {u.FirstName} {u.LastName}");
+                }
+
+                JackLib.CopyValues(ev, v);
+                _db.Visitors.Update(v);
+                await _db.Logs.AddAsync(await Log.New("Visitor", $"Visitor witg ID: {v.ID}, was EDITED", _id, _db));
+                return RedirectToAction("ViewVisitor", "Admin", new {ID = ev.ID});
+            }
+            return RedirectToAction("Dashboard", "Admin", new {message = "Couldn't execute this request. Please try again."});
         }
 
+        [HttpGet]
+        [Authorize(Policy="Visitor Killer")]
+        public async Task <IActionResult> DeleteVisitor (int? ID)
+        {
+            if (ID == null)
+            {
+                return RedirectToAction("Dashboard", "Admin", new {message = "Couldn't access the visitor."});
+            }
+    
+            Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ID);
+            return View(v);
+        }
+
+        [HttpGet]
+        [Authorize(Policy="Visitor Killer")]
+        public async Task <IActionResult> DeleteOk (int? ID)
+        {
+            if (ID == null)
+            {
+                return RedirectToAction("Dashboard", "Admin", new {message = "Couldn't execute this request."});
+            }
+            
+            Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ID);
+            v.Deleted = true;
+            var u = await _userManager.GetUserAsync(User);
+            v.AddLog("ADMIN", $"DELETED BY {u.Level}: {u.FirstName} {u.LastName}");
+            _db.Visitors.Update(v);
+            await _db.Logs.AddAsync(await Log.New("Visitor", $"Visitor(ID: {v.ID}) {v.Name} {v.Last} was DELETED.", _id, _db));
+            await Order.Decrement(v.OrderNumber, _db);
+
+            return RedirectToAction("ViewVisitor", "Admin", new {ID = v.ID});
+        }
+
+        [HttpGet]
+        [Authorize(Policy="Visitor Killer")]
+        public async Task <IActionResult> Reinstate (int? ID)
+        {
+            if (ID == null)
+            {
+                return RedirectToAction("Dashboard", "Admin", new {message = "Couldn't execute this request."});
+            }
+            
+            Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ID);
+            v.Deleted = false;
+            if ((await _db.Orders.SingleOrDefaultAsync(x => x.Number.ToString() == v.OrderNumber)).Full)
+            {
+                await _db.Logs.AddAsync(await Log.New("Visitor", $"Attempt to REINSTATE Visitor(ID: {v.ID}) {v.Name} {v.Last} failed.", _id, _db));
+
+                return RedirectToAction("Dashboard", "Admin", new {message = "This Visitor can NOT be reinstated. All tickets were used. Advise the visitor to purchase another ticket or ask Manager for assistance."});
+            }
+
+            // log for visitor
+            var user = await _userManager.GetUserAsync(User);
+            v.AddLog("ADMIN", $"REINSTATED BY {user.Level}: {user.FirstName} {user.LastName}");
+            _db.Visitors.Update(v);
+            await Order.Increment(v.OrderNumber, _db);
+            await _db.Logs.AddAsync(await Log.New("Visitor", $"Visitor(ID: {v.ID}) {v.Name} {v.Last} was REINSTATED.", _id, _db));
+
+            return RedirectToAction("ViewVisitor", "Admin", new {ID = v.ID});
+        }
     }
 }

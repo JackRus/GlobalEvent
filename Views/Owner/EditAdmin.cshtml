@@ -1,7 +1,7 @@
 @model EditAdmin
 
 @{
-    ViewData["Title"] = "Edit User Info";
+    ViewData["Title"] = "Edit ADMIN Info";
     var count = 1;
 }
 
@@ -9,7 +9,7 @@
     <div class="col-sm-6">
         <form asp-controller="Owner" asp-action="EditAdmin" autocomplete="off">
         
-            <h2>@ViewData["Title"]. </h2>
+            <h2>@ViewData["Title"].</h2>
 
             <div class="form-group">
                 <label asp-for="FirstName" class="control-label"></label>
@@ -59,7 +59,7 @@
         </form>
     </div>
     <div class="col-sm-6 text-center">
-        <h2> USER Access </h2>
+        <h2> ADMIN Access </h2>
 
         @foreach(var c in ViewBag.Claims)
         {

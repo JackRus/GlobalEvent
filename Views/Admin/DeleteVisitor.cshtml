@@ -1,0 +1,13 @@
+@model Visitor
+
+<h1>DELETE Visitor</h1>
+
+<div class="f-attention f1-3"><br />You are going to delete the Visitor:
+	@Model.Name @Model.Last <br />
+</div>
+
+<div class="text-center">
+	<a asp-action="ViewVisitor" asp-controller="Admin" asp-route-ID="@Model.ID" class="btn mybtn bgBase">CANCEL</a>
+	<a asp-action="DeleteOk" asp-route-id="@Model.ID" class="btn mybtn bgRed">DELETE</button>
+	</a>
+</div>

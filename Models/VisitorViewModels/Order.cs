@@ -131,6 +131,15 @@ namespace GlobalEvent.Models.VisitorViewModels
             await _db.SaveChangesAsync();
         }
 
+        public static async Task Decrement (string number, ApplicationDbContext _db)
+        {
+            Order o = await _db.Orders.FirstOrDefaultAsync(x => x.Number.ToString() == number);
+			o.CheckedIn--;
+            o.Full = o.CheckedIn >= o.Amount ? true : false;
+            _db.Orders.Update(o);
+            await _db.SaveChangesAsync();
+        }
+
         public void CopyInfo (Order o)
         {
             this.OwnerName = o.OwnerName;

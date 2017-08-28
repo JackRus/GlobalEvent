@@ -26,10 +26,12 @@ namespace GlobalEvent.Models.AdminViewModels
 
 		[Required]
 		[Display(Name = "Email")]
+		[RegularExpression(@"^[0-9a-zA-z]+@[0-9a-zA-z]+.[a-zA-z]+$", ErrorMessage = "Not a valid email.")]
 		public string OwnerEmail { get; set; }
 
 		[Required]
 		[Display(Name = "Phone Number")]
+		[RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid Phone number.")]
 		public string OwnerPhone { get; set; }
 
 		public int EID { get; set; }   //date / time
@@ -43,7 +45,7 @@ namespace GlobalEvent.Models.AdminViewModels
 		public string VType { get; set; }
 
 		[Required]
-		[MinLength(5)]
+		[MinLength(5, ErrorMessage="Minimal length is 5 characters.")]
 		[Display(Name = "Comment (reason/explanation)")]
 		public string Comment { get; set; }
 

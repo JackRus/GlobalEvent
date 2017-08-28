@@ -9,7 +9,7 @@ namespace GlobalEvent.Models.OwnerViewModels
 {
 	public class Claims
 	{
-	// events
+	// events		
 		public bool EventCanCreate { get; set; }	// owner, manager +
 		public bool EventCanChangeStatus { get; set; } 	// owner + 
 		public bool EventCanEdit { get; set; }	// owner +
@@ -49,7 +49,7 @@ namespace GlobalEvent.Models.OwnerViewModels
 
 	// owner
 		public bool OwnerCanSeeDashboard { get; set; } // owner +
-		public bool Owner { get; set; }   // only owner + 
+		public bool OwnerCanDoExtra { get; set; }   // only owner + 
 		public bool OwnerCanSeeMenu { get; set; }	// MAIN MENU: manager, owner +
 
 	// todo

@@ -15,6 +15,8 @@ using GlobalEvent.Services;
 using GlobalEvent.Data;
 using GlobalEvent.Models.OwnerViewModels;
 using System.Reflection;
+using Microsoft.AspNetCore.Http;
+using GlobalEvent.Models.AdminViewModels;
 
 namespace GlobalEvent.Controllers
 {
@@ -27,6 +29,7 @@ namespace GlobalEvent.Controllers
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
         private readonly string _externalCookieScheme;
+        private readonly string _id;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
@@ -34,7 +37,8 @@ namespace GlobalEvent.Controllers
             IOptions<IdentityCookieOptions> identityCookieOptions,
             IEmailSender emailSender,
             ISmsSender smsSender,
-            ApplicationDbContext db)
+            ApplicationDbContext db,
+            IHttpContextAccessor http)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -42,6 +46,7 @@ namespace GlobalEvent.Controllers
             _emailSender = emailSender;
             _smsSender = smsSender;
             _db = db;
+            _id = _userManager.GetUserId(http.HttpContext.User);
         }
 
         //
@@ -69,13 +74,9 @@ namespace GlobalEvent.Controllers
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
                 if (result.Succeeded)
                 {
-                    // ==> LOG
-                    var user = await _userManager.FindByNameAsync(model.Email);
-                    await _db.Logs.AddAsync(user.CreateLog("Log In", "User Loged In"));
-                    // ==> END OF LOG
-
-                    await _db.SaveChangesAsync();
-                    return RedirectToLocal(returnUrl);
+                    var user = await _userManager.FindByEmailAsync(model.Email);
+                    await _db.Logs.AddAsync(await Log.New("Log In", "User Loged In", user.Id, _db));
+                    return RedirectToAction("Dashboard", "Admin");
                 }
                 if (result.RequiresTwoFactor)
                 {
@@ -83,11 +84,7 @@ namespace GlobalEvent.Controllers
                 }
                 if (result.IsLockedOut)
                 {
-                    // log
-                    var user = await _userManager.GetUserAsync(User);
-                    await _db.Logs.AddAsync(user.CreateLog("Log In", "User account locked out"));
-                    await _db.SaveChangesAsync();
-
+                    await _db.Logs.AddAsync(await Log.New("Log In", "User account locked out", _id, _db));
                     return View("Lockout");
                 }
                 else
@@ -133,15 +130,13 @@ namespace GlobalEvent.Controllers
                     var u = await _userManager.FindByEmailAsync(model.Email);
                 
                     // Adding All Claims
-                    var properties = new Claims().GetType().GetProperties().ToList();
+                    var properties = JackLib.PropertyAsObject(new Claims());
                     foreach(var item in properties)
                     {
                         await _userManager.AddClaimAsync(u, new Claim(item.Name, ""));
                     }
 
-                    // log
-                    await _db.Logs.AddAsync(u.CreateLog("Register", $"Owner's initial registration"));
-                    await _db.SaveChangesAsync();
+                    await _db.Logs.AddAsync(await Log.New("Register", $"Owner's initial registration", _id, _db));
                     await _signInManager.SignInAsync(u, isPersistent: false);
                     return RedirectToAction("Index", "Owner");
                 }
@@ -179,12 +174,12 @@ namespace GlobalEvent.Controllers
                 {
                     // ==> LOG for creator
                     var creator = await _userManager.GetUserAsync(User);
-                    await _db.Logs.AddAsync(creator.CreateLog("Create User", $"{model.Level.ToUpper()}: {model.FirstName} {model.LastName}, was created"));
+                    await _db.Logs.AddAsync(await Log.New("Create User", $"{model.Level.ToUpper()}: {model.FirstName} {model.LastName}, was created", creator.Id, _db));
                     
                     // ==> LOG for created user
-                    await _db.Logs.AddAsync(user.CreateLog("Create User", $"{model.Level.ToUpper()} created by {creator.Level}: {creator.FirstName} {creator.LastName}"));
+                    var newUser = await _userManager.FindByEmailAsync(model.Email);
+                    await _db.Logs.AddAsync(await Log.New("Create User", $"{model.Level.ToUpper()} created by {creator.Level}: {creator.FirstName} {creator.LastName}", newUser.Id, _db));
 
-                    await _db.SaveChangesAsync();
                     return RedirectToAction("Admins", "Owner");
                 }
                 AddErrors(result);
@@ -216,10 +211,10 @@ namespace GlobalEvent.Controllers
                 
                 // log for deleter
                 var user = await _userManager.GetUserAsync(User);
-                await _db.Logs.AddAsync(user.CreateLog("Delete User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, was deleted"));
+                await _db.Logs.AddAsync(await Log.New("USER", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, was DELETED", user.Id, _db));
+                
                 // lof for deleted user
-                await _db.Logs.AddAsync(u.CreateLog("Delete User", $"User was deleted by {user.FirstName} {user.LastName}"));
-                await _db.SaveChangesAsync();
+                await _db.Logs.AddAsync(await Log.New("USER", $"User was DELETED by {user.FirstName} {user.LastName}", u.Id, _db));
 
                 await _userManager.DeleteAsync(u);
             }
@@ -235,12 +230,7 @@ namespace GlobalEvent.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
-            // ==> LOG
-            var user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(user.CreateLog("Log Out", "User Loged Out"));
-            await _db.SaveChangesAsync();
-            // ==> END OF LOG
-            
+            await _db.Logs.AddAsync(await Log.New("Log Out", "User Loged Out", _id, _db));
             await _signInManager.SignOutAsync();
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }

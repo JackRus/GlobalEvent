@@ -25,7 +25,7 @@
 		<tbody>
 		@foreach(var o in Model)
 		{	
-			<tr>
+			<tr class="@(o.Cancelled ? "bgAttention" : "")">
 				<td>@o.ID</td>
 				<td>@o.Number</td>
 				<td>@o.TicketType</td>
@@ -38,24 +38,20 @@
 					@o.OwnerEmail <br />
 					@o.OwnerPhone
 				</td>
-				<td>
+				<td class="text-center">
 					<div class="bulp @(o.Cancelled ? "bgRed" : "bgBase")"></div>
 				</td>
 				<td>
 					<div class="bulp @(!o.Full ? "bgBase" : "bgGray")"></div>
 				</td>
 				<td style="width: auto; text-align: right;">	
-				
 					<div class="dropdown">
-						<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
-						<span class="caret"></span></button>
+						<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions &nbsp &#x25BC;</button>
 						<ul class="dropdown-menu dropdown-menu-right">
 							<li><a asp-action="EditOrder" asp-controller="Order" asp-route-ID="@o.ID">Edit</a></li>
 							<li><a asp-action="AddOrder" asp-controller="Order" asp-route-ID="@o.EID">Add New</a></li>
 						</ul>
 					</div>
-
-					
 				</td>
 			</tr>
 		}

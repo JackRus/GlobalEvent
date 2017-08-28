@@ -27,25 +27,22 @@
 				<td>@t.Limit</td>
 				<td>@t.Description </td>
 				<td style="width: auto; text-align: right;">
-
-				<div class="dropdown">
-					<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
-					<span class="caret"></span></button>
-					
-					<ul class="dropdown-menu dropdown-menu-right">
-						@if(await AuthorizationService.AuthorizeAsync(User, "Ticket Creator"))
-						{	
+				@if((await AuthorizationService.AuthorizeAsync(User, "Ticket Creator")) || (await AuthorizationService.AuthorizeAsync(User, "Ticket Killer")))
+				{
+					<div class="dropdown">
+						<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
+						&nbsp &#x25BC;</button>
+						<ul class="dropdown-menu dropdown-menu-right">	
 							<li><a asp-action="Copy" asp-route-ID="@t.ID">Copy</a></li>
-
 							<li><a asp-action="Edit" asp-route-ID="@t.ID">Edit</a></li>
-						}
-						@if(await AuthorizationService.AuthorizeAsync(User, "Ticket Killer"))
-						{
 							<li><a asp-action="Delete" asp-route-ID="@t.ID">Delete</a></li>
-						}
-					</ul>
-
-				</div>
+						</ul>
+					</div>
+				}
+				else 
+				{
+					<span>No Access</span>
+				}
 				</td>
 			</tr>
 			<tr style="height: 4px;">
@@ -61,7 +58,10 @@ else
 }
 	<br />
 	<div class="text-center">
+	@if(await AuthorizationService.AuthorizeAsync(User, "Ticket Creator"))
+	{ 
 		<a asp-action="Add" asp-route-id="@ViewBag.ID" class="btn mybtn bgBase">ADD</a>
+	}
 		<a asp-action="ViewEvent" asp-controller="Owner" asp-route-id="@ViewBag.ID" class="btn mybtn bgBro">BACK</a>
 		
 	@if (ViewBag.Tickets.Count != 0 && (await AuthorizationService.AuthorizeAsync(User, "Is Owner"))) 

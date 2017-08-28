@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using GlobalEvent.Models;
 using GlobalEvent.Models.VisitorViewModels;
+using Microsoft.AspNetCore.Http;
 
 namespace GlobalEvent.Controllers
 {
@@ -16,11 +17,13 @@ namespace GlobalEvent.Controllers
     {
 		private readonly ApplicationDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
+        private string _id;
 
-		public RequestController (UserManager<ApplicationUser> userManager, ApplicationDbContext context)
+		public RequestController (UserManager<ApplicationUser> userManager, ApplicationDbContext context, IHttpContextAccessor http)
         {
             _db = context;
             _userManager = userManager;
+            _id = _userManager.GetUserId(http.HttpContext.User);
         }
 
         [HttpGet]
@@ -44,11 +47,7 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin");
             }
 
-            ///    LOG     ///
             var user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(user.CreateLog("Request", $"Request: \"{r.Description}\" for VID: {r.VID}, was CREATED"));
-            /// END OF LOG ///
-
             r.AdminID = user.Id;
             r.AdminName = $"{user.FirstName} {user.LastName}";
 
@@ -56,7 +55,9 @@ namespace GlobalEvent.Controllers
             Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == r.VID);
             v.Requests.Add(r);
             _db.Visitors.Update(v);
-            await _db.SaveChangesAsync();
+
+            await _db.Logs.AddAsync(await Log.New("Request", $"Request: \"{r.Description}\" for VID: {r.VID}, was CREATED", _id, _db));
+
             return RedirectToAction("ViewVisitor", "Admin", new {ID = r.VID});
         }
 
@@ -75,25 +76,15 @@ namespace GlobalEvent.Controllers
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Edit (Request r)
         {
-            if (string.IsNullOrEmpty(r.Description) || r.ID == 0)
+			if (string.IsNullOrEmpty(r.Description) || r.ID == 0)
             {
                 return RedirectToAction("Dashboard", "Admin");
             }
 
-            Request rOld = await _db.Requests.FirstOrDefaultAsync(x => x.ID == r.ID);
-            rOld.Description = r.Description;
-            rOld.SeenByAdmin = r.SeenByAdmin;
-            rOld.Solved = r.Solved;
-            rOld.Important = r.Important;
-            _db.Requests.Update(rOld);
+            var VID = r.CopyValues(_db);
+            await _db.Logs.AddAsync(await Log.New("Request", $"Request: \"{r.Description}\" for VID: {r.VID}, was EDITED", _id, _db));
 
-            ///    LOG     ///
-            var user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(user.CreateLog("Request", $"Request: \"{r.Description}\" for VID: {r.VID}, was EDITED"));
-            /// END OF LOG ///
-
-            await _db.SaveChangesAsync();
-            return RedirectToAction("ViewVisitor", "Admin", new {ID = rOld.VID});
+            return RedirectToAction("ViewVisitor", "Admin", new {ID = VID});
         }
 
         [HttpGet]
@@ -106,13 +97,8 @@ namespace GlobalEvent.Controllers
 
             Request r = await _db.Requests.FirstOrDefaultAsync(x => x.ID == ID);
             _db.Requests.Remove(r);
+            await _db.Logs.AddAsync(await Log.New("Request", $"Request: \"{r.Description}\" for VID: {r.VID}, was DELETED", _id, _db));
 
-            ///    LOG     ///
-            var user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(user.CreateLog("Request", $"Request: \"{r.Description}\" for VID: {r.VID}, was DELETED"));
-            /// END OF LOG ///
-
-            await _db.SaveChangesAsync();
             return RedirectToAction("ViewVisitor", "Admin", new {ID = r.VID});
         }
 
@@ -124,32 +110,10 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin");
             }
 
-            // get request by ID
             Request r = await _db.Requests.FirstOrDefaultAsync(x => x.ID == ID);
-            
-            switch (Name)
-            {
-                case "SEEN": 
-                    r.SeenByAdmin = r.SeenByAdmin ? false : true;
-                    break;
-                case "IMPORTANT": 
-                    r.Important = r.Important ? false : true;
-                    break;
-                case "SOLVED": 
-                    r.Solved = r.Solved ? false : true;
-                    break;
-                default: 
-                    break;
-            }
+            r.UpdateValue(Name, _db);
+            await _db.Logs.AddAsync(await Log.New("Request", $"Request: \"{r.Description}\" for VID: {r.VID}, feild {Name} was changed", _id, _db));
 
-            _db.Requests.Update(r);
-
-            ///    LOG     ///
-            var user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(user.CreateLog("Request", $"Request: \"{r.Description}\" for VID: {r.VID}, feild {Name} was changed"));
-            /// END OF LOG ///
-
-            await _db.SaveChangesAsync();
             return RedirectToAction("ViewVisitor", "Admin", new {ID = r.VID});
         }
 	}

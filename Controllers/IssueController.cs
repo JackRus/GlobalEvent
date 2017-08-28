@@ -10,19 +10,22 @@ using GlobalEvent.Models;
 using GlobalEvent.Models.VisitorViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.Http;
 
 namespace GlobalEvent.Controllers
 {
-	[Authorize]
+    [Authorize(Policy="Visitor Editor")]
     public class IssueController : Controller
     {
 		private readonly ApplicationDbContext _db;
         private readonly UserManager<ApplicationUser> _userManager;
+        private string _id;
 
-		public IssueController (UserManager<ApplicationUser> userManager, ApplicationDbContext context)
+		public IssueController (UserManager<ApplicationUser> userManager, ApplicationDbContext context, IHttpContextAccessor http)
         {
             _db = context;
             _userManager = userManager;
+            _id = _userManager.GetUserId(http.HttpContext.User);
         }
 
         // GET ADD
@@ -43,14 +46,9 @@ namespace GlobalEvent.Controllers
             var result = $"Could't add Issue record.";
             if (!string.IsNullOrEmpty(i.Description))
             {
-                ///    LOG     ///
-                var user = await _userManager.GetUserAsync(User);
-                await _db.Logs.AddAsync(user.CreateLog("Issue", $"Issue: \"{i.Description}\", was CREATED"));
-                /// END OF LOG ///
-
-                i.Complete(user);
+                i.Complete(await _userManager.GetUserAsync(User));
                 await _db.Issues.AddAsync(i);   
-                await _db.SaveChangesAsync();
+                await _db.Logs.AddAsync(await Log.New("Issue", $"Issue: \"{i.Description}\", was CREATED", _id, _db));
                 result = $"Issue record \"{i.Description}\" was created.";
             }
             return RedirectToAction("Dashboard", "Admin", new {message = result});
@@ -82,13 +80,7 @@ namespace GlobalEvent.Controllers
                 Issue oldI = await _db.Issues.FirstOrDefaultAsync(x => x.ID == i.ID);
                 oldI.CopyInfo(i);
                 _db.Issues.Update(oldI);
-
-                // ===> LOG
-                var user = await _userManager.GetUserAsync(User);
-                await _db.Logs.AddAsync(user.CreateLog("Issue", $"Issue: \"{i.Description}\", was EDITED"));
-                // ===> END OF LOG
-
-                await _db.SaveChangesAsync();
+                await _db.Logs.AddAsync(await Log.New("Issue", $"Issue: \"{i.Description}\", was EDITED", _id, _db));
                 result = $"Issue record was edited.";
             }
 
@@ -104,13 +96,7 @@ namespace GlobalEvent.Controllers
             {
                 Issue i = await _db.Issues.SingleOrDefaultAsync(x => x.ID == ID);
                 _db.Issues.Remove(i);
-
-                ///    LOG     ///
-                var user = await _userManager.GetUserAsync(User);
-                await _db.Logs.AddAsync(user.CreateLog("Issue", $"Issue: \"{i.Description}\", was DELETED"));
-                /// END OF LOG ///
-
-                await _db.SaveChangesAsync();
+                await _db.Logs.AddAsync(await Log.New("Issue", $"Issue: \"{i.Description}\", was DELETED", _id, _db));
                 result = $"Issue record \"{i.Description}\" was deleted.";
             }
             
@@ -125,22 +111,8 @@ namespace GlobalEvent.Controllers
             if (ID != null && Name != null)
             {
                 Issue i = await _db.Issues.FirstOrDefaultAsync(x => x.ID == ID);
-                if (Name == "Solved")
-                {
-                    i.Solved = i.Solved ? false : true;
-                }
-                else if (Name == "Assigned")
-                {
-                    i.Assigned = i.Assigned ? false : true;
-                }
-                _db.Issues.Update(i);
-
-                // ==> LOG
-                var user = await _userManager.GetUserAsync(User);
-                await _db.Logs.AddAsync(user.CreateLog("Issue", $"Issue: \"{i.Description}\", feild {Name} was changed."));
-                // ==> END OF LOG
-
-                await _db.SaveChangesAsync();
+                i.UpdateValues(Name, _db);
+                await _db.Logs.AddAsync(await Log.New("Issue", $"Issue: \"{i.Description}\", feild {Name} was changed.", _id, _db));
                 result = $"Value of \"{Name}\" was changed.";
             }
             return RedirectToAction("Dashboard", "Admin", new {message = result});

@@ -46,27 +46,23 @@
 				</td>
 				<td style="max-width: 300px;">@p.Description </td>
 				<td style="width: auto; text-align: right;">
+				@if((await AuthorizationService.AuthorizeAsync(User, "Product Creator")) || (await AuthorizationService.AuthorizeAsync(User, "Product Killer")))
+				{
 					<div class="dropdown">
 						<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
-						<span class="caret"></span></button>
-						
+						 &nbsp &#x25BC;</button>
 						<ul class="dropdown-menu dropdown-menu-right">
-							@if(await AuthorizationService.AuthorizeAsync(User, "Product Creator"))
-							{
-								<li><a asp-action="Copy" asp-route-ID="@p.ID">Copy</a></li>
-
-								<li><a asp-action="Edit" asp-route-ID="@p.ID">Edit</a></li>
-							}
-							@if(await AuthorizationService.AuthorizeAsync(User, "Product Killer"))
-							{
-								<li><a asp-action="Delete" asp-route-ID="@p.ID">Delete</a></li>
-							}
-							@if(await AuthorizationService.AuthorizeAsync(User, "Product Creator"))
-							{	
-								<li><a asp-action="SelectTickets" asp-route-ID="@p.ID" asp-route-EID="@p.EID">Add/Remove Tickets</a></li>
-							}
+							<li><a asp-action="Copy" asp-route-ID="@p.ID">Copy</a></li>
+							<li><a asp-action="Edit" asp-route-ID="@p.ID">Edit</a></li>
+							<li><a asp-action="Delete" asp-route-ID="@p.ID">Delete</a></li>
+							<li><a asp-action="SelectTickets" asp-route-ID="@p.ID" asp-route-EID="@p.EID">Add/Remove Tickets</a></li>
 						</ul>
 					</div>
+				}
+				else
+				{
+					<span>No Access</span>
+				}
 				</td>
 			</tr>
 			<tr style="height: 4px;">

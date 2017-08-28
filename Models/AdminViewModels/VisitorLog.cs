@@ -16,7 +16,6 @@ namespace GlobalEvent.Models.AdminViewModels
         {
             this.Date = DateTime.Now.ToString("yyyy-MM-dd");
             this.Time = DateTime.Now.ToString("HH:mm");
-            this.CurrentState = new Change();
         }
     }
 }
