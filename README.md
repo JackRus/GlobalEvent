@@ -11,11 +11,11 @@ AS ATTENDEE
 AS ADMIN
 
 1. To log-in as an Owner (has full access to all features) use
-PASS: Password1!
-USERNAME: owner@owner.owner
+* PASS: Password1!
+* USERNAME: owner@owner.owner
 2. To log-in as an regular Admin (basic access level) use
-PASS: Password1!
-USERNAME: admin@admin.admin
+* PASS: Password1!
+* USERNAME: admin@admin.admin
 
 ## Technologies used:
 
