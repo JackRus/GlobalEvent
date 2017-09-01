@@ -224,6 +224,9 @@ select:-webkit-autofill {
     color: blue;
 }
 
+select.form-control {
+    padding: 5px 10px;
+}
 textarea{
     font-size: 1em!important;
 }

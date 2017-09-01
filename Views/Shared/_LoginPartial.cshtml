@@ -9,14 +9,7 @@
     <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="navbar-right">
         <ul class="nav navbar-nav navbar-right">
             <li>
-                @if(@UserManager.GetUserAsync(User).Result.Level == "Owner")
-                {
-                    <a asp-controller="Manage" asp-action="Index" title="Manage">Hello @UserManager.GetUserAsync(User).Result.FirstName!</a>
-                }
-                else
-                {
-                    <div style="color: #9d9d9d; padding: 15px 10px;">Hi, @UserManager.GetUserAsync(User).Result.FirstName!</div>
-                }
+                <div style="color: #9d9d9d; padding: 15px 10px;">Hi, @UserManager.GetUserAsync(User).Result.FirstName!</div>
             </li>
             <li>
                 <button type="submit" class="btn btn-link navbar-btn navbar-link">Log out</button>

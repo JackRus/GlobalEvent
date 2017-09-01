@@ -380,9 +380,36 @@ namespace GlobalEvent.Controllers
                 // log out the locked user
                 await _userManager.UpdateSecurityStampAsync(toLock);
             }
-            
             await _userManager.UpdateAsync(toLock);
 
+            return RedirectToAction("Admins", "Owner");
+        }
+
+        //
+        // POST: /Account/LOCK
+        [HttpPost]
+        [Authorize(Policy="Is Owner")]
+        public async Task<IActionResult> LockAll (string lockall)
+        {
+            if (lockall != "lockall")
+            {
+                return RedirectToAction("Admins", "Owner");
+            }
+            ApplicationUser locker = await _userManager.GetUserAsync(User);
+            List<ApplicationUser> users = await _db.Users.ToListAsync();
+            foreach (var user in users)
+            {
+                if (user.Level != "Owner")
+                {
+                    user.LockoutEnd = DateTime.Now.AddYears(10);
+                    await _userManager.UpdateSecurityStampAsync(user);
+                    await _userManager.UpdateAsync(user);
+
+                    await _db.Logs.AddAsync(await Log.New("Edit User", $"User was LOCKED by {locker.FirstName} {locker.LastName}", user.Id, _db));
+                }
+            }
+            // log for locker
+            await _db.Logs.AddAsync(await Log.New("Lock User", $"All users were LOCKED and Logged Out", _id, _db));
             return RedirectToAction("Admins", "Owner");
         }
 

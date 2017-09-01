@@ -6,7 +6,7 @@ Event Management Application. You can try the app [here](http://ge.jackrus.us)
 AS ATTENDEE
 
 1. To check the App as an attendee(visitor) you do not need to log-in. You simply need to "purchage" (tickets are free) a ticket on the Event's page here.
-2. After that follow the registration/check-in steps. More detailed instructions and description you can find below. [will be posted shortly] 
+2. After that follow the registration/check-in steps.
 
 AS ADMIN
 1. [click here](http://ge.jackrus.us/Account/Login) or click the button "Admin" in the right-bottom corner of any page.  
