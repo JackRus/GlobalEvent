@@ -9,13 +9,12 @@ AS ATTENDEE
 2. After that follow the registration/check-in steps. More detailed instructions and description you can find below. [will be posted shortly] 
 
 AS ADMIN
-[click here](http://ge.jackrus.us/Account/Login) or click the button "Admin" in the right-bottom corner of any page.  
+1. [click here](http://ge.jackrus.us/Account/Login) or click the button "Admin" in the right-bottom corner of any page.  
 
-
-1. To log-in as an Owner (has full access to all features) use
+2. To log-in as an Owner (has full access to all features) use
 * PASS: Password1!
 * USERNAME: owner@owner.owner
-2. To log-in as an regular Admin (basic access level) use
+3. To log-in as an regular Admin (basic access level) use
 * PASS: Password1!
 * USERNAME: admin@admin.admin
 
