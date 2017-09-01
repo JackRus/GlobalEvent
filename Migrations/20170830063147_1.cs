@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace GlobalEvent.Migrations
 {
-    public partial class _0 : Migration
+    public partial class _1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -37,11 +37,11 @@ namespace GlobalEvent.Migrations
                     AdminName = table.Column<string>(nullable: true),
                     Assigned = table.Column<bool>(nullable: false),
                     Date = table.Column<string>(nullable: true),
-                    Description = table.Column<string>(nullable: true),
-                    ExpectedToBeSolved = table.Column<string>(nullable: true),
+                    Description = table.Column<string>(nullable: false),
+                    ExpectedToBeSolved = table.Column<string>(nullable: false),
                     Solved = table.Column<bool>(nullable: false),
                     Time = table.Column<string>(nullable: true),
-                    Type = table.Column<string>(nullable: true)
+                    Type = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -73,6 +73,7 @@ namespace GlobalEvent.Migrations
                     ID = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Comments = table.Column<string>(nullable: true),
+                    Created = table.Column<string>(nullable: true),
                     Deadline = table.Column<string>(nullable: false),
                     Done = table.Column<bool>(nullable: false),
                     EID = table.Column<int>(nullable: false),
@@ -213,8 +214,9 @@ namespace GlobalEvent.Migrations
                 {
                     ID = table.Column<int>(nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Attendees = table.Column<int>(nullable: false),
+                    Attended = table.Column<int>(nullable: false),
                     Capacity = table.Column<int>(nullable: false),
+                    CurrentAttendees = table.Column<int>(nullable: false),
                     DateEnd = table.Column<string>(nullable: true),
                     DateStart = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
@@ -225,8 +227,7 @@ namespace GlobalEvent.Migrations
                     Status = table.Column<bool>(nullable: false),
                     TTypes = table.Column<string>(nullable: true),
                     TimeEnd = table.Column<string>(nullable: true),
-                    TimeStart = table.Column<string>(nullable: true),
-                    Visitors = table.Column<string>(nullable: true)
+                    TimeStart = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -307,12 +308,12 @@ namespace GlobalEvent.Migrations
                     EventID = table.Column<int>(nullable: true),
                     Full = table.Column<bool>(nullable: false),
                     Number = table.Column<int>(nullable: false),
-                    OwnerEmail = table.Column<string>(nullable: true),
-                    OwnerName = table.Column<string>(nullable: true),
+                    OwnerEmail = table.Column<string>(nullable: false),
+                    OwnerName = table.Column<string>(nullable: false),
                     OwnerPhone = table.Column<string>(nullable: true),
-                    TicketType = table.Column<string>(nullable: true),
+                    TicketType = table.Column<string>(nullable: false),
                     Time = table.Column<string>(nullable: true),
-                    VType = table.Column<string>(nullable: true)
+                    VType = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -409,6 +410,28 @@ namespace GlobalEvent.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Visits",
+                columns: table => new
+                {
+                    ID = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Present = table.Column<bool>(nullable: false),
+                    ProductID = table.Column<int>(nullable: true),
+                    Time = table.Column<string>(nullable: true),
+                    VID = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Visits", x => x.ID);
+                    table.ForeignKey(
+                        name: "FK_Visits_Products_ProductID",
+                        column: x => x.ProductID,
+                        principalTable: "Products",
+                        principalColumn: "ID",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -540,6 +563,11 @@ namespace GlobalEvent.Migrations
                 column: "EventID");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Visits_ProductID",
+                table: "Visits",
+                column: "ProductID");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Types_EventID",
                 table: "Types",
                 column: "EventID");
@@ -602,10 +630,10 @@ namespace GlobalEvent.Migrations
                 name: "VLogs");
 
             migrationBuilder.DropTable(
-                name: "Products");
+                name: "Tickets");
 
             migrationBuilder.DropTable(
-                name: "Tickets");
+                name: "Visits");
 
             migrationBuilder.DropTable(
                 name: "Types");
@@ -633,6 +661,9 @@ namespace GlobalEvent.Migrations
 
             migrationBuilder.DropTable(
                 name: "Visitors");
+
+            migrationBuilder.DropTable(
+                name: "Products");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

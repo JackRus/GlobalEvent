@@ -1,7 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading.Tasks;
 using GlobalEvent.Data;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace GlobalEvent.Models.AdminViewModels
 {
@@ -14,7 +18,8 @@ namespace GlobalEvent.Models.AdminViewModels
         public string Task { get; set; } //description
 
         [Required]
-        public string Deadline { get; set; } //date
+        public string Deadline { get; set; } // date
+        public string Created { get; set; } // date
 
         public bool Done { get; set; }  // if complited
 
@@ -36,7 +41,21 @@ namespace GlobalEvent.Models.AdminViewModels
             this.Done = t.Done;
             this.EID = t.EID;
             this.Deadline = t.Deadline;
+            this.Created = DateTime.Now.ToString("yyyy-MM-dd HH:mm");
             db.ToDos.Update(this);
+        }
+
+        public static async Task<List<SelectListItem>> GenerateEventList (ApplicationDbContext db)
+        {
+            var list = new List<SelectListItem>();
+            var events = await db.Events.Where(x => !x.Archived).ToListAsync();
+            events.ForEach(x => {
+                list.Add( new SelectListItem {
+                    Value = x.ID.ToString(),
+                    Text = $"{x.Name}: {(x.Status ? "Active" : "Inactive")}"
+                });
+            });
+            return list;
         }
     }
 }

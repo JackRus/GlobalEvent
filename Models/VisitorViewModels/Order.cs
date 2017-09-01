@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 using GlobalEvent.Data;
@@ -14,18 +15,39 @@ namespace GlobalEvent.Models.VisitorViewModels
     {
         public int ID { get; set; }
         public int Number { get; set; }
-        public int Amount { get; set; }
+        
+        [Required]
+		[Display(Name = "Quantity")]
+		public int Amount { get; set; }
+
         public bool Cancelled { get; set; }
         public int CheckedIn { get; set; }
         public bool Full { get; set; }
-        public string OwnerName { get; set; }
-        public string OwnerEmail { get; set; }
-        public string OwnerPhone { get; set; }
+        
+        [Required]
+		[Display(Name = "Full Name")]
+		public string OwnerName { get; set; }
+
+        [Required]
+		[Display(Name = "Email")]
+		[RegularExpression(@"^[0-9a-zA-z]+@[0-9a-zA-z]+.[a-zA-z]+$", ErrorMessage = "Not a valid email.")]
+		public string OwnerEmail { get; set; }
+
+		[Display(Name = "Phone Number")]
+		[RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid Phone number.")]
+		public string OwnerPhone { get; set; }
+
         public string Date { get; set; }     //date / time
         public string Time { get; set; }
         public int EID { get; set; }   //date / time
-        public string TicketType { get; set; }
-        public string VType { get; set; }
+        
+        [Required]
+		[Display(Name = "Ticket Type")]
+		public string TicketType { get; set; }
+
+        [Required]
+		[Display(Name = "Visitor Type")]
+		public string VType { get; set; }
 
         public Order()
         {
@@ -137,7 +159,6 @@ namespace GlobalEvent.Models.VisitorViewModels
 			o.CheckedIn--;
             o.Full = o.CheckedIn >= o.Amount ? true : false;
             _db.Orders.Update(o);
-            await _db.SaveChangesAsync();
         }
 
         public void CopyInfo (Order o)

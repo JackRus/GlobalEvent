@@ -21,8 +21,12 @@
         </div>
 
         <div class="form-group">
-            <label asp-for="Level" class="control-label">Level (Manager or Admin)</label>
-            <input asp-for="Level" class="form-control" />
+            <label asp-for="Level" class="control-label"></label>
+            <select asp-for="Level" asp-items="Model.Levels" class="form-control">
+                <option value="" hidden disabled selected>
+                    Select &#x25BC;
+                </option>
+            </select>
             <span asp-validation-for="Level" class="text-danger"></span>
         </div>
 

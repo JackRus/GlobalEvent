@@ -27,6 +27,7 @@ namespace GlobalEvent.Data
         public DbSet<Ticket> Tickets { get; set; }
         public DbSet<VType> Types { get; set; }
         public DbSet<ToDo> ToDos { get; set; }
+        public DbSet<Visit> Visits { get; set; }
         
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

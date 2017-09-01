@@ -9,35 +9,38 @@
     Layout = "_LayoutNoLogo";
 }
 
-<form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
-    <h1> @ViewData["Title"]. </h1>
- 
-    <div class="form-group">
-        <label asp-for="Email" class="control-label"></label>
-        <input asp-for="Email" class="form-control" />
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
+<div class="c-c mar10" style="width: 400px; max-width: 100%;">
+    <form asp-controller="Account" asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" method="post">
+        <h1> @ViewData["Title"]. </h1>
+    
+        <div class="form-group">
+            <label asp-for="Email" class="control-label"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
 
-    <div class="form-group">
-        <label asp-for="Password" class="control-label"></label>
-        <input asp-for="Password" class="form-control" />
-        <span asp-validation-for="Password" class="text-danger"></span>
-    </div>
+        <div class="form-group">
+            <label asp-for="Password" class="control-label"></label>
+            <input asp-for="Password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
 
-    <div class="form-group">
-        <label asp-for="RememberMe"></label> &nbsp
-        <span class="true-false" data-id="box1"></span>
-        <input asp-for="RememberMe" class="eye" id="box1"/>
-    </div>
+        <div class="form-group">
+            <label asp-for="RememberMe"></label> &nbsp
+            <span class="true-false" data-id="box1"></span>
+            <input asp-for="RememberMe" class="eye" id="box1"/>
+        </div>
 
-    <div class="text-center">
-        <button type="submit" class="btn mybtn bgBase" style="margin: 30px auto;">Log in</button>
+        <div class="text-center">
+            <button type="submit" class="btn mybtn bgBase" style="margin: 30px auto;">Log in</button>
+            <a asp-controller="Home" asp-action="Index" class="btn mybtn bgRed" style="margin: 30px auto;">Back</a>
 
-        <p>
-            <a asp-action="ForgotPassword">Forgot your password?</a>
-        </p>
-    </div>
-</form>
+            <!-- <p>
+                <a asp-action="ForgotPassword">Forgot your password?</a>
+            </p> -->
+        </div>
+    </form>
+</div>
 
 @section Scripts {
     @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }

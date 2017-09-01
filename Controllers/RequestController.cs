@@ -35,7 +35,7 @@ namespace GlobalEvent.Controllers
             }
 
             ViewBag.Visitor = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ID);
-            return View(new Request());
+            return View();
         }
         
         [HttpPost]
@@ -47,11 +47,9 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin");
             }
 
-            var user = await _userManager.GetUserAsync(User);
+            ApplicationUser user = await _userManager.GetUserAsync(User);
             r.AdminID = user.Id;
             r.AdminName = $"{user.FirstName} {user.LastName}";
-
-            // update visitor + add requests to db
             Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == r.VID);
             v.Requests.Add(r);
             _db.Visitors.Update(v);
@@ -81,7 +79,7 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin");
             }
 
-            var VID = r.CopyValues(_db);
+            int VID = await r.CopyValues(_db);
             await _db.Logs.AddAsync(await Log.New("Request", $"Request: \"{r.Description}\" for VID: {r.VID}, was EDITED", _id, _db));
 
             return RedirectToAction("ViewVisitor", "Admin", new {ID = VID});

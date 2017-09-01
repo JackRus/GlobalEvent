@@ -17,11 +17,14 @@ namespace GlobalEvent.Models.OwnerViewModels
         public bool Free { get; set; } // if visitor has free admission
         public bool Limited { get; set; } // if amount is limited
         
+        [Display(Name="Maximum Amount Allowed")]
         [RegularExpression(@"^[0-9]+$", ErrorMessage = "Has to be a number.")]
         public int MaxLimit { get; set; } // max amount
         public int EID { get; set; }  // EventID
         public string Description { get; set; }
+        // amount checked in
         public int CheckIned { get; set; }
+        // amount registred
         public int Registered { get; set; }
 
         public VType()

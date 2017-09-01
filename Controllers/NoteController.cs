@@ -47,7 +47,7 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin");
             }
             
-            var user = await _userManager.GetUserAsync(User);
+            ApplicationUser user = await _userManager.GetUserAsync(User);
             n.AdminID = user.Id;
             n.AdminName = $"{user.FirstName} {user.LastName}";
 
@@ -78,8 +78,7 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Dashboard", "Admin");
             }
-            var VID = await n.CopyValues(_db);
-
+            int VID = await n.CopyValues(_db);
             await _db.Logs.AddAsync(await Log.New("Note", $"Note: \"{n.Description}\" for VID: {n.VID}, was EDITED", _id, _db));
 
             return RedirectToAction("ViewVisitor", "Admin", new {ID = VID});

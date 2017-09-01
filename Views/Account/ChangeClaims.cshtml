@@ -7,18 +7,19 @@
 <h1> Admin's access</h1>
 <h3> @ViewBag.AdminName </h3>
 
-<form asp-action="ChangeClaims" asp-controller="Owner" asp-route-ID="@ViewBag.AID" autocomplete="off">
+<form asp-action="ChangeClaims" asp-controller="Account" asp-route-ID="@ViewBag.AID" autocomplete="off">
 
 @foreach(var c in ViewBag.Properties)
 {
-	check = c.Name.StartsWith(name) ? true : false;
+	check = c.Name.StartsWith(name) ? true : false; 
 	@if(!check)
 	{	
 		name = c.Name.Substring(0, c.Name.IndexOf("C"));
-		<div class="events-number-container" style="border-bottom: 1px solid #3cb371;">
+		check = true;
+		
+		<div class="events-number-container bbBase">
 			<span class="events-number bgBase">@name</span>
 		</div>
-		check = true;
 	}
 	@if(c.Name.StartsWith(name))
 	{
@@ -27,13 +28,12 @@
 				@(Regex.Replace(c.Name.Replace(name, ""), @"(\B[A-Z]+?(?=[A-Z][^A-Z])|\B[A-Z]+?(?=[^A-Z]))", " $1"))
 			</label>&nbsp
 			<span class="true-false" data-id="@c.Name"></span>
-			
-			<input class="eye" @(c.GetValue(Model, null) == false ? "" : "checked") data-val="true" data-val-required="The @c.Name Event field is required." id="@c.Name" name="@c.Name" type="checkbox" value="true" />
+			<input class="eye" @(c.GetValue(Model, null) == false ? "" : "checked") id="@c.Name" name="@c.Name" type="checkbox" value="true" />
 		</div>
 	}
 }
 	<div class="text-center form-group">
 		<button type="submit" class="btn mybtn bgBase">Save</button>
-		<a asp-action="EditAdmin" asp-controller="Owner" asp-route-ID="@ViewBag.AID" class="btn mybtn bgRed">Cancel</a>
+		<a asp-action="EditAdmin" asp-controller="Account" asp-route-ID="@ViewBag.AID" class="btn mybtn bgRed">Cancel</a>
 	</div>
 </form>

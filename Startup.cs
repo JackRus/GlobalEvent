@@ -45,9 +45,14 @@ namespace GlobalEvent
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddIdentity<ApplicationUser, IdentityRole>()
+            services.AddIdentity<ApplicationUser, IdentityRole>(identityOptions =>
+            {
+                // enables immediate logout, after updating the user's stat.
+                identityOptions.SecurityStampValidationInterval = TimeSpan.Zero;
+            })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
+                
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             services.AddAuthorization(options => {

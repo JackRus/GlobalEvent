@@ -1,7 +1,7 @@
 @model Ticket
 
 <h1>ADD TICKET</h1>
-<h3> @ViewBag.Event </h3>
+<h3> @ViewBag.Event.Name </h3>
 
 <form asp-action="Add" autocomplete="off">
 
@@ -29,12 +29,12 @@
         <span asp-validation-for="Description" class="Red"></span>
     </div>
 
-	<input asp-for="EID" value="@Model.EID" class="eye" />
+	<input asp-for="EID" value="@ViewBag.Event.ID" class="eye" />
 
     <div class="form-group text-center">
         <button type="submit" class="btn mybtn bgBase">ADD</button>
         <button type="reset" class="btn mybtn bgBro">RESET</button>
-        <a asp-action="Index" asp-route-ID="@Model.EID" class="btn mybtn bgRed">CANCEL</a>
+        <a asp-action="Index" asp-route-ID="@ViewBag.Event.ID" class="btn mybtn bgRed">CANCEL</a>
     </div>
 </form>
 

@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using GlobalEvent.Models;
 using Microsoft.AspNetCore.Http;
+using System;
 
 namespace GlobalEvent.Controllers
 {
@@ -34,13 +35,14 @@ namespace GlobalEvent.Controllers
                 .Where(x => !x.Done)
                 .OrderBy(x => x.Deadline)
                 .ToList();
-
+            
             // get completed todos
             ViewBag.Done = await _db.ToDos
                 .Where(x => x.Done)
                 .OrderByDescending(x => x.Deadline)
                 .Take(50)
                 .ToListAsync();
+
             return View();
         }
 
@@ -51,7 +53,8 @@ namespace GlobalEvent.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.ToDos.Add(t);
+                t.Created = DateTime.Now.ToString("yyyy-MM-dd");
+                await _db.ToDos.AddAsync(t);
                 await _db.Logs.AddAsync(await Log.New("ToDo", $"Task: {t.Task}, was CREATED", _id, _db));
 
                 return RedirectToAction("Index", url);
@@ -62,9 +65,10 @@ namespace GlobalEvent.Controllers
 
         [HttpGet]
         [Authorize(Policy="Todo Creator")]
-        public IActionResult AddFull() // from Todo/Index
+        public async Task<IActionResult> AddFull() // from Todo/Index
         {
-            return View(new ToDo());
+            ViewBag.EventList = await ToDo.GenerateEventList(_db);
+            return View();
         }
 
         [HttpGet]
@@ -75,7 +79,7 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Index");
             }
-
+            ViewBag.EventList = await ToDo.GenerateEventList(_db);
             return View(await _db.ToDos.FirstOrDefaultAsync(x => x.ID == ID));
         }
 
@@ -87,6 +91,7 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Index");
             }
+            ViewBag.EventList = await ToDo.GenerateEventList(_db);
             return View(await _db.ToDos.FirstOrDefaultAsync(x => x.ID == ID));
         }
 
@@ -95,32 +100,28 @@ namespace GlobalEvent.Controllers
         [Authorize(Policy="Todo EditorKiller")]
         public async Task<IActionResult> Edit (ToDo t)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                return RedirectToAction("Index");
+                ToDo tOld = await _db.ToDos.FirstOrDefaultAsync(x => x.ID == t.ID);
+                tOld.CopyValues(t, _db);
+                await _db.Logs.AddAsync(await Log.New("ToDo", $"Task: {tOld.Task}, was EDITED", _id, _db));
             }
 
-            ToDo tOld = await _db.ToDos.FirstOrDefaultAsync(x => x.ID == t.ID);
-            tOld.CopyValues(t, _db);
-            await _db.Logs.AddAsync(await Log.New("ToDo", $"Task: {tOld.Task}, was EDITED", _id, _db));
-
-            return RedirectToAction("Index");
+            return RedirectToAction("Index", "Todo");
         }
 
         [HttpGet]
         [Authorize(Policy="Todo EditorKiller")]
         public async Task<IActionResult> Delete (int? ID)
         {
-            if (ID == null) 
+            if (ID != null) 
             {
-                return RedirectToAction("Index");
+                ToDo t = await _db.ToDos.FirstOrDefaultAsync(x => x.ID == ID);
+                _db.ToDos.Remove(t);
+                await _db.Logs.AddAsync(await Log.New("ToDo", $"Task: {t.Task}, was DELETED", _id, _db));
             }
 
-            ToDo t = await _db.ToDos.FirstOrDefaultAsync(x => x.ID == ID);
-            _db.ToDos.Remove(t);
-            await _db.Logs.AddAsync(await Log.New("ToDo", $"Task: {t.Task}, was DELETED", _id, _db));
-
-            return RedirectToAction("index");
+            return RedirectToAction("index", "Todo");
         }
 
         [HttpGet]
@@ -133,30 +134,26 @@ namespace GlobalEvent.Controllers
 
         [HttpGet]
         [Authorize(Policy="Is Owner")]
-        public async Task<IActionResult> DeleteAllOk (string code = null)
+        public async Task<IActionResult> DeleteAllOk ()
         {
-            if (code == "dltok")
-            {
-                var t = await _db.ToDos.ToArrayAsync();
-                _db.ToDos.RemoveRange(t);
-                await _db.Logs.AddAsync(await Log.New("ToDo", $"All Tasks were DELETED", _id, _db));
-            }
-            return RedirectToAction("Index");
+            var t = await _db.ToDos.ToArrayAsync();
+            _db.ToDos.RemoveRange(t);
+            await _db.Logs.AddAsync(await Log.New("ToDo", $"All Tasks were DELETED", _id, _db));
+
+            return RedirectToAction("Index", "Todo");
         }
 
         [HttpGet]
         [Authorize(Policy="Todo EditorKiller")]
         public async Task<IActionResult> Done (int? ID)
         {
-            if (ID == null) 
+            if (ID != null) 
             {
-                return RedirectToAction("Index", "Todo");
+                ToDo t = await _db.ToDos.SingleOrDefaultAsync(x => x.ID == ID);
+                t.Done = true;
+                _db.ToDos.Update(t);
+                await _db.Logs.AddAsync(await Log.New("ToDo", $"Task: {t.Task}, was marked as DONE", _id, _db));
             }
-
-            ToDo t = await _db.ToDos.SingleOrDefaultAsync(x => x.ID == ID);
-            t.Done = true;
-            _db.ToDos.Update(t);
-            await _db.Logs.AddAsync(await Log.New("ToDo", $"Task: {t.Task}, was marked as DONE", _id, _db));
 
             return RedirectToAction("Index", "Todo");
         }

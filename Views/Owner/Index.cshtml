@@ -11,11 +11,8 @@
 
 <div class="row m20-0-20-0">
 	<div class="col-sm-6">
-		@if (await AuthorizationService.AuthorizeAsync(User, "Owner's Dashboard"))
-        {
-			<a asp-action="Dashboard" class="btn i-block-owner">Owner's Dashboard</a>	
-			<br />
-		}
+		<a asp-action="Dashboard" class="btn i-block-owner">Owner Dashboard</a>	
+		<br />
 		<a asp-action="Events" class="btn i-block-owner">Events</a>
 		<br />	
 		<a asp-action="Admins" class="btn i-block-owner">Admins</a>
@@ -41,18 +38,29 @@
 			<form asp-action="Add" asp-controller="Todo" autocomplete="off">
 				<div class="form-group-sm">
 					<label asp-for="Task" class="control-label"></label>
-					<input asp-for="Task" class="form-control" style="font-size: 1.2em;"/>
+					<textarea asp-for="Task" class="form-control f1-2" ></textarea>
 					<span asp-validation-for="Task" class="Red"></span>
 				</div>
 				<div class="form-group-sm">
 					<label asp-for="Deadline" class="control-label"></label>
-					<input asp-for="Deadline" type="date" class="form-control" style="font-size: 1.2em;"/>
+					<input asp-for="Deadline" type="date" class="form-control f1-2"/>
 					<span asp-validation-for="Deadline" class="Red"></span>
 				</div>
 				<div class="form-group-sm">
 					<label asp-for="Comments" class="control-label"></label>
-					<textarea asp-for="Comments" class="form-control" rows="5" wrap="soft" style="font-size: 1.2em;"/></textarea>
+					<textarea asp-for="Comments" class="form-control f1-2" rows="5" wrap="soft" /></textarea>
 				</div>
+
+				<div class="form-group-sm">
+					<label asp-for="EID" class="control-label"></label>
+					<select asp-for="EID" asp-items="ViewBag.EventList" class="form-control  f1-2" style="padding: 0px 10px;">
+						<option value="0" selected>
+							No specific event
+						</option>
+					</select>
+					<span asp-validation-for="EID" class="Red"></span>
+				</div>
+				
 				<div class="text-center">
 					<button type="submit" class="btn mybtn bgBase">Add</button>
 					<button type="reset" class="btn mybtn bgRed tog" data-id="todo-add">Cancel</a>

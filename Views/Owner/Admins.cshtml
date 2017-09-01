@@ -5,16 +5,13 @@
 {
 	<a asp-action="AddUser" asp-controller="Account" class="btn mybtn bgBase">ADD</a>
 }
-@if(await AuthorizationService.AuthorizeAsync(User, "Is Owner"))
-{	
-	<a asp-action="LockAll" asp-controller="Account" class="btn mybtn bgRed">LOCK ALL</a>
-}
 </div>
 <br />
 
 <table class="table table-hover">
 	<thead>
 		<tr>
+			<th>#</th>
 			<th>First Name</th>
 			<th>Last Name</th>
 			<th>Login Name</th>
@@ -24,9 +21,11 @@
 		</tr>
 	</thead>
 	<tbody>
+	@{ var count = 1;}
 	@foreach(var u in ViewBag.Admins)
 	{
 		<tr>
+			<td>@count</td>
 			<td>@u.FirstName</td>
 			<td>@u.LastName</td>
 			@if (u.Level == "Owner")
@@ -45,7 +44,12 @@
 				<td>@u.UserName</td>
 			}
 			<td>@u.Level</td>
-			<td>TODO</td>
+			<td>
+				@if (u.LockoutEnd <= DateTime.Now || u.LockoutEnd == null) {
+					<span class='Base'>NO</span> } 
+				else {
+					<span class='Red'>YES</span> }
+			</td>
 			<td style="width: auto; text-align: right;">
 			@if (u.Level == "Owner")
 			{
@@ -56,15 +60,14 @@
 				else if (await AuthorizationService.AuthorizeAsync(User, "Is Owner"))
 				{
 					<div class="dropdown">
-						<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
-						<span class="caret"></span></button>
+						<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions &#x25BC;</button>
 						
 						<ul class="dropdown-menu dropdown-menu-right">
 						@if(await AuthorizationService.AuthorizeAsync(User, "Admin Editor"))
 						{
 
-							<li><a asp-action="EditAdmin" asp-route-ID="@u.Id">View/Edit</a></li>
-							<li><a asp-action="Lock" asp-route-ID="@u.Id">Lock</a></li>
+							<li><a asp-action="EditAdmin" asp-controller="Account" asp-route-ID="@u.Id">View/Edit</a></li>
+							<li><a asp-action="Lock" asp-controller="Account" asp-route-ID="@u.Id">Lock</a></li>
 						}
 						@if(await AuthorizationService.AuthorizeAsync(User, "Admin Killer"))
 						{
@@ -83,14 +86,12 @@
 				@if((await AuthorizationService.AuthorizeAsync(User, "Admin Editor")) || (await AuthorizationService.AuthorizeAsync(User, "Admin Killer")))
 				{
 				<div class="dropdown">
-						<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
-						<span class="caret"></span></button>
-						
+						<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions &#x25BC;</button>	
 						<ul class="dropdown-menu dropdown-menu-right">
-						
-
-							<li><a asp-action="EditAdmin" asp-route-ID="@u.Id">View/Edit</a></li>
-							<li><a asp-action="Lock" asp-route-ID="@u.Id">Lock</a></li>
+							<li><a asp-action="EditAdmin" asp-controller="Account" asp-route-ID="@u.Id">View/Edit</a></li>
+							<li><a asp-action="LockUser" asp-controller="Account" asp-route-ID="@u.Id">
+								@(u.LockoutEnd > DateTime.Now ? "Unlock" : "Lock")
+								</a></li>
 							<li><a asp-action="DeleteUser" asp-controller="Account" asp-route-ID="@u.Id">Delete</a></li>
 						</ul>
 					</div>
@@ -102,6 +103,7 @@
 			}
 			</td> 
 		</tr>
+		count++;
 	}
 	</tbody>
 </table>

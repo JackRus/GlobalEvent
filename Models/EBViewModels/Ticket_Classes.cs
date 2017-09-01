@@ -37,7 +37,7 @@ namespace GlobalEvent.Models.EBViewModels
             // get request to Eventbrite
             var text = new EBGet(url);
             var ebTickets = JsonConvert.DeserializeObject<EBTickets>(text.responseE);
-            var myTickets = await _db.Tickets.Where(x => x.EID == e.ID).ToListAsync();
+            List<Ticket> myTickets = await _db.Tickets.Where(x => x.EID == e.ID).ToListAsync();
             
             foreach (var t in ebTickets.Ticket_Classes)
             {   
@@ -48,8 +48,9 @@ namespace GlobalEvent.Models.EBViewModels
                 }
                 else
                 {
-                    ticket.Description = t.description;
+                    ticket.Description = "[EB] " + t.description;
                     ticket.Price = t.free ? 0 : t.cost.value;
+                    ticket.Limit = t.quantity_total;
                     _db.Tickets.Update(ticket);   
                 }
             }

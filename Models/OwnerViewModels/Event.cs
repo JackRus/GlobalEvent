@@ -92,7 +92,6 @@ namespace GlobalEvent.Models.OwnerViewModels
 
 		public static async Task Update (ApplicationDbContext _db, int ID)
 		{
-
 			// Update orders
             await Order.OrderUpdate(_db, ID);
 			await Ticket_Classes.UpdateEB(_db, ID);

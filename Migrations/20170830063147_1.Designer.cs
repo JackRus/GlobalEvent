@@ -8,8 +8,8 @@ using GlobalEvent.Data;
 namespace GlobalEvent.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20170821025800_0")]
-    partial class _0
+    [Migration("20170830063147_1")]
+    partial class _1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -53,15 +53,18 @@ namespace GlobalEvent.Migrations
 
                     b.Property<string>("Date");
 
-                    b.Property<string>("Description");
+                    b.Property<string>("Description")
+                        .IsRequired();
 
-                    b.Property<string>("ExpectedToBeSolved");
+                    b.Property<string>("ExpectedToBeSolved")
+                        .IsRequired();
 
                     b.Property<bool>("Solved");
 
                     b.Property<string>("Time");
 
-                    b.Property<string>("Type");
+                    b.Property<string>("Type")
+                        .IsRequired();
 
                     b.HasKey("ID");
 
@@ -160,6 +163,8 @@ namespace GlobalEvent.Migrations
                         .ValueGeneratedOnAdd();
 
                     b.Property<string>("Comments");
+
+                    b.Property<string>("Created");
 
                     b.Property<string>("Deadline")
                         .IsRequired();
@@ -319,9 +324,11 @@ namespace GlobalEvent.Migrations
                     b.Property<int>("ID")
                         .ValueGeneratedOnAdd();
 
-                    b.Property<int>("Attendees");
+                    b.Property<int>("Attended");
 
                     b.Property<int>("Capacity");
+
+                    b.Property<int>("CurrentAttendees");
 
                     b.Property<string>("DateEnd");
 
@@ -345,8 +352,6 @@ namespace GlobalEvent.Migrations
                     b.Property<string>("TimeEnd");
 
                     b.Property<string>("TimeStart");
-
-                    b.Property<string>("Visitors");
 
                     b.HasKey("ID");
 
@@ -384,6 +389,26 @@ namespace GlobalEvent.Migrations
                     b.HasIndex("EventID");
 
                     b.ToTable("Tickets");
+                });
+
+            modelBuilder.Entity("GlobalEvent.Models.OwnerViewModels.Visit", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("Present");
+
+                    b.Property<int?>("ProductID");
+
+                    b.Property<string>("Time");
+
+                    b.Property<int>("VID");
+
+                    b.HasKey("ID");
+
+                    b.HasIndex("ProductID");
+
+                    b.ToTable("Visits");
                 });
 
             modelBuilder.Entity("GlobalEvent.Models.OwnerViewModels.VType", b =>
@@ -438,17 +463,21 @@ namespace GlobalEvent.Migrations
 
                     b.Property<int>("Number");
 
-                    b.Property<string>("OwnerEmail");
+                    b.Property<string>("OwnerEmail")
+                        .IsRequired();
 
-                    b.Property<string>("OwnerName");
+                    b.Property<string>("OwnerName")
+                        .IsRequired();
 
                     b.Property<string>("OwnerPhone");
 
-                    b.Property<string>("TicketType");
+                    b.Property<string>("TicketType")
+                        .IsRequired();
 
                     b.Property<string>("Time");
 
-                    b.Property<string>("VType");
+                    b.Property<string>("VType")
+                        .IsRequired();
 
                     b.HasKey("ID");
 
@@ -666,6 +695,13 @@ namespace GlobalEvent.Migrations
                     b.HasOne("GlobalEvent.Models.OwnerViewModels.Event")
                         .WithMany("Tickets")
                         .HasForeignKey("EventID");
+                });
+
+            modelBuilder.Entity("GlobalEvent.Models.OwnerViewModels.Visit", b =>
+                {
+                    b.HasOne("GlobalEvent.Models.OwnerViewModels.Product")
+                        .WithMany("Visits")
+                        .HasForeignKey("ProductID");
                 });
 
             modelBuilder.Entity("GlobalEvent.Models.OwnerViewModels.VType", b =>

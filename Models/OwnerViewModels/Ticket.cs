@@ -34,10 +34,12 @@ namespace GlobalEvent.Models.OwnerViewModels
 
 		public string Description { get; set; } // visible to public
 		public int EID { get; set; }
+		// amount of checked in visitors with this type of the ticket
 		public int CheckIned { get; set; }
+		// amount of registered in visitors with this type of the ticket
 		public int Registered { get; set; }
+		// amount sold
 		public int Sold { get; set; }
-
 
 		public static async Task<List<SelectListItem>> GenerateTypes(ApplicationDbContext db, int? EID)
         {

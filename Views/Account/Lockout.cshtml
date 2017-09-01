@@ -1,8 +1,8 @@
 @{
-    ViewData["Title"] = "Locked out";
+    Layout="_LayoutNoLogo";
 }
 
-<header>
-    <h1 class="text-danger">Locked out.</h1>
-    <p class="text-danger">This account has been locked out, please try again later.</p>
-</header>
+<div class="row text-center c-c">
+	<h2> This account was locked out. <br /> Please try again later.</h2>
+	<a asp-action="Index" asp-controller="Home" class="btn mybtn bgBro"> OK </a>
+</div>

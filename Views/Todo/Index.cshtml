@@ -22,6 +22,7 @@
 		<thead>
 			<tr>
 				<th>Task</th>
+				<th>Created</th>
 				<th>Deadline</th>
 				<th>Event ID</th>
 				<th>Comments</th>
@@ -37,11 +38,12 @@
 			{
 				<tr>
 					<td>@t.Task</td>
+					<td>@t.Created</td>
 					<td>@t.Deadline</td>
 					<td>@t.EID</td>
 					<td>@t.Comments</td>
 					<td style="width: auto; text-align: right;">
-					@if((await AuthorizationService.AuthorizeAsync(User, "Todo EditorKiller")) || (await AuthorizationService.AuthorizeAsync(User, "Todo Creator")))
+					@if((await AuthorizationService.AuthorizeAsync(User, "Todo EditorKiller")))
 					{
 						<div class="dropdown">
 							<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions
@@ -97,7 +99,7 @@
 					<td>@t.EID</td>
 					<td>@t.Comments</td>
 					<td class="text-right">
-					@if((await AuthorizationService.AuthorizeAsync(User, "Todo EditorKiller")) || (await AuthorizationService.AuthorizeAsync(User, "Todo Creator")))
+					@if((await AuthorizationService.AuthorizeAsync(User, "Todo EditorKiller")))
 					{
 						<div class="dropdown">
 							<button class="btn mybtn-sm-actions bgGray" type="button" data-toggle="dropdown">Actions

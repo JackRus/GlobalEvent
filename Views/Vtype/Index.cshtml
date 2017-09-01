@@ -1,8 +1,8 @@
 <h1>ALL Visitor Types</h1>
-<h3> @ViewBag.Event </h3>
+<h3> @ViewBag.Event.Name </h3>
 
 <div style="width: 100%">
-@if (ViewBag.VTypes.Count != 0)
+@if (ViewBag.Event.Types.Count != 0)
 {
 	<table class="table table-hover">
 		<thead>
@@ -20,13 +20,13 @@
 			<tr style="height: 4px;">
 					<td colspan="20" class="line-space"></td>
 			</tr>
-			@foreach(VType v in ViewBag.VTypes)
+			@foreach(VType v in ViewBag.Event.Types)
 			{
 				<tr>
 					<td>@v.Name</td>
-					<td>@v.Limited</td>
+					<td>@(v.Limited ? "Yes" : "No")</td>
 					<td>@v.MaxLimit</td>
-					<td>@v.Free</td>
+					<td>@(v.Free ? "Yes" : "No")</td>
 					<td style="max-width: 250px;">@v.Description</td>
 					<td style="width: auto; text-align: right;">
 					@if((await AuthorizationService.AuthorizeAsync(User, "VType Creator")) || (await AuthorizationService.AuthorizeAsync(User, "VType Killer")))
@@ -62,12 +62,12 @@ else
 	<div class="text-center">
 		@if(await AuthorizationService.AuthorizeAsync(User, "VType Creator"))
 		{
-			<a asp-action="Add" asp-route-id="@ViewBag.ID" class="btn mybtn bgBase">ADD</a>
+			<a asp-action="Add" asp-route-id="@ViewBag.Event.ID" class="btn mybtn bgBase">ADD</a>
 		}
-		<a asp-action="ViewEvent" asp-controller="Owner" asp-route-id="@ViewBag.ID" class="btn mybtn bgBro">BACK</a>
-		@if (ViewBag.VTypes.Count != 0 && (await AuthorizationService.AuthorizeAsync(User, "Is Owner"))) 
+		<a asp-action="ViewEvent" asp-controller="Owner" asp-route-id="@ViewBag.Event.ID" class="btn mybtn bgBro">BACK</a>
+		@if (ViewBag.Event.Types.Count != 0 && (await AuthorizationService.AuthorizeAsync(User, "Is Owner"))) 
 		{
-			<a asp-action="DeleteAll" asp-route-id="@ViewBag.ID" class="btn mybtn bgRed">DELETE ALL</a>
+			<a asp-action="DeleteAll" asp-route-id="@ViewBag.Event.ID" class="btn mybtn bgRed">DELETE ALL</a>
 		}
 	</div>
 </div>

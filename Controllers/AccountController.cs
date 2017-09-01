@@ -17,6 +17,7 @@ using GlobalEvent.Models.OwnerViewModels;
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using GlobalEvent.Models.AdminViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace GlobalEvent.Controllers
 {
@@ -72,9 +73,9 @@ namespace GlobalEvent.Controllers
             if (ModelState.IsValid)
             {
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
+                var user = await _userManager.FindByEmailAsync(model.Email);
                 if (result.Succeeded)
                 {
-                    var user = await _userManager.FindByEmailAsync(model.Email);
                     await _db.Logs.AddAsync(await Log.New("Log In", "User Loged In", user.Id, _db));
                     return RedirectToAction("Dashboard", "Admin");
                 }
@@ -84,7 +85,7 @@ namespace GlobalEvent.Controllers
                 }
                 if (result.IsLockedOut)
                 {
-                    await _db.Logs.AddAsync(await Log.New("Log In", "User account locked out", _id, _db));
+                    await _db.Logs.AddAsync(await Log.New("Log In", "Attempted to Log in", user.Id, _db));
                     return View("Lockout");
                 }
                 else
@@ -149,17 +150,17 @@ namespace GlobalEvent.Controllers
 
 
         //
-        // GET: /Account/Register
+        // GET: /Account/AddUser
         [HttpGet]
         [Authorize(Policy="Admin Creator")]
         public IActionResult AddUser(string returnUrl = null)
         {
             ViewData["ReturnUrl"] = returnUrl;
-            return View();
+            return View(new RegisterViewModel());
         }
 
         //
-        // POST: /Account/Register
+        // POST: /Account/Adduser
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Policy="Admin Creator")]
@@ -188,7 +189,7 @@ namespace GlobalEvent.Controllers
         }
 
         [HttpGet]
-        [Authorize(Policy="Is Owner")]
+        [Authorize(Policy="Admin Killer")]
         public async Task<IActionResult> DeleteUser(string ID = null)
         {
             if (ID == null)
@@ -202,7 +203,7 @@ namespace GlobalEvent.Controllers
         }
         
         [HttpGet]
-        [Authorize(Policy="Is Owner")]
+        [Authorize(Policy="Admin Killer")]
         public async Task<IActionResult> DeleteUserOk(string ID = null)
         {
             if (ID != null)
@@ -222,7 +223,168 @@ namespace GlobalEvent.Controllers
             return RedirectToAction("Admins", "Owner");
         }
 
+                [HttpGet]
+        [Authorize(Policy="Admin Editor")]
+        public async Task<IActionResult> EditAdmin (string ID = null)
+        {
+            if (ID == null) 
+            {
+                return RedirectToAction("Admins", "Owner");
+            }
 
+            // get user from db by ID
+            ApplicationUser u = await _userManager.FindByIdAsync(ID);
+            ViewBag.Claims = await _userManager.GetClaimsAsync(u);
+            EditAdmin ea = new EditAdmin();
+            ea.CopyValues(u);
+            
+            // all user logs
+            ViewBag.Logs = await _db.Logs.Where(x => x.AdminID == u.Id).OrderByDescending(x => x.ID).Take(100).ToListAsync();
+            
+            return View(ea);
+        }
+
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        [Authorize(Policy="Admin Editor")]
+        public async Task<IActionResult> EditAdmin (EditAdmin a)
+        {
+            if (!ModelState.IsValid) 
+            {
+                return RedirectToAction("Admins", "Owner");
+            }
+
+            // update user
+            ApplicationUser u = await _userManager.FindByIdAsync(a.Id);
+            u.FirstName = a.FirstName;
+            u.LastName = a.LastName;
+            u.Level = a.Level;
+            u.Email = a.Email;
+            await _userManager.UpdateAsync(u);
+
+            // logs
+            ApplicationUser user = await _userManager.GetUserAsync(User);
+            await _db.Logs.AddAsync(await Log.New("Edit User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, was EDITED", _id, _db));
+            await _db.Logs.AddAsync(await Log.New("Edit User", $"User was EDITED by {user.FirstName} {user.LastName}", _id, _db));
+
+            // change password if new one is provided
+            if (!string.IsNullOrEmpty(a.Password) 
+                && !string.IsNullOrEmpty(a.ConfirmPassword) 
+                && a.Password == a.ConfirmPassword)
+            {
+                await _userManager.RemovePasswordAsync(u);
+                await _userManager.AddPasswordAsync(u, a.Password); 
+
+                await _db.Logs.AddAsync(await Log.New("Edit User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, PASSWORD was changed", _id, _db));
+                await _db.Logs.AddAsync(await Log.New("Edit User", $"Password was changed by {user.FirstName} {user.LastName}", _id, _db));
+            }
+
+            return RedirectToAction("Admins", "Owner");
+        }
+
+        [HttpGet]
+        [Authorize(Policy = "Claims Editor")]
+        public async Task<IActionResult> ChangeClaims (string ID)
+        {
+            if (ID == null) 
+            {
+                return RedirectToAction("Admins", "Owner");
+            }
+
+            Claims c = new Claims();
+            // get properties for Claims
+            List<PropertyInfo> properties = c.GetType().GetProperties().ToList();
+            ApplicationUser u = await _userManager.FindByIdAsync(ID);
+            IList<Claim> hasClaims = await _userManager.GetClaimsAsync(u);
+            
+            // if claim exist change the value to TRUE
+            foreach (var claim in hasClaims){
+                foreach (var item in properties){
+                    if (item.Name == claim.Type){
+                        item.SetValue(c, true);
+                    }
+                }
+            }
+
+            ViewBag.Properties = properties.OrderBy(x => x.Name);
+            ViewBag.AdminName = $"{u.Level}: {u.FirstName} {u.LastName}";
+            ViewBag.AID = u.Id;
+            
+            return View(c);
+        }
+
+        [HttpPost]
+        [AutoValidateAntiforgeryToken]
+        [Authorize(Policy = "Claims Editor")]
+        public async Task<IActionResult> ChangeClaims (Claims c, string ID = null)
+        {
+            if (c == null || ID == null) 
+            {
+                return RedirectToAction("Admins", "Owner");
+            }
+            
+            // get user by ID
+            ApplicationUser u = await _userManager.FindByIdAsync(ID);
+            List<PropertyInfo> properties = c.GetType().GetProperties().ToList();
+            
+            // remove claims before assigning new ones
+            IList<Claim> hasClaims = await _userManager.GetClaimsAsync(u);
+            await _userManager.RemoveClaimsAsync(u, hasClaims);
+            
+            // add new claims
+            foreach(var item in properties)
+            {
+                if ((bool)item.GetValue(c, null) == true)
+                {
+                    await _userManager.AddClaimAsync(u, new Claim(item.Name, ""));
+                }
+            }
+
+            ApplicationUser user = await _userManager.GetUserAsync(User);
+            // log for editor
+            await _db.Logs.AddAsync(await Log.New("Edit User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, CLAIMS were changed", _id, _db));
+            // log for edited
+            await _db.Logs.AddAsync(await Log.New("Edit User", $"User's CLAIMS were changed by {user.FirstName} {user.LastName}", u.Id, _db));
+
+            return RedirectToAction("EditAdmin", "Account", new {ID = ID});
+        }
+
+        //
+        // GET: /Account/LOCK
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> LockUser (string ID)
+        {
+            if (ID == null) 
+            {
+                return RedirectToAction("Admins", "Owner");
+            }
+            ApplicationUser toLock = await _userManager.FindByIdAsync(ID);
+            ApplicationUser locker = await _userManager.GetUserAsync(User);
+            
+            if (toLock.LockoutEnd > DateTime.Now)
+            {
+                toLock.LockoutEnd = DateTime.Now.AddDays(-1);
+                // log for locker
+                await _db.Logs.AddAsync(await Log.New("Lock User", $"{toLock.Level.ToUpper()}: {toLock.FirstName} {toLock.LastName}, was UNLOCKED", _id, _db));
+                // Log for locked user
+                await _db.Logs.AddAsync(await Log.New("Edit User", $"User was UNLOCKED by {locker.FirstName} {locker.LastName}", toLock.Id, _db));
+            }
+            else
+            {
+                toLock.LockoutEnd = DateTime.Now.AddYears(10);
+                // log for locker
+                await _db.Logs.AddAsync(await Log.New("Lock User", $"{toLock.Level.ToUpper()}: {toLock.FirstName} {toLock.LastName}, was LOCKED and Logged Out", _id, _db));
+                // Log for locked user
+                await _db.Logs.AddAsync(await Log.New("Edit User", $"User was LOCKED by {locker.FirstName} {locker.LastName}", toLock.Id, _db));
+                // log out the locked user
+                await _userManager.UpdateSecurityStampAsync(toLock);
+            }
+            
+            await _userManager.UpdateAsync(toLock);
+
+            return RedirectToAction("Admins", "Owner");
+        }
 
         //
         // POST: /Account/Logout

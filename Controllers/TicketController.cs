@@ -39,9 +39,8 @@ namespace GlobalEvent.Controllers
             }
 
             await Ticket_Classes.UpdateEB(_db, (int)ID);
-            ViewBag.Tickets = await _db.Tickets.Where(x => x.EID == ID).ToListAsync();
-            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ID)).Name;
-            ViewBag.ID = (int)ID;
+            ViewBag.Event = await _db.Events.Include(x => x.Tickets).SingleOrDefaultAsync(x => x.ID == ID);
+
             return View();
         }
 
@@ -54,8 +53,8 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Events", "Owner");
             }
 
-            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ID)).Name;
-            return View(new Ticket(){EID = (int)ID});
+            ViewBag.Event = await _db.Events.SingleOrDefaultAsync(x => x.ID == ID);
+            return View();
         }
 
 
@@ -64,11 +63,10 @@ namespace GlobalEvent.Controllers
         [Authorize(Policy="Ticket Creator")]
         public async Task<IActionResult> Add(Ticket t)
         {
-            // reset ticket ID to 0
-            t.ID = 0;
             if (ModelState.IsValid)
             {
                 Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == t.EID);
+                t.ID = 0; // reset the ID before adding to DB
                 e.Tickets.Add(t);
                 _db.Events.Update(e);
                 await _db.Logs.AddAsync(await Log.New("Ticket", $"Ticket: {t.Type}, was CREATED", _id, _db));
@@ -87,9 +85,9 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Events", "Owner");
             }
-
-            var t = await _db.Tickets.FirstOrDefaultAsync(x => x.ID == ID);
+            Ticket t = await _db.Tickets.FirstOrDefaultAsync(x => x.ID == ID);
             ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == t.EID)).Name;
+            
             return View(t);
         }
 
@@ -117,7 +115,7 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Events", "Owner");
             }
-            var t = await _db.Tickets.SingleOrDefaultAsync(x => x.ID == ID);
+            Ticket t = await _db.Tickets.SingleOrDefaultAsync(x => x.ID == ID);
             ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == t.EID)).Name;
             return View(t);
         }
@@ -127,11 +125,10 @@ namespace GlobalEvent.Controllers
         [Authorize(Policy="Ticket Creator")]
         public async Task<IActionResult> Copy (Ticket t)
         { 
-            // reset ticket ID to 0
-            t.ID = 0;
             if (ModelState.IsValid)
             {
                 Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == t.EID);
+                t.ID = 0; // reset ID beofre adding to db
                 e.Tickets.Add(t);
                 _db.Events.Update(e);
                 await _db.Logs.AddAsync(await Log.New("Ticket", $"Ticket: {t.Type}, was COPIED", _id, _db));
@@ -178,7 +175,6 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Events", "Owner");
             }
-
             Event e = await _db.Events.Include(x => x.Tickets).FirstOrDefaultAsync(x => x.ID == ID);
 
             return View(e);

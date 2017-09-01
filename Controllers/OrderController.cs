@@ -41,6 +41,7 @@ namespace GlobalEvent.Controllers
             AddOrder o = new AddOrder();
             o.EID = (int)ID;
             await o.CreateLists(_db);
+        
             return View(o);
         }
 
@@ -73,9 +74,9 @@ namespace GlobalEvent.Controllers
         public async Task<IActionResult> AllOrders (int? ID)
         {
             // get Active event id
-            var EID = ID == null ? (await _db.Events.SingleOrDefaultAsync(x => x.Status)).ID : ID;
+            int EID = ID == null ? (await _db.Events.SingleOrDefaultAsync(x => x.Status)).ID : (int)ID;
  
-            var orders = await _db.Orders.Where(x => x.EID == EID).ToListAsync(); 
+            List<Order> orders = await _db.Orders.Where(x => x.EID == EID).ToListAsync(); 
             return View(orders);
         }
 
@@ -100,7 +101,7 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin", new {message = "Couldn't execute this request. Please try again."});
             }
 
-            var oldO = await _db.Orders.SingleOrDefaultAsync(x => x.ID == o.ID);
+            Order oldO = await _db.Orders.SingleOrDefaultAsync(x => x.ID == o.ID);
             oldO.CopyInfo(o);
             _db.Orders.Update(oldO);
             await _db.Logs.AddAsync(await Log.New("Order", $"Order ID: {oldO.ID} was EDITED", _id, _db));

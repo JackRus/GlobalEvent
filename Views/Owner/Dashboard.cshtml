@@ -53,7 +53,8 @@
 			<span class="dash-name">Dates: </span> @Model.TimeStart, @Model.DateStart / @Model.TimeEnd, @Model.DateEnd
 			<span class="dash-name">Eventbrite ID: </span> @Model.EventbriteID
 			<br />
-			<span class="dash-name">Ticket Sales: </span> @Model.TicketLink
+			<span class="dash-name">Ticket Sales: </span> 
+				<a href="@Model.TicketLink">@Model.TicketLink</a>
 			<br />
 			<span class="dash-name">Description: </span> @Model.Description
 		</div>

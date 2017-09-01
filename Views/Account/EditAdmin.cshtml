@@ -3,11 +3,13 @@
 @{
     ViewData["Title"] = "Edit ADMIN Info";
     var count = 1;
+    bool check = false;
+    var type = " ";
 }
 
 <div class="row">
     <div class="col-sm-6">
-        <form asp-controller="Owner" asp-action="EditAdmin" autocomplete="off">
+        <form asp-controller="Account" asp-action="EditAdmin" autocomplete="off">
         
             <h2>@ViewData["Title"].</h2>
 
@@ -24,8 +26,12 @@
             </div>
 
             <div class="form-group">
-                <label asp-for="Level" class="control-label">Level (Manager or Admin)</label>
-                <input asp-for="Level" class="form-control" />
+                <label asp-for="Level" class="control-label"></label>
+                <select asp-for="Level" asp-items="Model.Levels" class="form-control">
+					<option value="" hidden disabled selected>
+						Select &#x25BC;
+					</option>
+				</select>
                 <span asp-validation-for="Level" class="text-danger"></span>
             </div>
 
@@ -58,18 +64,29 @@
             </div>
         </form>
     </div>
-    <div class="col-sm-6 text-center">
+    <div class="col-sm-6">
         <h2> ADMIN Access </h2>
-
         @foreach(var c in ViewBag.Claims)
         {
-            <div>@count. @c.Type </div>
-            count++;
+            check = c.Type.StartsWith(type) ? true : false; 
+            @if(!check)
+            {	
+                <hr class="m10-0-10-0"/>
+                type = c.Type.Substring(0, c.Type.IndexOf("C"));
+                <span class="Base bold">@type:</span>
+                check = true;
+            }
+            @if(c.Type.StartsWith(type))
+            {
+                <span>
+                    @(Regex.Replace(c.Type.Replace(type, ""), @"(\B[A-Z]+?(?=[A-Z][^A-Z])|\B[A-Z]+?(?=[^A-Z]))", " $1")) &nbsp; &nbsp;
+                </span>
+            }
         }
         @if(await AuthorizationService.AuthorizeAsync(User, "Claims Editor"))
         {
             <div class="text-center m15-0">
-                <a asp-action="ChangeClaims" asp-controller="Owner" asp-route-ID="@Model.Id" class="btn mybtn bgBase">Edit</a>
+                <a asp-action="ChangeClaims" asp-controller="Account" asp-route-ID="@Model.Id" class="btn mybtn bgBase">Edit</a>
             </div>
         }
     </div>

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using GlobalEvent.Models;
 using GlobalEvent.Models.AdminViewModels;
 using Microsoft.AspNetCore.Http;
+using System;
 
 namespace GlobalEvent.Controllers
 {
@@ -38,8 +39,6 @@ namespace GlobalEvent.Controllers
                 .Include(x => x.Visitors)
                     .ThenInclude(x => x.Requests)
                 .FirstOrDefaultAsync(x => x.Status);
-
-            // get active event
             ViewBag.Active = e == null ? false : true;
             if (ViewBag.Active)
             {
@@ -108,6 +107,7 @@ namespace GlobalEvent.Controllers
     
             EditVisitor ev = new EditVisitor();
             await ev.SetValues(_db, (int)ID);
+
             return View(ev);
         }
 
@@ -118,8 +118,8 @@ namespace GlobalEvent.Controllers
         {
             if (ModelState.IsValid)
             {
-                var v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ev.ID);
-                var u = await _userManager.GetUserAsync(User); 
+                Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ev.ID);
+                ApplicationUser u = await _userManager.GetUserAsync(User); 
 
                 if (!v.Blocked && ev.Blocked)
                 {
@@ -146,8 +146,8 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Dashboard", "Admin", new {message = "Couldn't access the visitor."});
             }
-    
             Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ID);
+
             return View(v);
         }
 
@@ -162,11 +162,13 @@ namespace GlobalEvent.Controllers
             
             Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ID);
             v.Deleted = true;
-            var u = await _userManager.GetUserAsync(User);
+            await Order.Decrement(v.OrderNumber, _db);
+            ApplicationUser u = await _userManager.GetUserAsync(User);
+            // visitor log
             v.AddLog("ADMIN", $"DELETED BY {u.Level}: {u.FirstName} {u.LastName}");
             _db.Visitors.Update(v);
+            // admin log
             await _db.Logs.AddAsync(await Log.New("Visitor", $"Visitor(ID: {v.ID}) {v.Name} {v.Last} was DELETED.", _id, _db));
-            await Order.Decrement(v.OrderNumber, _db);
 
             return RedirectToAction("ViewVisitor", "Admin", new {ID = v.ID});
         }
@@ -190,7 +192,7 @@ namespace GlobalEvent.Controllers
             }
 
             // log for visitor
-            var user = await _userManager.GetUserAsync(User);
+            ApplicationUser user = await _userManager.GetUserAsync(User);
             v.AddLog("ADMIN", $"REINSTATED BY {user.Level}: {user.FirstName} {user.LastName}");
             _db.Visitors.Update(v);
             await Order.Increment(v.OrderNumber, _db);

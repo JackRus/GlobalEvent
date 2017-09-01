@@ -1,8 +1,8 @@
 <h1>ALL Tickets</h1>
-<h3> @ViewBag.Event </h3>
+<h3> @ViewBag.Event.Name </h3>
 
 <div style="width: 100%">
-@if (ViewBag.Tickets.Count != 0)
+@if (ViewBag.Event.Tickets.Count != 0)
 {
 	<table class="table table-hover">
 	<thead>
@@ -19,7 +19,7 @@
 		<tr style="height: 4px;">
 				<td colspan="20" class="line-space"></td>
 		</tr>
-		@foreach(Ticket t in ViewBag.Tickets)
+		@foreach(Ticket t in ViewBag.Event.Tickets)
 		{
 			<tr>
 				<td>@t.Type</td>
@@ -60,13 +60,13 @@ else
 	<div class="text-center">
 	@if(await AuthorizationService.AuthorizeAsync(User, "Ticket Creator"))
 	{ 
-		<a asp-action="Add" asp-route-id="@ViewBag.ID" class="btn mybtn bgBase">ADD</a>
+		<a asp-action="Add" asp-route-id="@ViewBag.Event.ID" class="btn mybtn bgBase">ADD</a>
 	}
-		<a asp-action="ViewEvent" asp-controller="Owner" asp-route-id="@ViewBag.ID" class="btn mybtn bgBro">BACK</a>
+		<a asp-action="ViewEvent" asp-controller="Owner" asp-route-id="@ViewBag.Event.ID" class="btn mybtn bgBro">BACK</a>
 		
-	@if (ViewBag.Tickets.Count != 0 && (await AuthorizationService.AuthorizeAsync(User, "Is Owner"))) 
+	@if (ViewBag.Event.Tickets.Count != 0 && (await AuthorizationService.AuthorizeAsync(User, "Is Owner"))) 
 	{
-		<a asp-action="DeleteAll" asp-route-id="@ViewBag.ID" class="btn mybtn bgRed">DELETE ALL</a>
+		<a asp-action="DeleteAll" asp-route-id="@ViewBag.Event.ID" class="btn mybtn bgRed">DELETE ALL</a>
 	}
 	</div>
 </div>

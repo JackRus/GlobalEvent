@@ -5,7 +5,7 @@
 <form asp-action="Add" asp-route-url="Todo" autocomplete="off">
     <div class="form-group">
         <label asp-for="Task" class="control-label"></label>
-        <input asp-for="Task" class="form-control"/>
+        <textarea asp-for="Task" class="form-control" rows="2"></textarea>
         <span asp-validation-for="Task" class="Red"></span>
     </div>
 
@@ -23,7 +23,11 @@
 
     <div class="form-group">
         <label asp-for="EID" class="control-label"></label>
-        <input asp-for="EID" class="form-control" />
+        <select asp-for="EID" asp-items="ViewBag.EventList" class="form-control">
+            <option value="0" selected>
+                No specific event
+            </option>
+        </select>
         <span asp-validation-for="EID" class="Red"></span>
     </div>
 

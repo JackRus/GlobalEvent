@@ -31,7 +31,7 @@ namespace GlobalEvent.Controllers
         }
 
         [Authorize(Policy="Owner's Menu")]
-        public IActionResult Index(string message = null)
+        public async Task<IActionResult> Index(string message = null)
         {
             // get all unfinished todos 
             ViewBag.Todos = _db.ToDos
@@ -40,6 +40,7 @@ namespace GlobalEvent.Controllers
                 .ToList();
                 
             ViewBag.Message = message;
+            ViewBag.EventList = await ToDo.GenerateEventList(_db);
             return View();
         }
 
@@ -54,18 +55,12 @@ namespace GlobalEvent.Controllers
                 .Include(x => x.Products)
                 .FirstOrDefaultAsync(x => x.Status);
 
-            ViewBag.Requests = await _db.Requests
-                .OrderBy(x => x.ID)
-                .ToListAsync();
-
+            ViewBag.Requests = await _db.Requests.OrderBy(x => x.ID).ToListAsync();
             ViewBag.Active = e == null ? false : true;
             
             if (ViewBag.Active)
             {
-                // Update orders
-                await Order.OrderUpdate(_db, e.ID);
                 await Event.Update(_db, e.ID);
-
                 ViewBag.CheckIned = e.Visitors.Where(x => x.CheckIned).Count();
                 ViewBag.Registered = e.Visitors.Where(x => x.Registered).Count();
                 
@@ -238,139 +233,6 @@ namespace GlobalEvent.Controllers
         {
             ViewBag.Admins = await _db.Users.ToListAsync();
             return View();
-        }
-
-        [HttpGet]
-        [Authorize(Policy="Admin Editor")]
-        public async Task<IActionResult> EditAdmin (string ID = null)
-        {
-            if (ID == null) 
-            {
-                return RedirectToAction("Admins", "Owner");
-            }
-
-            // get user from db by ID
-            var u = await _userManager.FindByIdAsync(ID);
-            ViewBag.Claims = await _userManager.GetClaimsAsync(u);
-            
-            // copy data to a view model
-            EditAdmin ea = new EditAdmin();
-            ea.FirstName = u.FirstName;
-            ea.LastName = u.LastName;
-            ea.Level = u.Level;
-            ea.Email = u.Email;
-            ea.Id = u.Id;
-
-            // all user logs
-            ViewBag.Logs = await _db.Logs.Where(x => x.AdminID == u.Id).OrderByDescending(x => x.ID).Take(100).ToListAsync();
-            
-            return View(ea);
-        }
-
-        [HttpPost]
-        [AutoValidateAntiforgeryToken]
-        [Authorize(Policy="Admin Editor")]
-        public async Task<IActionResult> EditAdmin (EditAdmin a)
-        {
-            if (!ModelState.IsValid) 
-            {
-                return RedirectToAction("Admins", "Owner");
-            }
-
-            // update user
-            var u = await _userManager.FindByIdAsync(a.Id);
-            u.FirstName = a.FirstName;
-            u.LastName = a.LastName;
-            u.Level = a.Level;
-            u.Email = a.Email;
-            await _userManager.UpdateAsync(u);
-
-            // logs
-            var user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(await Log.New("Edit User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, was EDITED", _id, _db));
-            await _db.Logs.AddAsync(await Log.New("Edit User", $"User was EDITED by {user.FirstName} {user.LastName}", _id, _db));
-
-            // change password if new one is provided
-            if (!string.IsNullOrEmpty(a.Password) 
-                && !string.IsNullOrEmpty(a.ConfirmPassword) 
-                && a.Password == a.ConfirmPassword)
-            {
-                await _userManager.RemovePasswordAsync(u);
-                await _userManager.AddPasswordAsync(u, a.Password); 
-
-                await _db.Logs.AddAsync(await Log.New("Edit User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, PASSWORD was changed", _id, _db));
-                await _db.Logs.AddAsync(await Log.New("Edit User", $"Password was changed by {user.FirstName} {user.LastName}", _id, _db));
-            }
-
-            return RedirectToAction("Admins", "Owner");
-        }
-
-        [HttpGet]
-        [Authorize(Policy = "Claims Editor")]
-        public async Task<IActionResult> ChangeClaims (string ID)
-        {
-            if (ID == null) 
-            {
-                return RedirectToAction("Admins", "Owner");
-            }
-
-            Claims c = new Claims();
-            // get properties for Claims
-            var properties = c.GetType().GetProperties().ToList();
-            var u = await _userManager.FindByIdAsync(ID);
-            var hasClaims = await _userManager.GetClaimsAsync(u);
-            
-            // if claim exist change the value to TRUE
-            foreach (var claim in hasClaims)
-            {
-                foreach (var item in properties)
-                {
-                    if (item.Name == claim.Type)
-                    {
-                        item.SetValue(c, true);
-                    }
-                }
-            }
-            ViewBag.Properties = properties.OrderBy(x => x.Name);
-            ViewBag.AdminName = $"{u.Level}: {u.FirstName} {u.LastName}";
-            ViewBag.AID = u.Id;
-            
-            return View(c);
-        }
-
-        [HttpPost]
-        [AutoValidateAntiforgeryToken]
-        [Authorize(Policy = "Claims Editor")]
-        public async Task<IActionResult> ChangeClaims (Claims c, string ID = null)
-        {
-            if (c == null || ID == null) 
-            {
-                return RedirectToAction("Admins", "Owner");
-            }
-            
-            // get user by ID
-            var u = await _userManager.FindByIdAsync(ID);
-            var properties = c.GetType().GetProperties().ToList();
-            
-            // remove claims before assigning new ones
-            var hasClaims = await _userManager.GetClaimsAsync(u);
-            await _userManager.RemoveClaimsAsync(u, hasClaims);
-            
-            // add new claims
-            foreach(var item in properties)
-            {
-                if ((bool)item.GetValue(c, null) == true)
-                {
-                    await _userManager.AddClaimAsync(u, new Claim(item.Name, ""));
-                }
-            }
-
-            // logs
-            var user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(await Log.New("Edit User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, CLAIMS were changed", _id, _db));
-            await _db.Logs.AddAsync(await Log.New("Edit User", $"User's CLAIMS were changed by {user.FirstName} {user.LastName}", _id, _db));
-
-            return RedirectToAction("EditAdmin", "Owner", new {ID = ID});
         }
 
         [HttpGet]

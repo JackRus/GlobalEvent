@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace GlobalEvent.Models.AccountViewModels
 {
@@ -33,5 +34,17 @@ namespace GlobalEvent.Models.AccountViewModels
         // Determines the access level for the user: owner, manager, admin
         [Required]
         public string Level { get; set; }
+        public List<SelectListItem> Levels { get; set; }
+
+        public RegisterViewModel()
+		{
+			this.Levels = new List<SelectListItem> {
+                new SelectListItem { Value = "Manager", Text = "Manager" },
+                new SelectListItem { Value = "Admin", Text = "Admin" }
+            };
+		}
+    
     }
+
+    
 }

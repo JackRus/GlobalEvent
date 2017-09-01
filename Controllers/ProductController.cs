@@ -38,13 +38,7 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Events", "Owner");
             }
 
-            // get all products for the current event
-            ViewBag.Products = await _db.Products
-                .Where(x => x.EID == ID)
-                .ToListAsync();
-            
-            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ID)).Name;
-            ViewBag.ID = ID;
+            ViewBag.Event = await _db.Events.Include(x => x.Products).SingleOrDefaultAsync(x => x.ID == ID);
             return View();
         }
 
@@ -57,8 +51,8 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Events", "Owner");
             }
 
-            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ID)).Name;
-            return View(new Product(){EID = (int)ID});
+            ViewBag.Event = await _db.Events.SingleOrDefaultAsync(x => x.ID == ID);
+            return View();
         }
 
         [HttpPost]
@@ -66,7 +60,6 @@ namespace GlobalEvent.Controllers
         [Authorize(Policy="Product Creator")]
         public async Task<IActionResult> Add(Product p)
         {
-            // reset Product ID to 0
             p.ID = 0;
             if (ModelState.IsValid)
             {
@@ -91,8 +84,8 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Events", "Owner");
             }
 
-            Product p = await _db.Products.Where(x => x.ID == ID).FirstOrDefaultAsync();
-            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ID)).Name;
+            Product p = await _db.Products.SingleOrDefaultAsync(x => x.ID == ID);
+            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == p.EID)).Name;
             return View(p);
         }
 
@@ -101,12 +94,11 @@ namespace GlobalEvent.Controllers
         [Authorize(Policy="Product Creator")]
         public async Task<IActionResult> Copy (Product p)
         {
-            // reset Product ID to 0
-            p.ID = 0;
             if (ModelState.IsValid)
             {
                 // update and save changes
                 Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == p.EID);
+                p.ID = 0;
                 e.Products.Add(p);
                 _db.Events.Update(e);
                 await _db.Logs.AddAsync(await Log.New("Product", $"Product: {p.Name}, was COPIED", _id, _db));
@@ -125,8 +117,9 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Events", "Owner");
             }
-            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ID)).Name;
-            return View(await _db.Products.FirstOrDefaultAsync(x => x.ID == ID));
+            Product p = await _db.Products.FirstOrDefaultAsync(x => x.ID == ID);
+            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == p.EID)).Name;
+            return View(p);
         }
 
         [HttpPost]
@@ -136,8 +129,10 @@ namespace GlobalEvent.Controllers
         {
             if (ModelState.IsValid)
             {
-                _db.Products.Update(p);
-                await _db.Logs.AddAsync(await Log.New("Product", $"Product: {p.Name}, was EDITED", _id, _db));
+                Product old = await _db.Products.SingleOrDefaultAsync(x => x.ID == p.ID);
+                old.UpdateValues(p);
+                _db.Products.Update(old);
+                await _db.Logs.AddAsync(await Log.New("Product", $"Product: {old.Name}, was EDITED", _id, _db));
 
                 return RedirectToAction("Index", new { ID = p.EID });
             }
@@ -169,7 +164,7 @@ namespace GlobalEvent.Controllers
             _db.Products.Remove(p);
             await _db.Logs.AddAsync(await Log.New("Product", $"Product: {p.Name}, was DELETED", _id, _db));
 
-            return RedirectToAction("Index", new { ID = p.EID });
+            return RedirectToAction("Index", "Product", new { ID = p.EID });
         }
 
         [HttpGet]
@@ -180,7 +175,6 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Events", "Owner");
             }
-
             Event e = await _db.Events.Include(x => x.Products).FirstOrDefaultAsync(x => x.ID == ID);
 
             return View(e);

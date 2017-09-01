@@ -23,44 +23,41 @@ namespace GlobalEvent.Models
 		
 		public static void CopyValues(object from, object to)
 		{
-            from.GetType().GetProperties().ToList().ForEach(p => 
-			{
-				if (to.GetType().GetProperty(p.Name) != null)
-				{
-					to.GetType().GetProperty(p.Name).GetSetMethod().Invoke(
-						to, new[] { p.GetGetMethod().Invoke(from, null) }
-					);
-				}
-			});
-		}
-
-		// VERSION with vars:
-		// public static void SetValues(object from, object to)
-		// {
-		//     var toType = to.GetType();
-		//     foreach (var prop in from.GetType().GetProperties())
-		//     {
-		//         if (toType.GetProperty(prop.Name) != null)
-		//         {
-		//             var propGetter = prop.GetGetMethod();
-		//             var propSetter = toType.GetProperty(prop.Name).GetSetMethod();
-		//             var valueToSet = propGetter.Invoke(from, null);
-		//             propSetter.Invoke(to, new[] { valueToSet });
-		//         }
-		//     }
-		// }
-		//
+            if (from != null && to != null)
+            {
+                from.GetType().GetProperties().ToList().ForEach(p =>
+                {
+                    var toProperty = to.GetType().GetProperty(p.Name);
+                    if (toProperty != null && toProperty.GetType() == p.GetType())
+                    {
+                        toProperty.GetSetMethod().Invoke(
+                            to, new[] { p.GetGetMethod().Invoke(from, null) }
+                        );
+                    }
+                });
+            }
+        }
 
 		// Returns the List<string> of Object's rpoperties names
 		public static List<string> PropertyAsString(object from)
 		{
-			return from.GetType().GetProperties().Select(x => x.Name).ToList();
+			if (from != null)
+			{
+				return from.GetType().GetProperties().Select(x => x.Name).ToList();
+			}
+
+			return null;
 		}
 
 		// Returns the List<PropertyInfo> of Object 
 		public static List<PropertyInfo> PropertyAsObject(object from)
 		{
-			return from.GetType().GetProperties().ToList();
+			if (from != null)
+			{
+				return from.GetType().GetProperties().ToList();
+			}
+
+			return null;
 		}
 
 
@@ -85,27 +82,6 @@ namespace GlobalEvent.Models
 		}
 		// Add Comparison 
 
-		// public static void CheckNull(object one)
-		// {
-		// 	if (one == null)
-		// 	{
-		// 		throw new ArgumentNullException(nameof(one));
-		// 	}
-		// }
-
-		// public static void CheckNull(object one, object two)
-		// {
-		// 	if (one == null)
-		// 	{
-		// 		throw new ArgumentNullException(nameof(one));
-		// 	}
-
-		// 	if (two == null)
-		// 	{
-		// 		throw new ArgumentNullException(nameof(two));
-		// 	}
-		// }
-
 		// supports JackLibCopyValues();
 		public class Property
 		{
@@ -113,5 +89,34 @@ namespace GlobalEvent.Models
 			public string Value { get; set; }
 			public string Type { get; set; }
 		}
-	}
+
+        public static void IfNull(params object[] objects)
+        {
+            int count = 1;
+            // Lists all NULL objects 
+            foreach(object obj in objects)
+            {
+				if (obj == null)
+				{
+					Console.ForegroundColor = ConsoleColor.Red;
+					Console.WriteLine("===>");
+					Console.WriteLine($"===> Object number \"{count}\" is NULL <===");
+					Console.WriteLine("===>");
+					Console.ResetColor();
+				}
+                count++;
+            }
+
+            count = 1;
+            // Throws an Exception for the 1st null object
+            foreach (object obj in objects)
+			{
+				if (obj == null)
+				{
+					throw new ArgumentNullException($"OBJECT {count.ToString()}");
+				}
+				count++;
+			}
+        }
+    }
 }

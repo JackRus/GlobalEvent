@@ -15,14 +15,12 @@ namespace GlobalEvent.Models.VisitorViewModels
         [Display(Name = "Attendee")]
 		public string Type { get; set; } // type of the visitor Guest// exibitor//stuff
 
-		[Required]
+		[Required] 
 		[Display(Name = "First Name")]
-		[RegularExpression(@"^[a-zA-Z'- ]+$", ErrorMessage = "Contains non Alphabetic characters.")]
 		public string Name { get; set; }
 
 		[Required]
 		[Display(Name = "Last Name")]
-		[RegularExpression(@"^[a-zA-Z ]+$", ErrorMessage = "Contains non Alphabetic characters.")]
 		public string Last { get; set; }
 
 		[Required]
@@ -36,7 +34,6 @@ namespace GlobalEvent.Models.VisitorViewModels
 
 		[Required]
 		[RegularExpression(@"^[0-9a-zA-z]+@[0-9a-zA-z]+.[a-zA-z]+$", ErrorMessage = "Not a valid email.")]
-		[Display(Name = "Email")]
 		public string Email { get; set; }
 
 		[Required(ErrorMessage = "Phone number is required.")]
@@ -85,19 +82,26 @@ namespace GlobalEvent.Models.VisitorViewModels
 			this.Deleted = false;
 		}
 
-		public static void CompleteRegistration (Visitor v, ApplicationDbContext _db)
+		public async Task CompleteRegistration (ApplicationDbContext _db)
 		{
 			// generates random REGISTRATION number/ exclude duplicates
 			string rand;
 		    do
 			{
 				rand = new Random().Next(1000000000,2140999999).ToString();
-			} while (_db.Visitors.Any(x => x.RegistrationNumber == rand));
+			} while (await _db.Visitors.AnyAsync(x => x.RegistrationNumber == rand));
 			
-			v.RegistrationNumber = rand;
-            v.Registered = true;
-			v.RegDate = DateTime.Now.ToString("yyyy-MM-dd");
-			v.RegTime = DateTime.Now.ToString("HH:mm");
+			this.RegistrationNumber = rand;
+            this.Registered = true;
+			this.RegDate = DateTime.Now.ToString("yyyy-MM-dd");
+			this.RegTime = DateTime.Now.ToString("HH:mm");
+		}
+
+		public void CompleteCheckIn ()
+		{
+			this.CheckIned = true;
+			this.CheckDate = DateTime.Now.ToString("yyyy-MM-dd");
+			this.CheckTime = DateTime.Now.ToString("HH:mm");
 		}
 
 		public void AddLog (string stage, string description, bool change = false)
@@ -108,13 +112,6 @@ namespace GlobalEvent.Models.VisitorViewModels
 			{
 				vl.CurrentState = new Change();
 				JackLib.CopyValues(this, vl.CurrentState);
-				// vl.CurrentState.Name = this.Name;
-				// vl.CurrentState.Last = this.Last;
-				// vl.CurrentState.Company = this.Company;
-				// vl.CurrentState.Phone = this.Phone;
-				// vl.CurrentState.Email = this.Email;
-				// vl.CurrentState.Extention = this.Extention;
-				// vl.CurrentState.Occupation = this.Occupation;
 			}
 			
 			vl.Type = stage;

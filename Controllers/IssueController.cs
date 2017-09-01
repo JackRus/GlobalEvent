@@ -43,7 +43,7 @@ namespace GlobalEvent.Controllers
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Add (Issue i)
         {
-            var result = $"Could't add Issue record.";
+            var result = "Could't add Issue record.";
             if (!string.IsNullOrEmpty(i.Description))
             {
                 i.Complete(await _userManager.GetUserAsync(User));
@@ -74,7 +74,7 @@ namespace GlobalEvent.Controllers
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Edit (Issue i)
         {
-            var result = $"Could't edit Issue record.";
+            var result = "Could't edit Issue record.";
             if (ModelState.IsValid)
             {
                 Issue oldI = await _db.Issues.FirstOrDefaultAsync(x => x.ID == i.ID);
@@ -83,7 +83,6 @@ namespace GlobalEvent.Controllers
                 await _db.Logs.AddAsync(await Log.New("Issue", $"Issue: \"{i.Description}\", was EDITED", _id, _db));
                 result = $"Issue record was edited.";
             }
-
             return RedirectToAction("Dashboard", "Admin", new {message = result});
         }
 
@@ -91,7 +90,7 @@ namespace GlobalEvent.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete (int? ID)
         {
-            var result = $"Could't delete Issue record.";
+            var result = "Could't delete Issue record.";
             if (ID != null) 
             {
                 Issue i = await _db.Issues.SingleOrDefaultAsync(x => x.ID == ID);
@@ -107,7 +106,6 @@ namespace GlobalEvent.Controllers
         public async Task<IActionResult> Status (int? ID, string Name = null)
         {
             var result = $"Could't change \"{Name}\" value.";
-
             if (ID != null && Name != null)
             {
                 Issue i = await _db.Issues.FirstOrDefaultAsync(x => x.ID == ID);

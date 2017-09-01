@@ -168,7 +168,7 @@ h3 {
 .f1-5 {font-size: 1.5em!important;}
 .f1-4 {font-size: 1.4em;}
 .f1-3 {font-size: 1.3em;}
-.f1-2 {font-size: 1.2em;}
+.f1-2 {font-size: 1.2em!important;}
 .f1-1 {font-size: 1.1em;}
 .f0-9 {font-size: 0.9em;}
 .f0-8 {font-size: 0.8em;}
@@ -325,6 +325,10 @@ label {
     font-weight: 300;
     width: 100%;
     margin: 10px auto 5px auto;
+}
+
+.bbBase {
+    border-bottom: 1px solid #3cb371;
 }
 /* END OF FORMS */
 
