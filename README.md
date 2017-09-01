@@ -9,6 +9,8 @@ AS ATTENDEE
 2. After that follow the registration/check-in steps. More detailed instructions and description you can find below. [will be posted shortly] 
 
 AS ADMIN
+[click here](http://ge.jackrus.us/Account/Login) or click the button "Admin" in the right-bottom corner of any page.  
+
 
 1. To log-in as an Owner (has full access to all features) use
 * PASS: Password1!
@@ -31,19 +33,6 @@ AS ADMIN
 *   Nginx as reverse proxy
 *   QR Core [Libruary] () (for qr code generation) 
 
-
-
-## Features:
-
-### => Event Admins:
-*   Create and set up multiple events.
-*   Edit, Copy, Delete events.
-*   ...
-
-### => Event Visitors:
-*   
-*   
-*   
 
 ## More detailed info to come...
 
