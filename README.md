@@ -49,6 +49,8 @@ TODO
 ## How To:
 
 #### Create an Event:
+
+- First you need to create an Event on Eventbrite. Also create tickets for the Event.
 - Clicks: Main Menu -> Events -> Add
 - Form Instructions: 
   - Name: event's name
