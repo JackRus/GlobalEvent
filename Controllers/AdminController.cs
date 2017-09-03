@@ -114,26 +114,26 @@ namespace GlobalEvent.Controllers
 
         [HttpPost]
         [Authorize(Policy="Visitor Editor")]
-        public async Task<IActionResult> EditVisitor (EditVisitor ev)
+        public async Task<IActionResult> EditVisitor (EditVisitor edit)
         {
             if (ModelState.IsValid)
             {
-                Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ev.ID);
+                Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == edit.ID);
                 ApplicationUser u = await _userManager.GetUserAsync(User); 
 
-                if (!v.Blocked && ev.Blocked)
+                if (!v.Blocked && edit.Blocked)
                 {
                     v.AddLog("ADMIN", $"BLOCKED BY {u.Level}: {u.FirstName} {u.LastName}");
                 }
-                else if (v.Blocked && !ev.Blocked)
+                else if (v.Blocked && !edit.Blocked)
                 {
                     v.AddLog("ADMIN", $"UNBLOCKED BY {u.Level}: {u.FirstName} {u.LastName}");
                 }
 
-                JackLib.CopyValues(ev, v);
+                JackLib.CopyValues(edit, v);
                 _db.Visitors.Update(v);
                 await _db.Logs.AddAsync(await Log.New("Visitor", $"Visitor witg ID: {v.ID}, was EDITED", _id, _db));
-                return RedirectToAction("ViewVisitor", "Admin", new {ID = ev.ID});
+                return RedirectToAction("ViewVisitor", "Admin", new {ID = edit.ID});
             }
             return RedirectToAction("Dashboard", "Admin", new {message = "Couldn't execute this request. Please try again."});
         }
