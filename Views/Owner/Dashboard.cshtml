@@ -2,362 +2,369 @@
 
 <h1> OWNER'S DASHBOARD</h1>
 
-@if(ViewBag.Message != null) {
-<div id="tog" class="f-attention">@ViewBag.Message <br/>
-	<a class="btn mybtn-sm-red tog inline m5-0-5-0" data-id="tog">OK</a>
-</div>
-} @if (ViewBag.Active) {
-<h3> @Model.Name </h3>
-
-<!-- buttons -->
-<div class="text-center">
-	<a asp-action="Dashboard" class="btn mybtn bgBase">Refresh</a>
-	<div class="dropdown inline">
-		<button class="btn mybtn bgBro dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true"
-		    aria-expanded="false">
-				Actions <span style="font-size: 0.7em;">&nbsp &#x25BC;</span>
-			</button>
-		<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu2">
-			<li><a asp-action="Add" asp-controller="Issue" asp-route-EID="@Model.ID" >ADD ISSUE</a></li>
-			@if(await AuthorizationService.AuthorizeAsync(User, "Event Editor")) {
-			<li><a asp-action="EditEvent" asp-route-id="@Model.ID">EDIT</a></li>
-			<li><a asp-action="ViewEvent" asp-route-ID="@Model.ID">VIEW DETAILS</a></li>
-			} 
-			@if(await AuthorizationService.AuthorizeAsync(User, "Tickets Viewer")) {
-			<li><a asp-action="Index" asp-controller="Ticket" asp-route-id="@Model.ID">MANAGE TICKETS</a></li>
-			} 
-			@if(await AuthorizationService.AuthorizeAsync(User, "Products Viewer")) {
-			<li><a asp-action="Index" asp-controller="Product" asp-route-id="@Model.ID">MANAGE PRODUCTS</a></li>
-			} 
-			@if(await AuthorizationService.AuthorizeAsync(User, "VTypes Viewer")) {
-			<li><a asp-action="Index" asp-controller="VType" asp-route-id="@Model.ID">MANAGE VISITOR TYPES</a></li>
-			}
-		</ul>
+@if(ViewBag.Message != null) 
+{
+	<div id="tog" class="f-attention">@ViewBag.Message <br/>
+		<a class="btn mybtn-sm-red tog inline m5-0-5-0" data-id="tog">OK</a>
 	</div>
-</div>
-<!-- end of buttons -->
+} 
 
-<div class="row mar5">
+@if (@Model != null) 
+{
+	<h3> @Model.Name </h3>
 
-	<div class="col-sm-4 nopad">
-		<div class="dash-head">
-			EVENT
-		</div>
-		<div class="dash-section">
-			<span class="dash-name">Name: </span> @Model.Name
-			<br />
-			<span class="dash-name">ID: </span> @Model.ID
-			<br />
-			<span class="dash-name">Time frame: </span> @Model.TimeStart, @Model.DateStart / @Model.TimeEnd, @Model.DateEnd
-			<br />
-			<span class="dash-name">Dates: </span> @Model.TimeStart, @Model.DateStart / @Model.TimeEnd, @Model.DateEnd
-			<span class="dash-name">Eventbrite ID: </span> @Model.EventbriteID
-			<br />
-			<span class="dash-name">Ticket Sales: </span> 
-				<a href="@Model.TicketLink">@Model.TicketLink</a>
-			<br />
-			<span class="dash-name">Description: </span> @Model.Description
+	<!-- buttons -->
+	<div class="text-center">
+		<a asp-action="Dashboard" class="btn mybtn bgBase">Refresh</a>
+		<div class="dropdown inline">
+			<button class="btn mybtn bgBro dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true"
+				aria-expanded="false">
+					Actions <span style="font-size: 0.7em;">&nbsp &#x25BC;</span>
+				</button>
+			<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu2">
+				<li><a asp-action="Add" asp-controller="Issue" asp-route-EID="@Model.ID" >ADD ISSUE</a></li>
+				@if(await AuthorizationService.AuthorizeAsync(User, "Event Editor")) {
+				<li><a asp-action="EditEvent" asp-route-id="@Model.ID">EDIT</a></li>
+				<li><a asp-action="ViewEvent" asp-route-ID="@Model.ID">VIEW DETAILS</a></li>
+				} 
+				@if(await AuthorizationService.AuthorizeAsync(User, "Tickets Viewer")) {
+				<li><a asp-action="Index" asp-controller="Ticket" asp-route-id="@Model.ID">MANAGE TICKETS</a></li>
+				} 
+				@if(await AuthorizationService.AuthorizeAsync(User, "Products Viewer")) {
+				<li><a asp-action="Index" asp-controller="Product" asp-route-id="@Model.ID">MANAGE PRODUCTS</a></li>
+				} 
+				@if(await AuthorizationService.AuthorizeAsync(User, "VTypes Viewer")) {
+				<li><a asp-action="Index" asp-controller="VType" asp-route-id="@Model.ID">MANAGE VISITOR TYPES</a></li>
+				}
+			</ul>
 		</div>
 	</div>
+	<!-- end of buttons -->
 
-	<!-- TICKETS -->
-	<div class="col-sm-4 nopad">
-		<div class="dash-head">
-			TICKETS
-		</div>
-		<div class="dash-section">
-			<span class="dash-name">Types: </span> <br /> 
-			@foreach (Ticket t in @Model.Tickets) {
-			<div> @t.Type - @t.Limit for $@t.Price </div>
-			}
-			<br />
-			<span class="dash-name">Attendance (CheckIn/Register/Sold): </span> <br /> @foreach (Ticket t in @Model.Tickets) {
-			<div> @t.Type - @t.CheckIned / @t.Registered / @t.Sold </div>
-			}
+	<div class="row mar5">
 
-		</div>
-	</div>
-
-	<!-- VISITORS -->
-	<div class="col-sm-4 nopad">
-		<div class="dash-head">
-			VISITORS
-		</div>
-		<div class="dash-section">
-			<span class="dash-name">Types: </span> <br /> 
-			@foreach (VType v in @Model.Types) {
-			<div> @v.Name - @(v.Free ? "Free" : "Paid") </div>
-			}
-			<br />
-			<span class="dash-name">Checked In: </span> @ViewBag.CheckIned out of @ViewBag.Registered <br />
-
-			<div class="chart-base">
-				<div class="chart" style="width:@(ViewBag.Registered != 0 ? ViewBag.CheckIned * 100 / ViewBag.Registered: 0)%;"> @(ViewBag.Registered != 0 ? ViewBag.CheckIned * 100 / ViewBag.Registered: 0)% </div>
+		<div class="col-sm-4 nopad">
+			<div class="dash-head">
+				EVENT
 			</div>
-
-			<span class="dash-name">Registered: </span> @ViewBag.Registered out of @Model.TicketsSold <br />
-
-			<div class="chart-base">
-				<div class="chart" style="width:@(Model.TicketsSold != 0 ? ViewBag.Registered * 100 / Model.TicketsSold : 0)%;">
-					@(Model.TicketsSold != 0 ? ViewBag.Registered * 100 / Model.TicketsSold : 0)% </div>
+			<div class="dash-section">
+				<span class="dash-name">Name: </span> @Model.Name
+				<br />
+				<span class="dash-name">ID: </span> @Model.ID
+				<br />
+				<span class="dash-name">Time frame: </span> @Model.TimeStart, @Model.DateStart / @Model.TimeEnd, @Model.DateEnd
+				<br />
+				<span class="dash-name">Dates: </span> @Model.TimeStart, @Model.DateStart / @Model.TimeEnd, @Model.DateEnd
+				<span class="dash-name">Eventbrite ID: </span> @Model.EventbriteID
+				<br />
+				<span class="dash-name">Ticket Sales: </span> 
+					<a href="@Model.TicketLink">@Model.TicketLink</a>
+				<br />
+				<span class="dash-name">Description: </span> @Model.Description
 			</div>
+		</div>
 
-			<span class="dash-name">Tickets Sold: </span> @Model.TicketsSold out of @ViewBag.AllTickets <br />
-			<div class="chart-base">
-				<div class="chart" style="width:@(ViewBag.AllTickets != 0 ? Model.TicketsSold * 100 / ViewBag.AllTickets : 0)%;">
-					@(ViewBag.AllTickets != 0 ? Model.TicketsSold * 100 / ViewBag.AllTickets : 0)% </div>
+		<!-- TICKETS -->
+		<div class="col-sm-4 nopad">
+			<div class="dash-head">
+				TICKETS
 			</div>
+			<div class="dash-section">
+				<span class="dash-name">Types: </span> <br /> 
+				@foreach (Ticket t in @Model.Tickets) {
+				<div> @t.Type - @t.Limit for $@t.Price </div>
+				}
+				<br />
+				<span class="dash-name">Attendance (CheckIn/Register/Sold): </span> <br /> @foreach (Ticket t in @Model.Tickets) {
+				<div> @t.Type - @t.CheckIned / @t.Registered / @t.Sold </div>
+				}
 
+			</div>
 		</div>
-	</div>
-</div>
 
-<div class="row mar5">
-	<div class="col-sm-4 nopad">
-		<div class="dash-head">
-			PRODUCTS / EVENTS
-		</div>
-		<div class="dash-section">
-			<span class="dash-name">Events: </span> <br /> 
-			@foreach (Product p in @Model.Products) {
-				<div> @p.Name - @(p.Free ? "Free" : "Paid") - @p.DateStart, @p.TimeStart/@p.TimeEnd - 
-					@if (p.Status) {
-					<span class='Base'>Active</span> } 
-					else {
-					<span class='Red'>Inactive</span> }
+		<!-- VISITORS -->
+		<div class="col-sm-4 nopad">
+			<div class="dash-head">
+				VISITORS
+			</div>
+			<div class="dash-section">
+				<span class="dash-name">Types: </span> <br /> 
+				@foreach (VType v in @Model.Types) {
+				<div> @v.Name - @(v.Free ? "Free" : "Paid") </div>
+				}
+				<br />
+				<span class="dash-name">Checked In: </span> @ViewBag.CheckIned out of @ViewBag.Registered <br />
+
+				<div class="chart-base">
+					<div class="chart" style="width:@(ViewBag.Registered != 0 ? ViewBag.CheckIned * 100 / ViewBag.Registered: 0)%;"> @(ViewBag.Registered != 0 ? ViewBag.CheckIned * 100 / ViewBag.Registered: 0)% </div>
 				</div>
-			}
-			<br />
+
+				<span class="dash-name">Registered: </span> @ViewBag.Registered out of @Model.TicketsSold <br />
+
+				<div class="chart-base">
+					<div class="chart" style="width:@(Model.TicketsSold != 0 ? ViewBag.Registered * 100 / Model.TicketsSold : 0)%;">
+						@(Model.TicketsSold != 0 ? ViewBag.Registered * 100 / Model.TicketsSold : 0)% </div>
+				</div>
+
+				<span class="dash-name">Tickets Sold: </span> @Model.TicketsSold out of @ViewBag.AllTickets <br />
+				<div class="chart-base">
+					<div class="chart" style="width:@(ViewBag.AllTickets != 0 ? Model.TicketsSold * 100 / ViewBag.AllTickets : 0)%;">
+						@(ViewBag.AllTickets != 0 ? Model.TicketsSold * 100 / ViewBag.AllTickets : 0)% </div>
+				</div>
+
+			</div>
 		</div>
 	</div>
 
-	<div class="col-sm-4 nopad">
-		<div class="dash-head">
-			SALES
+	<div class="row mar5">
+		<div class="col-sm-4 nopad">
+			<div class="dash-head">
+				PRODUCTS / EVENTS
+			</div>
+			<div class="dash-section">
+				<span class="dash-name">Events: </span> <br /> 
+				@foreach (Product p in @Model.Products) {
+					<div> @p.Name - @(p.Free ? "Free" : "Paid") - @p.DateStart, @p.TimeStart/@p.TimeEnd - 
+						@if (p.Status) {
+						<span class='Base'>Active</span> } 
+						else {
+						<span class='Red'>Inactive</span> }
+					</div>
+				}
+				<br />
+			</div>
 		</div>
-		<div class="dash-section">
-			<span class="dash-name">Revenue Planned: </span> $@(String.Format("{0:0,0.00}", Model.RevPlan))
-			<br />
-			<span class="dash-name">Revenue Fact: </span> $@(String.Format("{0:0,0.00}", Model.RevFact))
-			<br />
-			<span class="dash-name">Fact / Plan: </span>
-			<div class="chart-base">
-				<div class="chart" style="width:@(ViewBag.AllTickets != 0 ? Model.TicketsSold * 100 / ViewBag.AllTickets : 0)%;">
-					@(Model.RevPlan != 0 ? Model.RevFact * 100 / Model.RevPlan : 0)% </div>
+
+		<div class="col-sm-4 nopad">
+			<div class="dash-head">
+				SALES
+			</div>
+			<div class="dash-section">
+				<span class="dash-name">Revenue Planned: </span> $@(String.Format("{0:0,0.00}", Model.RevPlan))
+				<br />
+				<span class="dash-name">Revenue Fact: </span> $@(String.Format("{0:0,0.00}", Model.RevFact))
+				<br />
+				<span class="dash-name">Fact / Plan: </span>
+				<div class="chart-base">
+					<div class="chart" style="width:@(ViewBag.AllTickets != 0 ? Model.TicketsSold * 100 / ViewBag.AllTickets : 0)%;">
+						@(Model.RevPlan != 0 ? Model.RevFact * 100 / Model.RevPlan : 0)% </div>
+				</div>
+
+				<span class="dash-name">Tickets Sold: </span> @Model.TicketsSold
+				<br />
+
+
+			</div>
+		</div>
+
+		<div class="col-sm-4 nopad">
+			<div class="dash-head">
+				VISITORS REQUESTS
+			</div>
+			<div class="dash-section">
+				<span class="dash-name">Total Requests: </span> @ViewBag.Requests.Count
+				<br />
+				<span class="dash-name">Not Seen: </span> @ViewBag.NotSeen
+				<br />
+				<span class="dash-name">Important: </span> @ViewBag.Important
+				<br />
 			</div>
 
-			<span class="dash-name">Tickets Sold: </span> @Model.TicketsSold
-			<br />
-
-
 		</div>
 	</div>
 
-	<div class="col-sm-4 nopad">
-		<div class="dash-head">
-			VISITORS REQUESTS
-		</div>
-		<div class="dash-section">
-			<span class="dash-name">Total Requests: </span> @ViewBag.Requests.Count
-			<br />
-			<span class="dash-name">Not Seen: </span> @ViewBag.NotSeen
-			<br />
-			<span class="dash-name">Important: </span> @ViewBag.Important
-			<br />
-		</div>
-
+	<!-- ALL Requests -->
+	<div class="row text-center m20-0-20-0 tog" data-id="requests">
+		<h2> ALL Requests </h2>
 	</div>
-</div>
-} else {
-<div class="row pad10 text-center">
-	<div class="f-attention">You have no ACTIVE event yet!</div>
-	<br />
-	<a asp-action="Index" asp-controller="Owner" class="btn mybtn bgBase">OK</a>
-</div>
-}
 
-<!-- ALL Requests -->
-<div class="row text-center m20-0-20-0 tog" data-id="requests">
-	<h2> ALL Requests </h2>
-</div>
+	@if(ViewBag.Requests != null && ViewBag.Requests.Count != 0) {
+	<table class="table table-hover" id="requests">
+		<thead>
+			<tr style="border-bottom: 2px solid gray;">
+				<th>ID</th>
+				<th>Time</th>
+				<th>Date</th>
+				<th style="width: 40%;">Description</th>
+				<th>Admin</th>
+				<th>Important</th>
+				<th>Seen</th>
+				<th>Solved</th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
 
-@if(ViewBag.Requests != null && ViewBag.Requests.Count != 0) {
-<table class="table table-hover" id="requests">
-	<thead>
-		<tr style="border-bottom: 2px solid gray;">
-			<th>ID</th>
-			<th>Time</th>
-			<th>Date</th>
-			<th style="width: 40%;">Description</th>
-			<th>Admin</th>
-			<th>Important</th>
-			<th>Seen</th>
-			<th>Solved</th>
-			<th></th>
+		@foreach(var r in ViewBag.Requests)
+		{	
+		<tr>
+			<td>@r.ID</td>
+			<td>@r.Time</td>
+			<td>@r.Date</td>
+			<td style="width: 40%;">@r.Description</td>
+			<td>@r.AdminName</td>
+			<td class="text-center">
+				<div class="bulp @(r.Important ? "bgRed" : "bgBase")"></div>
+			</td>
+			<td>
+				<div class="bulp @(r.SeenByAdmin ? "bgBase" : "bgRed")"></div>
+			</td>
+			<td>
+				<div class="bulp @(r.Solved ? "bgBase" : "bgRed")"></div>
+			</td>
+			<td style="width: auto; text-align: right;">
+				<div class="dropdown">
+					<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions &nbsp &#x25BC;</button>
+					<ul class="dropdown-menu dropdown-menu-right">
+						<li><a asp-action="ViewVisitor" asp-controller="Admin" asp-route-ID="@r.ID">View Info</a></li>
+						<li><a asp-action="Edit" asp-controller="Request" asp-route-ID="@r.ID">Edit</a></li>
+						<li><a asp-action="Status" asp-controller="Request" asp-route-ID="@r.ID" asp-route-Name="SOLVED">Change Solved </a></li>
+						<li><a asp-action="Status" asp-controller="Request" asp-route-ID="@r.ID" asp-route-Name="IMPORTANT">Change Importance</a></li>
+						<li><a asp-action="Status" asp-controller="Request" asp-route-ID="@r.ID" asp-route-Name="SEEN">Change Seen</a></li>
+						<li><a asp-action="Delete" asp-controller="Request" asp-route-ID="@r.ID">Delete</a></li>
+					</ul>
+				</div>		
+			</td>
 		</tr>
-	</thead>
-	<tbody>
-
-	@foreach(var r in ViewBag.Requests)
-	{	
-	<tr>
-		<td>@r.ID</td>
-		<td>@r.Time</td>
-		<td>@r.Date</td>
-		<td style="width: 40%;">@r.Description</td>
-		<td>@r.AdminName</td>
-		<td class="text-center">
-			<div class="bulp @(r.Important ? "bgRed" : "bgBase")"></div>
-		</td>
-		<td>
-			<div class="bulp @(r.SeenByAdmin ? "bgBase" : "bgRed")"></div>
-		</td>
-		<td>
-			<div class="bulp @(r.Solved ? "bgBase" : "bgRed")"></div>
-		</td>
-		<td style="width: auto; text-align: right;">
-			<div class="dropdown">
-				<button class="btn mybtn-sm-actions bgBro" type="button" data-toggle="dropdown">Actions &nbsp &#x25BC;</button>
-				<ul class="dropdown-menu dropdown-menu-right">
-					<li><a asp-action="ViewVisitor" asp-controller="Admin" asp-route-ID="@r.ID">View Info</a></li>
-					<li><a asp-action="Edit" asp-controller="Request" asp-route-ID="@r.ID">Edit</a></li>
-					<li><a asp-action="Status" asp-controller="Request" asp-route-ID="@r.ID" asp-route-Name="SOLVED">Change Solved </a></li>
-					<li><a asp-action="Status" asp-controller="Request" asp-route-ID="@r.ID" asp-route-Name="IMPORTANT">Change Importance</a></li>
-					<li><a asp-action="Status" asp-controller="Request" asp-route-ID="@r.ID" asp-route-Name="SEEN">Change Seen</a></li>
-					<li><a asp-action="Delete" asp-controller="Request" asp-route-ID="@r.ID">Delete</a></li>
-				</ul>
-			</div>		
-		</td>
-	</tr>
+		}
+		</tbody>
+	</table>
+	} 
+	else 
+	{
+	<h4 class="text-center">
+		No Requests have been created yet.
+	</h4>
 	}
-	</tbody>
-</table>
+
+	<!-- Blocked Visitors -->
+	<div class="row text-center m20-0-20-0 tog" data-id="blocked">
+		<h2> BLOCKED Visitors </h2>
+	</div>
+
+	@if(ViewBag.Blocked != null && ViewBag.Blocked.Count != 0)
+	{
+		<table class="table table-hover" id="blocked">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>First Name</th>
+					<th>Last Name</th>
+					<th>Reg. Number</th>
+					<th>Order Number</th>
+					<th>Company</th>
+					<th>Ocupation</th>
+					<th>Phone #</th>
+					<th>Chk</th>
+					<th>Reg</th>
+					<th>Blk</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+			@foreach(var v in ViewBag.Blocked)
+			{	
+				<tr>
+					<td>@v.ID</td>
+					<td>@v.Name</td>
+					<td>@v.Last</td>
+					<td>@v.RegistrationNumber</td>
+					<td>@v.OrderNumber</td>
+					<td>@v.Company</td>
+					<td>@v.Occupation</td>
+					<td>@v.Phone</td>
+					<td>
+						<div class="bulp @(v.CheckIned ? "bgBase" : "bgGray") block"></div>
+					</td>
+					<td>
+						<div class="bulp @(v.Registered ? "bgBase" : "bgGray") block"></div>
+					</td>
+					<td>
+						<div class="bulp @(v.Blocked ? "bgRed" : "bgBase") block"></div>
+					</td>
+					<td>
+						<a asp-action="ViewVisitor" asp-controller="Admin" asp-route-ID="@v.ID">Details</a>
+					</td>
+				</tr>
+			}
+			</tbody>
+		</table>
+	}
+	else
+	{
+		<div class="text-center">
+			This Event has no blocked users yet.
+		</div>
+	}
+
+	<!-- Blocked Visitors -->
+	<div class="row text-center m20-0-20-0 tog" data-id="deleted">
+		<h2> Deleted Visitors </h2>
+	</div>
+
+	@if(ViewBag.Deleted != null && ViewBag.Deleted.Count != 0)
+	{
+		<table class="table table-hover" id="deleted">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>First Name</th>
+					<th>Last Name</th>
+					<th>Reg. Number</th>
+					<th>Order Number</th>
+					<th>Company</th>
+					<th>Ocupation</th>
+					<th>Phone #</th>
+					<th>Chk</th>
+					<th>Reg</th>
+					<th>Blk</th>
+					<th></th>
+				</tr>
+			</thead>
+			<tbody>
+			@foreach(var v in ViewBag.Deleted)
+			{	
+				<tr>
+					<td>@v.ID</td>
+					<td>@v.Name</td>
+					<td>@v.Last</td>
+					<td>@v.RegistrationNumber</td>
+					<td>@v.OrderNumber</td>
+					<td>@v.Company</td>
+					<td>@v.Occupation</td>
+					<td>@v.Phone</td>
+					<td>
+						<div class="bulp @(v.CheckIned ? "bgBase" : "bgGray") block"></div>
+					</td>
+					<td>
+						<div class="bulp @(v.Registered ? "bgBase" : "bgGray") block"></div>
+					</td>
+					<td>
+						<div class="bulp @(v.Blocked ? "bgRed" : "bgBase") block"></div>
+					</td>
+					<td>
+						<a asp-action="ViewVisitor" asp-controller="Admin" asp-route-ID="@v.ID">Details</a>
+					</td>
+				</tr>
+			}
+			</tbody>
+		</table>
+	}
+	else
+	{
+		<h4 class="text-center">
+			This Event has no deleted users yet.
+		</h4>
+	}
+
+<br />
+<br />
 } 
 else 
 {
-<h4 class="text-center">
-	No Requests have been created yet.
-</h4>
-}
-
-<!-- Blocked Visitors -->
-<div class="row text-center m20-0-20-0 tog" data-id="blocked">
-	<h2> BLOCKED Visitors </h2>
-</div>
-
-@if(ViewBag.Blocked != null && ViewBag.Blocked.Count != 0)
-{
-	<table class="table table-hover" id="blocked">
-		<thead>
-			<tr>
-				<th>ID</th>
-				<th>First Name</th>
-				<th>Last Name</th>
-				<th>Reg. Number</th>
-				<th>Order Number</th>
-				<th>Company</th>
-				<th>Ocupation</th>
-				<th>Phone #</th>
-				<th>Chk</th>
-				<th>Reg</th>
-				<th>Blk</th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody>
-		@foreach(var v in ViewBag.Blocked)
-		{	
-			<tr>
-				<td>@v.ID</td>
-				<td>@v.Name</td>
-				<td>@v.Last</td>
-				<td>@v.RegistrationNumber</td>
-				<td>@v.OrderNumber</td>
-				<td>@v.Company</td>
-				<td>@v.Occupation</td>
-				<td>@v.Phone</td>
-				<td>
-					<div class="bulp @(v.CheckIned ? "bgBase" : "bgGray") block"></div>
-				</td>
-				<td>
-					<div class="bulp @(v.Registered ? "bgBase" : "bgGray") block"></div>
-				</td>
-				<td>
-					<div class="bulp @(v.Blocked ? "bgRed" : "bgBase") block"></div>
-				</td>
-				<td>
-					<a asp-action="ViewVisitor" asp-controller="Admin" asp-route-ID="@v.ID">Details</a>
-				</td>
-			</tr>
-		}
-		</tbody>
-	</table>
-}
-else
-{
-	<div class="text-center">
-		This Event has no blocked users yet.
+	<div class="row pad10 text-center">
+		<div class="f-attention">You have no ACTIVE event yet!</div>
+		<br />
+		<a asp-action="Index" asp-controller="Owner" class="btn mybtn bgBase">OK</a>
 	</div>
 }
-
-<!-- Blocked Visitors -->
-<div class="row text-center m20-0-20-0 tog" data-id="deleted">
-	<h2> Deleted Visitors </h2>
-</div>
-
-@if(ViewBag.Deleted != null && ViewBag.Deleted.Count != 0)
-{
-	<table class="table table-hover" id="deleted">
-		<thead>
-			<tr>
-				<th>ID</th>
-				<th>First Name</th>
-				<th>Last Name</th>
-				<th>Reg. Number</th>
-				<th>Order Number</th>
-				<th>Company</th>
-				<th>Ocupation</th>
-				<th>Phone #</th>
-				<th>Chk</th>
-				<th>Reg</th>
-				<th>Blk</th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody>
-		@foreach(var v in ViewBag.Deleted)
-		{	
-			<tr>
-				<td>@v.ID</td>
-				<td>@v.Name</td>
-				<td>@v.Last</td>
-				<td>@v.RegistrationNumber</td>
-				<td>@v.OrderNumber</td>
-				<td>@v.Company</td>
-				<td>@v.Occupation</td>
-				<td>@v.Phone</td>
-				<td>
-					<div class="bulp @(v.CheckIned ? "bgBase" : "bgGray") block"></div>
-				</td>
-				<td>
-					<div class="bulp @(v.Registered ? "bgBase" : "bgGray") block"></div>
-				</td>
-				<td>
-					<div class="bulp @(v.Blocked ? "bgRed" : "bgBase") block"></div>
-				</td>
-				<td>
-					<a asp-action="ViewVisitor" asp-controller="Admin" asp-route-ID="@v.ID">Details</a>
-				</td>
-			</tr>
-		}
-		</tbody>
-	</table>
-}
-else
-{
-	<h4 class="text-center">
-		This Event has no deleted users yet.
-	</h4>
-}
-<br />
-<br />

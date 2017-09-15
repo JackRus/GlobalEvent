@@ -25,9 +25,12 @@ namespace GlobalEvent.Controllers
 
         public async Task<IActionResult> Welcome()
         {
+            // all future events
             ViewBag.Future = await _db.Events
                 .Where(x => !x.Status && !x.Archived)
                 .ToListAsync();
+            
+            // get active event
             ViewBag.Active = await _db.Events.FirstOrDefaultAsync(x => x.Status);
             return View();
         }
@@ -40,6 +43,7 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Welcome", "Home");
             }
 
+            // event id
             ViewBag.EID = (int)EID;
             return View();
         }

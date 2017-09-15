@@ -30,6 +30,9 @@ namespace GlobalEvent.Controllers
             _id = _userManager.GetUserId(http.HttpContext.User);
         }
 
+        //
+        // GET: Owner/Index
+        [HttpGet]
         [Authorize(Policy="Owner's Menu")]
         public async Task<IActionResult> Index(string message = null)
         {
@@ -41,52 +44,61 @@ namespace GlobalEvent.Controllers
                 
             ViewBag.Message = message;
             ViewBag.EventList = await ToDo.GenerateEventList(_db);
+
             return View();
         }
 
+        //
+        // GET: Owner/Dashboard
         [HttpGet]
         [Authorize(Policy="Owner's Dashboard")]
         public async Task <IActionResult> Dashboard ()
         {
-            Event e = await _db.Events
+            Event active = await _db.Events
                 .Include(x => x.Tickets)
                 .Include(x => x.Visitors)
                     .ThenInclude(x => x.Requests)
                 .Include(x => x.Products)
                 .FirstOrDefaultAsync(x => x.Status);
-
-            ViewBag.Requests = await _db.Requests.OrderBy(x => x.ID).ToListAsync();
-            ViewBag.Active = e == null ? false : true;
             
-            if (ViewBag.Active)
+            if (active == null)
             {
-                await Event.Update(_db, e.ID);
-                ViewBag.CheckIned = e.Visitors.Where(x => x.CheckIned).Count();
-                ViewBag.Registered = e.Visitors.Where(x => x.Registered).Count();
-                
-                // select all requests for current event
-                ViewBag.Requests = new List<Request>();
-                ViewBag.NotSeen = 0;
-                ViewBag.Important = 0;
-                foreach (var item in e.Visitors)
-                {
-                    ViewBag.Requests.AddRange(item.Requests);
-                    ViewBag.NotSeen += item.Requests.Where(x => !x.SeenByAdmin).Count();
-                    ViewBag.Important += item.Requests.Where(x => x.Important).Count();
-                }
-                
-                ViewBag.Blocked = await _db.Visitors
-                    .Where(x => x.Blocked && x.EID == e.ID).ToListAsync();
-                ViewBag.Deleted = await _db.Visitors
-                    .Where(x => x.Deleted && x.EID == e.ID).ToListAsync();
+                 return View();
+            }
 
-                // All tickets
-                ViewBag.AllTickets = 0;
-                e.Tickets.ForEach(t => ViewBag.AllTickets += t.Limit);
-            }  
-            return View(e);
+            // update tickets and orders data
+            await Event.Update(_db, active.ID);
+            ViewBag.CheckIned = active.Visitors.Where(x => x.CheckIned).Count();
+            ViewBag.Registered = active.Visitors.Where(x => x.Registered).Count();
+            
+            // select all requests for current event
+            ViewBag.Requests = new List<Request>();
+            ViewBag.NotSeen = 0;
+            ViewBag.Important = 0;
+            foreach (var item in active.Visitors)
+            {
+                ViewBag.Requests.AddRange(item.Requests);
+                ViewBag.NotSeen += item.Requests.Where(x => !x.SeenByAdmin).Count();
+                ViewBag.Important += item.Requests.Where(x => x.Important).Count();
+            }
+            
+            // get all blocked visitors
+            ViewBag.Blocked = await _db.Visitors
+                .Where(x => x.Blocked && x.EID == active.ID).ToListAsync();
+
+            // get all deleted visitors
+            ViewBag.Deleted = await _db.Visitors
+                .Where(x => x.Deleted && x.EID == active.ID).ToListAsync();
+
+            // total tickets amount
+            ViewBag.AllTickets = 0;
+            active.Tickets.ForEach(t => ViewBag.AllTickets += t.Limit);
+
+            return View(active);
         }
 
+        //
+        // GET: Owner/Events
         [HttpGet]
         [Authorize(Policy="Events Viewer")]
         public async Task<IActionResult> Events (string message = null)
@@ -108,6 +120,8 @@ namespace GlobalEvent.Controllers
             return View();
         }
 
+        //
+        // GET: Owner/CreateEvent
         [HttpGet]
         [Authorize(Policy="Event Creator")]
         public IActionResult CreateEvent ()
@@ -115,6 +129,8 @@ namespace GlobalEvent.Controllers
             return View();
         }
 
+        //
+        // POST: Owner/CreateEvent
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         [Authorize(Policy="Event Creator")]
@@ -123,13 +139,18 @@ namespace GlobalEvent.Controllers
             if (ModelState.IsValid)
             {
                 _db.Events.Add(e);
+                
+                // Log for admin
                 await _db.Logs.AddAsync(await Log.New("Event", $"Event: {e.Name}, was created", _id, _db));
 
                 return RedirectToAction("Events", new { message = "The Event was successfully created."});
             }
+
             return RedirectToAction("Events", new { message = "Event wasn't created. Something went wrong. Please try again."});
         }
 
+        //
+        // GET: Owner/EditEvent
         [HttpGet]
         [Authorize(Policy="Event Editor")]
         public async Task<IActionResult> EditEvent (int? ID)
@@ -139,37 +160,48 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Events");
             }
 
-            return View(await _db.Events.FirstOrDefaultAsync(x => x.ID == ID));
+            Event edit = await _db.Events.SingleOrDefaultAsync(x => x.ID == ID);
+            return View(edit);
         }
 
+        //
+        // POST: Owner/EditEvent
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         [Authorize(Policy="Event Editor")]
-        public async Task<IActionResult> EditEvent (Event e)
+        public async Task<IActionResult> EditEvent (Event model)
         {
             if (!ModelState.IsValid)
             {
                 return RedirectToAction("Events", new { message = "Something went wrong. Please try again."});
             }
             
-            Event eOld = await e.CopyValues(_db);
-            if (!eOld.Status 
-                && e.Status 
+            Event eventToEdit = await model.CopyValues(_db);
+            
+            // check if there is any active event in db
+            if (!eventToEdit.Status 
+                && model.Status 
                 && await _db.Events.AnyAsync(x => x.Status))
             {
-                eOld.Status = false;
+                eventToEdit.Status = false;
                 ViewBag.Message = "One of the Events is currently ACTIVE. And only 1 event can be ACTIVE at a time. You have to change it's status in order to make any other event ACTIVE. All other changes were saved.";
             }
             else
             {
-                eOld.Status = e.Status;
+                // change status if no active event found
+                eventToEdit.Status = model.Status;
             }
-            _db.Events.Update(eOld);        
-            await _db.Logs.AddAsync(await Log.New("Event", $"Event: {eOld.Name}, was EDITED", _id, _db));
+            
+            _db.Events.Update(eventToEdit);        
+            
+            // log for admin
+            await _db.Logs.AddAsync(await Log.New("Event", $"Event: {eventToEdit.Name}, was EDITED", _id, _db));
 
-            return RedirectToAction("ViewEvent", new { ID = eOld.ID, message = ViewBag.Message });
+            return RedirectToAction("ViewEvent", new { ID = eventToEdit.ID, message = ViewBag.Message });
         }
 
+        //
+        // GET: Owner/ViewEvent
         [HttpGet]
         [Authorize(Policy="Event Viewer")]
 		public async Task<IActionResult> ViewEvent(int? ID, string message = null)
@@ -179,26 +211,33 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Events");
             }
 
-			// extrats event with the matching ID
-			Event e = await _db.Events
+			// get event by ID
+			Event eventToView = await _db.Events
 				.Include(x => x.Tickets)
 				.Include(x => x.Types)
 				.Include(x => x.Products)
                 .Include(x => x.Orders)
-				.FirstOrDefaultAsync(x => x.ID == ID);
+				.SingleOrDefaultAsync(x => x.ID == ID);
             
-            // Update orders
-            await Order.OrderUpdate(_db, e.ID);
-            await Event.Update(_db, e.ID);
-            ViewBag.CheckIned = e.Visitors.Where(x => x.CheckIned).Count();
-            ViewBag.Registered = e.Visitors.Where(x => x.Registered).Count();
+            // Update orders and tickets
+            await Order.OrderUpdate(_db, eventToView.ID);
+            await Event.Update(_db, eventToView.ID);
+
+            // update attendance
+            ViewBag.CheckIned = eventToView.Visitors.Where(x => x.CheckIned).Count();
+            ViewBag.Registered = eventToView.Visitors.Where(x => x.Registered).Count();
+            
+            // total amount of tickets
             ViewBag.AllTickets = 0;
-            e.Tickets.ForEach(t => ViewBag.AllTickets += t.Limit);
+            eventToView.Tickets.ForEach(t => ViewBag.AllTickets += t.Limit);
 
             ViewBag.Message = message;
-			return View(e);
+
+			return View(eventToView);
 		}
 
+        //
+        // GET: Owner/DeleteEvent
         [HttpGet]
         [Authorize(Policy="Event Killer")]
         public async Task<IActionResult> DeleteEvent (int? ID)
@@ -207,10 +246,13 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Events");
             }
+            Event eventToDelete = await _db.Events.SingleOrDefaultAsync(x => x.ID == ID);
 
-            return View(await _db.Events.FirstOrDefaultAsync(x => x.ID == ID));
+            return View(eventToDelete);
         }
 
+        //
+        // GET: Owner/DeleteEventOk
         [HttpGet]
         [Authorize(Policy="Event Killer")]
         public async Task<IActionResult> DeleteEventOk (int? ID)
@@ -220,30 +262,56 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Events");
             }
 
-            Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == ID);
-            _db.Events.Remove(e);
-            await _db.Logs.AddAsync(await Log.New("Event", $"Event: {e.Name}, was DELETED", _id, _db));
+            Event eventToDelete = await _db.Events.FirstOrDefaultAsync(x => x.ID == ID);
+            _db.Events.Remove(eventToDelete);
+            
+            // log for admin
+            await _db.Logs.AddAsync(await Log.New("Event", $"Event: {eventToDelete.Name}, was DELETED", _id, _db));
 
             return RedirectToAction("Events");
         }
 
+        //
+        // GET: Owner/Admins
         [HttpGet]
         [Authorize(Policy="Admins Viewer")]
         public async Task<IActionResult> Admins ()
         {
+            // get all users/admins
             ViewBag.Admins = await _db.Users.ToListAsync();
+            
             return View();
         }
 
+        //
+        // GET: Owner/Attention
         [HttpGet]
         [Authorize(Policy = "Owner's Menu")]
         public async Task<IActionResult> Attention ()
         {
-            ViewBag.Requests = await _db.Requests.Where(x => !x.Solved && !x.SeenByAdmin).OrderBy(x => x.Important).ThenBy(x => x.Date).ThenBy(x => x.Time).ToListAsync();
+            // get all unsolved and unseen requests
+            ViewBag.Requests = await _db.Requests
+                .Where(x => !x.Solved && !x.SeenByAdmin)
+                .OrderBy(x => x.Important)
+                    .ThenBy(x => x.Date)
+                    .ThenBy(x => x.Time)
+                .ToListAsync();
 
-            ViewBag.Issues = await _db.Issues.Where(x => !x.Solved && !x.Assigned).OrderBy(x => x.ExpectedToBeSolved).ThenBy(x => x.Date).ThenBy(x => x.Time).ToListAsync();
+            // get all unsolved and unassigned issues
+            ViewBag.Issues = await _db.Issues
+                .Where(x => !x.Solved && !x.Assigned)
+                .OrderBy(x => x.ExpectedToBeSolved)
+                    .ThenBy(x => x.Date)
+                    .ThenBy(x => x.Time)
+                .ToListAsync();
 
-            ViewBag.Notes = await _db.Notes.Where(x => !x.SeenByAdmin).OrderBy(x => x.Important).ThenBy(x => x.Date).ThenBy(x => x.Time).ToListAsync();
+            // get all unseen notes
+            ViewBag.Notes = await _db.Notes
+                .Where(x => !x.SeenByAdmin)
+                .OrderBy(x => x.Important)
+                    .ThenBy(x => x.Date)
+                    .ThenBy(x => x.Time)
+                .ToListAsync();
   
             return View();
         }

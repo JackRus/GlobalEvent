@@ -26,6 +26,8 @@ namespace GlobalEvent.Controllers
             _id = _userManager.GetUserId(http.HttpContext.User);
         }
 
+        //
+        // GET: Request/Add
         [HttpGet]
         public async Task<IActionResult> Add(int? ID)
         {
@@ -34,31 +36,43 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin");
             }
 
+            // get current visitor
             ViewBag.Visitor = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ID);
+
             return View();
         }
         
+        //
+        // POST: Request/Add
         [HttpPost]
         [AutoValidateAntiforgeryToken]
-        public async Task<IActionResult> Add (Request r)
+        public async Task<IActionResult> Add (Request model)
         {
-            if (string.IsNullOrEmpty(r.Description) || r.VID == 0)
+            if (string.IsNullOrEmpty(model.Description) || model.VID == 0)
             {
                 return RedirectToAction("Dashboard", "Admin");
             }
 
+            // get current admin
             ApplicationUser user = await _userManager.GetUserAsync(User);
-            r.AdminID = user.Id;
-            r.AdminName = $"{user.FirstName} {user.LastName}";
-            Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == r.VID);
-            v.Requests.Add(r);
+            
+            // update values
+            model.AdminID = user.Id;
+            model.AdminName = $"{user.FirstName} {user.LastName}";
+
+            // get current visitor, and add request
+            Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == model.VID);
+            v.Requests.Add(model);
             _db.Visitors.Update(v);
 
-            await _db.Logs.AddAsync(await Log.New("Request", $"Request: \"{r.Description}\" for VID: {r.VID}, was CREATED", _id, _db));
+            // log for admin
+            await _db.Logs.AddAsync(await Log.New("Request", $"Request: \"{model.Description}\" for VID: {model.VID}, was CREATED", _id, _db));
 
-            return RedirectToAction("ViewVisitor", "Admin", new {ID = r.VID});
+            return RedirectToAction("ViewVisitor", "Admin", new {ID = model.VID});
         }
 
+        //
+        // GET: Request/Edit
         [HttpGet]
         public async Task<IActionResult> Edit (int? ID)
         {
@@ -66,25 +80,37 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Index");
             }
-            ViewBag.Visitor = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ID);
-            return View(await _db.Requests.FirstOrDefaultAsync(x => x.ID == ID));
+            
+            // get request by id
+            Request request = await _db.Requests.SingleOrDefaultAsync(x => x.ID == ID);
+            // get visitor for the request
+            ViewBag.Visitor = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == request.VID);
+
+            return View(request);
         }
 
+        //
+        // POST: Request/Edit
         [HttpPost]
         [AutoValidateAntiforgeryToken]
-        public async Task<IActionResult> Edit (Request r)
+        public async Task<IActionResult> Edit (Request model)
         {
-			if (string.IsNullOrEmpty(r.Description) || r.ID == 0)
+			if (string.IsNullOrEmpty(model.Description) || model.ID == 0)
             {
                 return RedirectToAction("Dashboard", "Admin");
             }
 
-            int VID = await r.CopyValues(_db);
-            await _db.Logs.AddAsync(await Log.New("Request", $"Request: \"{r.Description}\" for VID: {r.VID}, was EDITED", _id, _db));
+            // get visitor ID and update request's values in db
+            int VID = await model.CopyValues(_db);
+
+            // log for admin
+            await _db.Logs.AddAsync(await Log.New("Request", $"Request: \"{model.Description}\" for VID: {model.VID}, was EDITED", _id, _db));
 
             return RedirectToAction("ViewVisitor", "Admin", new {ID = VID});
         }
 
+        //
+        // GET: Request/Delete
         [HttpGet]
         public async Task<IActionResult> Delete (int? ID)
         {
@@ -93,13 +119,18 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin");
             }
 
-            Request r = await _db.Requests.FirstOrDefaultAsync(x => x.ID == ID);
-            _db.Requests.Remove(r);
-            await _db.Logs.AddAsync(await Log.New("Request", $"Request: \"{r.Description}\" for VID: {r.VID}, was DELETED", _id, _db));
+            // find and delete request
+            Request request = await _db.Requests.SingleOrDefaultAsync(x => x.ID == ID);
+            _db.Requests.Remove(request);
 
-            return RedirectToAction("ViewVisitor", "Admin", new {ID = r.VID});
+            // log for admin
+            await _db.Logs.AddAsync(await Log.New("Request", $"Request: \"{request.Description}\" for VID: {request.VID}, was DELETED", _id, _db));
+
+            return RedirectToAction("ViewVisitor", "Admin", new {ID = request.VID});
         }
 
+        //
+        // GET: Request/Status
         [HttpGet]
         public async Task<IActionResult> Status (int? ID, string Name = null)
         {
@@ -108,8 +139,11 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin");
             }
 
+            // find and update values
             Request r = await _db.Requests.FirstOrDefaultAsync(x => x.ID == ID);
             r.UpdateValue(Name, _db);
+
+            // log for admin
             await _db.Logs.AddAsync(await Log.New("Request", $"Request: \"{r.Description}\" for VID: {r.VID}, feild {Name} was changed", _id, _db));
 
             return RedirectToAction("ViewVisitor", "Admin", new {ID = r.VID});

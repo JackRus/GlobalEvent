@@ -29,6 +29,8 @@ namespace GlobalEvent.Controllers
             _id = _userManager.GetUserId(http.HttpContext.User);
         }
 
+        //
+        // GET: Order/AddOrder
         [HttpGet]
         [Authorize(Policy="Order Creator")]
         public async Task<IActionResult> AddOrder (int? ID = null)
@@ -38,37 +40,49 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin");
             }
 
-            AddOrder o = new AddOrder();
-            o.EID = (int)ID;
-            await o.CreateLists(_db);
+            AddOrder order = new AddOrder();
+            // assign event's ID
+            order.EID = (int)ID;
+
+            // lists for <select> for VType and Ticket type
+            await order.CreateLists(_db);
         
-            return View(o);
+            return View(order);
         }
 
+        //
+        // POST: Order/AddOrderOk
         [HttpPost]
         [Authorize(Policy="Order Creator")]
-        public async Task<IActionResult> AddOrderOk (AddOrder o)
+        public async Task<IActionResult> AddOrderOk (AddOrder model)
         {  
             if (!ModelState.IsValid)
             {
                 return RedirectToAction("Dashboard", "Admin");
             } 
         
-            Order newO = new Order();
-            if (!(await o.CheckDuplicates(_db, newO)))
+            Order order = new Order();
+            // check for duplicate and copy info
+            bool hasDublicate = await model.CheckDuplicates(_db, order);
+
+            if (!hasDublicate)
             {
-                Event e = await _db.Events.SingleOrDefaultAsync(x => x.ID == o.EID);
-                e.Orders.Add(newO);
-                _db.Events.Update(e);
-                await _db.Logs.AddAsync(await Log.New("Order", $"New Order: {newO.ID}. Reason: {o.Comment} was CREATED", _id, _db));
+                Event currentEvent = await _db.Events.SingleOrDefaultAsync(x => x.ID == model.EID);
+                currentEvent.Orders.Add(order);
+                _db.Events.Update(currentEvent);
+
+                // log for admin
+                await _db.Logs.AddAsync(await Log.New("Order", $"New Order: {order.ID}. Reason: {model.Comment} was CREATED", _id, _db));
             }
             else
             {
                 ViewBag.Message = "This Order already exist.";
             }
-            return View(newO);
+            return View(order);
         } 
 
+        //
+        // GET: Order/AllOrders
         [HttpGet]
         [Authorize(Policy="Order Viewer")]
         public async Task<IActionResult> AllOrders (int? ID)
@@ -76,10 +90,14 @@ namespace GlobalEvent.Controllers
             // get Active event id
             int EID = ID == null ? (await _db.Events.SingleOrDefaultAsync(x => x.Status)).ID : (int)ID;
  
+            // all orders for this event id
             List<Order> orders = await _db.Orders.Where(x => x.EID == EID).ToListAsync(); 
+
             return View(orders);
         }
 
+        //
+        // GET: Order/EditOrder
         [HttpGet]
         [Authorize(Policy="Order Creator")]
         public async Task<IActionResult> EditOrder (int? ID = null)
@@ -88,28 +106,37 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Dashboard", "Admin", new {message = "Couldn't execute this request. Please try again."});
             }
-            return View(await _db.Orders.SingleOrDefaultAsync(x => x.ID == ID));
+            Order order = await _db.Orders.SingleOrDefaultAsync(x => x.ID == ID);
+
+            return View(order);
         }
 
+        // 
+        // POST: Order/EditOrder
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         [Authorize(Policy="Order Creator")]
-        public async Task<IActionResult> EditOrder (Order o)
+        public async Task<IActionResult> EditOrder (Order model)
         {
-            if (o == null)
+            if (model == null)
             {
                 return RedirectToAction("Dashboard", "Admin", new {message = "Couldn't execute this request. Please try again."});
             }
 
-            Order oldO = await _db.Orders.SingleOrDefaultAsync(x => x.ID == o.ID);
-            oldO.CopyInfo(o);
-            _db.Orders.Update(oldO);
-            await _db.Logs.AddAsync(await Log.New("Order", $"Order ID: {oldO.ID} was EDITED", _id, _db));
+            // find and update values
+            Order order = await _db.Orders.SingleOrDefaultAsync(x => x.ID == model.ID);
+            order.CopyInfo(model);
+            _db.Orders.Update(order);
 
-            return RedirectToAction("AllOrders", "Order", new {ID = oldO.EID});
+            // log for admin
+            await _db.Logs.AddAsync(await Log.New("Order", $"Order ID: {order.ID} was EDITED", _id, _db));
+
+            return RedirectToAction("AllOrders", "Order", new {ID = order.EID});
         }
 
 
+        // 
+        // GET: Order/Cancel
         [HttpGet]
         [Authorize(Policy="Order Canceler")]
         public async Task<IActionResult> Cancel (int? ID = null)
@@ -119,12 +146,15 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin");
             }
 
-            Order o = await _db.Orders.SingleOrDefaultAsync(x => x.ID == ID);
-            o.Cancelled = true;
-            _db.Orders.Update(o);
-            await _db.Logs.AddAsync(await Log.New("Order", $"Order({o.ID}) #: {o.Number} was CANCELLED", _id, _db));
+            // find and update values
+            Order order = await _db.Orders.SingleOrDefaultAsync(x => x.ID == ID);
+            order.Cancelled = true;
+            _db.Orders.Update(order);
 
-            return RedirectToAction("AllOrders", "Order", new {ID = o.EID});
+            // log for admin
+            await _db.Logs.AddAsync(await Log.New("Order", $"Order({order.ID}) #: {order.Number} was CANCELLED", _id, _db));
+
+            return RedirectToAction("AllOrders", "Order", new {ID = order.EID});
         }
     }
 }

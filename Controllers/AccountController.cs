@@ -73,10 +73,12 @@ namespace GlobalEvent.Controllers
             if (ModelState.IsValid)
             {
                 var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.RememberMe, lockoutOnFailure: false);
-                var user = await _userManager.FindByEmailAsync(model.Email);
+                
+                ApplicationUser currentUser = await _userManager.FindByEmailAsync(model.Email);
+                
                 if (result.Succeeded)
                 {
-                    await _db.Logs.AddAsync(await Log.New("Log In", "User Loged In", user.Id, _db));
+                    await _db.Logs.AddAsync(await Log.New("Log In", "User Loged In", currentUser.Id, _db));
                     return RedirectToAction("Dashboard", "Admin");
                 }
                 if (result.RequiresTwoFactor)
@@ -85,7 +87,8 @@ namespace GlobalEvent.Controllers
                 }
                 if (result.IsLockedOut)
                 {
-                    await _db.Logs.AddAsync(await Log.New("Log In", "Attempted to Log in", user.Id, _db));
+                    // If user tried to log-in while being locked.
+                    await _db.Logs.AddAsync(await Log.New("Log In", "Attempted to Log in", currentUser.Id, _db));
                     return View("Lockout");
                 }
                 else
@@ -105,6 +108,7 @@ namespace GlobalEvent.Controllers
         [AllowAnonymous]
         public IActionResult Register(string returnUrl = null)
         {
+            // prevents from registering if Owner exist
             if (_db.Users.Any(x => x.Level == "Owner"))
             {
                 return RedirectToAction("Login", "Account");
@@ -123,22 +127,28 @@ namespace GlobalEvent.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FirstName = model.FirstName, LastName = model.LastName, Level = model.Level };
-                var result = await _userManager.CreateAsync(user, model.Password);
+                // create a new user
+                ApplicationUser owner = new ApplicationUser { UserName = model.Email, Email = model.Email, FirstName = model.FirstName, LastName = model.LastName, Level = model.Level };
+                var result = await _userManager.CreateAsync(owner, model.Password);
+                
                 // LogIn
                 if (result.Succeeded)
                 {
-                    var u = await _userManager.FindByEmailAsync(model.Email);
+                    
+                    ApplicationUser registeredOwner = await _userManager.FindByEmailAsync(model.Email);
                 
                     // Adding All Claims
-                    var properties = JackLib.PropertyAsObject(new Claims());
+                    List<PropertyInfo> properties = JackLib.PropertyAsObject(new Claims());
                     foreach(var item in properties)
                     {
-                        await _userManager.AddClaimAsync(u, new Claim(item.Name, ""));
+                        await _userManager.AddClaimAsync(registeredOwner, new Claim(item.Name, ""));
                     }
 
+                    // log for the owner
                     await _db.Logs.AddAsync(await Log.New("Register", $"Owner's initial registration", _id, _db));
-                    await _signInManager.SignInAsync(u, isPersistent: false);
+                    
+                    // sign in after adding claims
+                    await _signInManager.SignInAsync(registeredOwner, isPersistent: false);
                     return RedirectToAction("Index", "Owner");
                 }
                 AddErrors(result);
@@ -169,17 +179,18 @@ namespace GlobalEvent.Controllers
             ViewData["ReturnUrl"] = returnUrl;
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email, FirstName = model.FirstName, LastName = model.LastName, Level = model.Level };
-                var result = await _userManager.CreateAsync(user, model.Password);
+                ApplicationUser newUser = new ApplicationUser { UserName = model.Email, Email = model.Email, FirstName = model.FirstName, LastName = model.LastName, Level = model.Level };
+                var result = await _userManager.CreateAsync(newUser, model.Password);
+                
                 if (result.Succeeded)
                 {
                     // ==> LOG for creator
-                    var creator = await _userManager.GetUserAsync(User);
-                    await _db.Logs.AddAsync(await Log.New("Create User", $"{model.Level.ToUpper()}: {model.FirstName} {model.LastName}, was created", creator.Id, _db));
+                    ApplicationUser creator = await _userManager.GetUserAsync(User);
+                    await _db.Logs.AddAsync(await Log.New("Create User", $"{newUser.Level.ToUpper()}: {newUser.FirstName} {newUser.LastName}, was created", creator.Id, _db));
                     
                     // ==> LOG for created user
-                    var newUser = await _userManager.FindByEmailAsync(model.Email);
-                    await _db.Logs.AddAsync(await Log.New("Create User", $"{model.Level.ToUpper()} created by {creator.Level}: {creator.FirstName} {creator.LastName}", newUser.Id, _db));
+                    ApplicationUser created = await _userManager.FindByEmailAsync(newUser.Email);
+                    await _db.Logs.AddAsync(await Log.New("Create User", $"{newUser.Level.ToUpper()} created by {creator.Level}: {creator.FirstName} {creator.LastName}", created.Id, _db));
 
                     return RedirectToAction("Admins", "Owner");
                 }
@@ -198,8 +209,8 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Admins", "Owner");
             }
             
-            var u = await _userManager.FindByIdAsync(ID);
-            return View(u);
+            ApplicationUser user = await _userManager.FindByIdAsync(ID);
+            return View(user);
         }
         
         [HttpGet]
@@ -208,22 +219,22 @@ namespace GlobalEvent.Controllers
         {
             if (ID != null)
             {                
-                var u = await _userManager.FindByIdAsync(ID);
+                ApplicationUser userToDelete= await _userManager.FindByIdAsync(ID);
                 
                 // log for deleter
-                var user = await _userManager.GetUserAsync(User);
-                await _db.Logs.AddAsync(await Log.New("USER", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, was DELETED", user.Id, _db));
+                ApplicationUser deleter = await _userManager.GetUserAsync(User);
+                await _db.Logs.AddAsync(await Log.New("USER", $"{userToDelete.Level.ToUpper()}: {userToDelete.FirstName} {userToDelete.LastName}, was DELETED", deleter.Id, _db));
                 
                 // lof for deleted user
-                await _db.Logs.AddAsync(await Log.New("USER", $"User was DELETED by {user.FirstName} {user.LastName}", u.Id, _db));
+                await _db.Logs.AddAsync(await Log.New("USER", $"User was DELETED by {deleter.FirstName} {deleter.LastName}", userToDelete.Id, _db));
 
-                await _userManager.DeleteAsync(u);
+                await _userManager.DeleteAsync(userToDelete);
             }
 
             return RedirectToAction("Admins", "Owner");
         }
 
-                [HttpGet]
+        [HttpGet]
         [Authorize(Policy="Admin Editor")]
         public async Task<IActionResult> EditAdmin (string ID = null)
         {
@@ -233,21 +244,23 @@ namespace GlobalEvent.Controllers
             }
 
             // get user from db by ID
-            ApplicationUser u = await _userManager.FindByIdAsync(ID);
-            ViewBag.Claims = await _userManager.GetClaimsAsync(u);
-            EditAdmin ea = new EditAdmin();
-            ea.CopyValues(u);
+            ApplicationUser userToEdit = await _userManager.FindByIdAsync(ID);
+            ViewBag.Claims = await _userManager.GetClaimsAsync(userToEdit);
+            
+            // create model for the view
+            EditAdmin model = new EditAdmin();
+            model.CopyValues(userToEdit);
             
             // all user logs
-            ViewBag.Logs = await _db.Logs.Where(x => x.AdminID == u.Id).OrderByDescending(x => x.ID).Take(100).ToListAsync();
+            ViewBag.Logs = await _db.Logs.Where(x => x.AdminID == userToEdit.Id).OrderByDescending(x => x.ID).Take(100).ToListAsync();
             
-            return View(ea);
+            return View(model);
         }
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         [Authorize(Policy="Admin Editor")]
-        public async Task<IActionResult> EditAdmin (EditAdmin a)
+        public async Task<IActionResult> EditAdmin (EditAdmin model)
         {
             if (!ModelState.IsValid) 
             {
@@ -255,28 +268,32 @@ namespace GlobalEvent.Controllers
             }
 
             // update user
-            ApplicationUser u = await _userManager.FindByIdAsync(a.Id);
-            u.FirstName = a.FirstName;
-            u.LastName = a.LastName;
-            u.Level = a.Level;
-            u.Email = a.Email;
-            await _userManager.UpdateAsync(u);
+            ApplicationUser userToUpdate = await _userManager.FindByIdAsync(model.Id);
+            userToUpdate.FirstName = model.FirstName;
+            userToUpdate.LastName = model.LastName;
+            userToUpdate.Level = model.Level;
+            userToUpdate.Email = model.Email;
+            await _userManager.UpdateAsync(userToUpdate);
 
-            // logs
-            ApplicationUser user = await _userManager.GetUserAsync(User);
-            await _db.Logs.AddAsync(await Log.New("Edit User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, was EDITED", _id, _db));
-            await _db.Logs.AddAsync(await Log.New("Edit User", $"User was EDITED by {user.FirstName} {user.LastName}", _id, _db));
+            // logs for updating user
+            ApplicationUser updator = await _userManager.GetUserAsync(User);
+            await _db.Logs.AddAsync(await Log.New("Edit User", $"{userToUpdate.Level.ToUpper()}: {userToUpdate.FirstName} {userToUpdate.LastName}, was EDITED", _id, _db));
+            
+            // log for updated user
+            await _db.Logs.AddAsync(await Log.New("Edit User", $"User was EDITED by {updator.FirstName} {updator.LastName}", _id, _db));
 
             // change password if new one is provided
-            if (!string.IsNullOrEmpty(a.Password) 
-                && !string.IsNullOrEmpty(a.ConfirmPassword) 
-                && a.Password == a.ConfirmPassword)
+            if (!string.IsNullOrEmpty(model.Password)  
+                && model.Password == model.ConfirmPassword)
             {
-                await _userManager.RemovePasswordAsync(u);
-                await _userManager.AddPasswordAsync(u, a.Password); 
+                await _userManager.RemovePasswordAsync(userToUpdate);
+                await _userManager.AddPasswordAsync(userToUpdate, model.Password); 
 
-                await _db.Logs.AddAsync(await Log.New("Edit User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, PASSWORD was changed", _id, _db));
-                await _db.Logs.AddAsync(await Log.New("Edit User", $"Password was changed by {user.FirstName} {user.LastName}", _id, _db));
+                // log for updating user
+                await _db.Logs.AddAsync(await Log.New("Edit User", $"{userToUpdate.Level.ToUpper()}: {userToUpdate.FirstName} {userToUpdate.LastName}, PASSWORD was changed", updator.Id, _db));
+                
+                // log for updated user
+                await _db.Logs.AddAsync(await Log.New("Edit User", $"Password was changed by {updator.FirstName} {updator.LastName}", userToUpdate.Id, _db));
             }
 
             return RedirectToAction("Admins", "Owner");
@@ -291,60 +308,66 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Admins", "Owner");
             }
 
-            Claims c = new Claims();
+            // new full list of claims
+            Claims claims = new Claims();
+            
             // get properties for Claims
-            List<PropertyInfo> properties = c.GetType().GetProperties().ToList();
-            ApplicationUser u = await _userManager.FindByIdAsync(ID);
-            IList<Claim> hasClaims = await _userManager.GetClaimsAsync(u);
+            List<PropertyInfo> properties = claims.GetType().GetProperties().ToList();
+            ApplicationUser userToUpdate = await _userManager.FindByIdAsync(ID);
+            IList<Claim> hasClaims = await _userManager.GetClaimsAsync(userToUpdate);
             
             // if claim exist change the value to TRUE
             foreach (var claim in hasClaims){
                 foreach (var item in properties){
                     if (item.Name == claim.Type){
-                        item.SetValue(c, true);
+                        item.SetValue(claims, true);
                     }
                 }
             }
 
+            // sort properties alphabetically by Name
             ViewBag.Properties = properties.OrderBy(x => x.Name);
-            ViewBag.AdminName = $"{u.Level}: {u.FirstName} {u.LastName}";
-            ViewBag.AID = u.Id;
+            ViewBag.AdminName = $"{userToUpdate.Level}: {userToUpdate.FirstName} {userToUpdate.LastName}";
             
-            return View(c);
+            // user ID
+            ViewBag.AID = userToUpdate.Id;
+            
+            return View(claims);
         }
 
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         [Authorize(Policy = "Claims Editor")]
-        public async Task<IActionResult> ChangeClaims (Claims c, string ID = null)
+        public async Task<IActionResult> ChangeClaims (Claims claims, string ID = null)
         {
-            if (c == null || ID == null) 
+            if (claims == null || ID == null) 
             {
                 return RedirectToAction("Admins", "Owner");
             }
             
             // get user by ID
-            ApplicationUser u = await _userManager.FindByIdAsync(ID);
-            List<PropertyInfo> properties = c.GetType().GetProperties().ToList();
+            ApplicationUser userToUpdate = await _userManager.FindByIdAsync(ID);
+            List<PropertyInfo> properties = claims.GetType().GetProperties().ToList();
             
             // remove claims before assigning new ones
-            IList<Claim> hasClaims = await _userManager.GetClaimsAsync(u);
-            await _userManager.RemoveClaimsAsync(u, hasClaims);
+            IList<Claim> hasClaims = await _userManager.GetClaimsAsync(userToUpdate);
+            await _userManager.RemoveClaimsAsync(userToUpdate, hasClaims);
             
             // add new claims
             foreach(var item in properties)
             {
-                if ((bool)item.GetValue(c, null) == true)
+                if ((bool)item.GetValue(claims, null) == true)
                 {
-                    await _userManager.AddClaimAsync(u, new Claim(item.Name, ""));
+                    await _userManager.AddClaimAsync(userToUpdate, new Claim(item.Name, ""));
                 }
             }
 
-            ApplicationUser user = await _userManager.GetUserAsync(User);
             // log for editor
-            await _db.Logs.AddAsync(await Log.New("Edit User", $"{u.Level.ToUpper()}: {u.FirstName} {u.LastName}, CLAIMS were changed", _id, _db));
+            ApplicationUser editor = await _userManager.GetUserAsync(User);
+            await _db.Logs.AddAsync(await Log.New("Edit User", $"{userToUpdate.Level.ToUpper()}: {userToUpdate.FirstName} {userToUpdate.LastName}, CLAIMS were changed", _id, _db));
+            
             // log for edited
-            await _db.Logs.AddAsync(await Log.New("Edit User", $"User's CLAIMS were changed by {user.FirstName} {user.LastName}", u.Id, _db));
+            await _db.Logs.AddAsync(await Log.New("Edit User", $"User's CLAIMS were changed by {editor.FirstName} {editor.LastName}", userToUpdate.Id, _db));
 
             return RedirectToAction("EditAdmin", "Account", new {ID = ID});
         }
@@ -359,57 +382,76 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Admins", "Owner");
             }
-            ApplicationUser toLock = await _userManager.FindByIdAsync(ID);
+            
+            ApplicationUser userToLock = await _userManager.FindByIdAsync(ID);
             ApplicationUser locker = await _userManager.GetUserAsync(User);
             
-            if (toLock.LockoutEnd > DateTime.Now)
+            if (userToLock.LockoutEnd > DateTime.Now)
             {
-                toLock.LockoutEnd = DateTime.Now.AddDays(-1);
+                // unlock user if locked
+                userToLock.LockoutEnd = DateTime.Now.AddDays(-1);
+                
                 // log for locker
-                await _db.Logs.AddAsync(await Log.New("Lock User", $"{toLock.Level.ToUpper()}: {toLock.FirstName} {toLock.LastName}, was UNLOCKED", _id, _db));
+                await _db.Logs.AddAsync(await Log.New("Lock User", $"{userToLock.Level.ToUpper()}: {userToLock.FirstName} {userToLock.LastName}, was UNLOCKED", _id, _db));
+                
                 // Log for locked user
-                await _db.Logs.AddAsync(await Log.New("Edit User", $"User was UNLOCKED by {locker.FirstName} {locker.LastName}", toLock.Id, _db));
+                await _db.Logs.AddAsync(await Log.New("Edit User", $"User was UNLOCKED by {locker.FirstName} {locker.LastName}", userToLock.Id, _db));
             }
             else
             {
-                toLock.LockoutEnd = DateTime.Now.AddYears(10);
+                // lock user
+                userToLock.LockoutEnd = DateTime.Now.AddYears(10);
+                
                 // log for locker
-                await _db.Logs.AddAsync(await Log.New("Lock User", $"{toLock.Level.ToUpper()}: {toLock.FirstName} {toLock.LastName}, was LOCKED and Logged Out", _id, _db));
+                await _db.Logs.AddAsync(await Log.New("Lock User", $"{userToLock.Level.ToUpper()}: {userToLock.FirstName} {userToLock.LastName}, was LOCKED and Logged Out", _id, _db));
+                
                 // Log for locked user
-                await _db.Logs.AddAsync(await Log.New("Edit User", $"User was LOCKED by {locker.FirstName} {locker.LastName}", toLock.Id, _db));
-                // log out the locked user
-                await _userManager.UpdateSecurityStampAsync(toLock);
+                await _db.Logs.AddAsync(await Log.New("Edit User", $"User was LOCKED by {locker.FirstName} {locker.LastName}", userToLock.Id, _db));
+                
+                // log out immediately
+                await _userManager.UpdateSecurityStampAsync(userToLock);
             }
-            await _userManager.UpdateAsync(toLock);
+            await _userManager.UpdateAsync(userToLock);
 
             return RedirectToAction("Admins", "Owner");
         }
 
         //
-        // POST: /Account/LOCK
+        // POST: /Account/LockAll
         [HttpPost]
         [Authorize(Policy="Is Owner")]
         public async Task<IActionResult> LockAll (string lockall)
         {
+            // check if proper string-code was submitted
             if (lockall != "lockall")
             {
                 return RedirectToAction("Admins", "Owner");
             }
+            
             ApplicationUser locker = await _userManager.GetUserAsync(User);
+            
+            // list of all users
             List<ApplicationUser> users = await _db.Users.ToListAsync();
+            
             foreach (var user in users)
             {
+                // lock all users but Owner
                 if (user.Level != "Owner")
                 {
                     user.LockoutEnd = DateTime.Now.AddYears(10);
+                    
+                    // lock immediately 
                     await _userManager.UpdateSecurityStampAsync(user);
                     await _userManager.UpdateAsync(user);
 
+                    // log for locked user
                     await _db.Logs.AddAsync(await Log.New("Edit User", $"User was LOCKED by {locker.FirstName} {locker.LastName}", user.Id, _db));
                 }
             }
+            
             // log for locker
             await _db.Logs.AddAsync(await Log.New("Lock User", $"All users were LOCKED and Logged Out", _id, _db));
+
             return RedirectToAction("Admins", "Owner");
         }
 
@@ -419,6 +461,7 @@ namespace GlobalEvent.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
+            // log for logging out user
             await _db.Logs.AddAsync(await Log.New("Log Out", "User Loged Out", _id, _db));
             await _signInManager.SignOutAsync();
             return RedirectToAction(nameof(HomeController.Index), "Home");

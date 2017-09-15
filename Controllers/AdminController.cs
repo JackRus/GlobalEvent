@@ -33,23 +33,25 @@ namespace GlobalEvent.Controllers
         [Authorize(Policy="Visitors Viewer")]
         public async Task<IActionResult> Dashboard (string message = null)
         {
-            Event e = await _db.Events
+            Event active = await _db.Events
                 .Include(x => x.Tickets)
                 .Include(x => x.Products)
                 .Include(x => x.Visitors)
                     .ThenInclude(x => x.Requests)
                 .FirstOrDefaultAsync(x => x.Status);
-            ViewBag.Active = e == null ? false : true;
+            
+            ViewBag.Active = active == null ? false : true;
+            
             if (ViewBag.Active)
             {
-                await Event.Update(_db, e.ID);
-                ViewBag.CheckIned = e.Visitors.Where(x => x.CheckIned).Count();
-                ViewBag.Registered = e.Visitors.Where(x => x.Registered).Count();
-                ViewBag.Requests = e.GetAllRequests();
-                ViewBag.AllTickets = e.Tickets.Select(x => x.Limit).Sum();
+                await Event.Update(_db, active.ID);
+                ViewBag.CheckIned = active.Visitors.Where(x => x.CheckIned).Count();
+                ViewBag.Registered = active.Visitors.Where(x => x.Registered).Count();
+                ViewBag.Requests = active.GetAllRequests();
+                ViewBag.AllTickets = active.Tickets.Select(x => x.Limit).Sum();
             }
             ViewBag.Message = message;
-            return View(e);
+            return View(active);
         }
 
         [HttpGet]
@@ -61,15 +63,18 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin", new {message = "Search couldn't be performed."});
             }
 
-            List<Visitor> v = await Visitor.Search(ID, _db);
-            await _db.Logs.AddAsync(await Log.New("Search", $"Search value: {ID}", _id, _db));
+            List<Visitor> visitors = await Visitor.Search(ID, _db);
             ViewBag.ID = ID;
-            if (v == null || v.Count == 0)
+
+            // log for user
+            await _db.Logs.AddAsync(await Log.New("Search", $"Search value: {ID}", _id, _db));
+                
+            if (visitors == null || visitors.Count == 0)
             {
                 ViewBag.Message = "No records were found. Please try different search creteria or make sure your input is correct.";
             }
 
-            return View(v);
+            return View(visitors);
         }
 
         [HttpGet]
@@ -81,18 +86,18 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin", new {message = "Request couldn't be executed."});
             }
 
-            Visitor v = await _db.Visitors
+            Visitor visitor = await _db.Visitors
                 .Include(x => x.Requests)
                 .Include(x => x.Notes)
                 .Include(x => x.Logs)
                     .ThenInclude(x => x.CurrentState)
                 .SingleOrDefaultAsync(x => x.ID == ID);
 
-            if (v == null)
+            if (visitor == null)
             {
                 return RedirectToAction("Dashboard", "Admin", new {message = "Visitor couldn't be found. Please, try again."});
             }   
-            return View(v);
+            return View(visitor);
         } 
 
 
@@ -105,35 +110,47 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin", new {message = "Couldn't access the visitor."});
             }
     
-            EditVisitor ev = new EditVisitor();
-            await ev.SetValues(_db, (int)ID);
+            EditVisitor model = new EditVisitor();
+            await model.SetValues(_db, (int)ID);
 
-            return View(ev);
+            return View(model);
         }
 
 
         [HttpPost]
         [Authorize(Policy="Visitor Editor")]
-        public async Task<IActionResult> EditVisitor (EditVisitor edit)
+        public async Task<IActionResult> EditVisitor (EditVisitor model)
         {
             if (ModelState.IsValid)
             {
-                Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == edit.ID);
-                ApplicationUser u = await _userManager.GetUserAsync(User); 
+                // get visitor by id
+                Visitor visitor = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == model.ID);
+                ApplicationUser user = await _userManager.GetUserAsync(User); 
 
-                if (!v.Blocked && edit.Blocked)
+                // logs for visitor
+                string action;
+                if (!visitor.Blocked && model.Blocked)
                 {
-                    v.AddLog("ADMIN", $"BLOCKED BY {u.Level}: {u.FirstName} {u.LastName}");
+                    action = "BLOCKED";
                 }
-                else if (v.Blocked && !edit.Blocked)
+                else if (visitor.Blocked && !model.Blocked)
                 {
-                    v.AddLog("ADMIN", $"UNBLOCKED BY {u.Level}: {u.FirstName} {u.LastName}");
+                    action = "UNBLOCKED";
                 }
+                else
+                {
+                    action = "CHANGED";
+                }
+                visitor.AddLog("ADMIN", $"{action} BY {user.Level}: {user.FirstName} {user.LastName}", true);
+                
+                // update and save visitor
+                JackLib.CopyValues(model, visitor);
+                _db.Visitors.Update(visitor);
+                
+                // log for admin
+                await _db.Logs.AddAsync(await Log.New("Visitor", $"Visitor witg ID: {visitor.ID}, was EDITED", _id, _db));
 
-                JackLib.CopyValues(edit, v);
-                _db.Visitors.Update(v);
-                await _db.Logs.AddAsync(await Log.New("Visitor", $"Visitor witg ID: {v.ID}, was EDITED", _id, _db));
-                return RedirectToAction("ViewVisitor", "Admin", new {ID = edit.ID});
+                return RedirectToAction("ViewVisitor", "Admin", new {ID = model.ID});
             }
             return RedirectToAction("Dashboard", "Admin", new {message = "Couldn't execute this request. Please try again."});
         }
@@ -146,9 +163,9 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Dashboard", "Admin", new {message = "Couldn't access the visitor."});
             }
-            Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ID);
+            Visitor visitor = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ID);
 
-            return View(v);
+            return View(visitor);
         }
 
         [HttpGet]
@@ -160,17 +177,24 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin", new {message = "Couldn't execute this request."});
             }
             
-            Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ID);
-            v.Deleted = true;
-            await Order.Decrement(v.OrderNumber, _db);
-            ApplicationUser u = await _userManager.GetUserAsync(User);
-            // visitor log
-            v.AddLog("ADMIN", $"DELETED BY {u.Level}: {u.FirstName} {u.LastName}");
-            _db.Visitors.Update(v);
-            // admin log
-            await _db.Logs.AddAsync(await Log.New("Visitor", $"Visitor(ID: {v.ID}) {v.Name} {v.Last} was DELETED.", _id, _db));
+            // update and save visitor
+            Visitor visitor = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ID);
+            visitor.Deleted = true;
+            
+            // change the number of checked-in tickets for this order number
+            await Order.Decrement(visitor.OrderNumber, _db);
 
-            return RedirectToAction("ViewVisitor", "Admin", new {ID = v.ID});
+            // get admin
+            ApplicationUser user = await _userManager.GetUserAsync(User);
+            
+            // visitor log
+            visitor.AddLog("ADMIN", $"DELETED BY {user.Level}: {user.FirstName} {user.LastName}");
+            _db.Visitors.Update(visitor);
+            
+            // admin log
+            await _db.Logs.AddAsync(await Log.New("Visitor", $"Visitor(ID: {visitor.ID}) {visitor.Name} {visitor.Last} was DELETED.", user.Id, _db));
+
+            return RedirectToAction("ViewVisitor", "Admin", new {ID = visitor.ID});
         }
 
         [HttpGet]
@@ -182,23 +206,34 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin", new {message = "Couldn't execute this request."});
             }
             
-            Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ID);
-            v.Deleted = false;
-            if ((await _db.Orders.SingleOrDefaultAsync(x => x.Number.ToString() == v.OrderNumber)).Full)
+            // update visitor's status
+            Visitor visitor = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ID);
+            visitor.Deleted = false;
+            
+            // check if all tickets for this order were used
+            Order order = await _db.Orders.SingleOrDefaultAsync(x => x.Number.ToString() == visitor.OrderNumber);
+            if (order.Full)
             {
-                await _db.Logs.AddAsync(await Log.New("Visitor", $"Attempt to REINSTATE Visitor(ID: {v.ID}) {v.Name} {v.Last} failed.", _id, _db));
+                // log for admin
+                await _db.Logs.AddAsync(await Log.New("Visitor", $"Attempt to REINSTATE Visitor(ID: {visitor.ID}) {visitor.Name} {visitor.Last} failed. Order is FULL", _id, _db));
 
                 return RedirectToAction("Dashboard", "Admin", new {message = "This Visitor can NOT be reinstated. All tickets were used. Advise the visitor to purchase another ticket or ask Manager for assistance."});
             }
 
-            // log for visitor
+            // admin
             ApplicationUser user = await _userManager.GetUserAsync(User);
-            v.AddLog("ADMIN", $"REINSTATED BY {user.Level}: {user.FirstName} {user.LastName}");
-            _db.Visitors.Update(v);
-            await Order.Increment(v.OrderNumber, _db);
-            await _db.Logs.AddAsync(await Log.New("Visitor", $"Visitor(ID: {v.ID}) {v.Name} {v.Last} was REINSTATED.", _id, _db));
 
-            return RedirectToAction("ViewVisitor", "Admin", new {ID = v.ID});
+            // log for visitor
+            visitor.AddLog("ADMIN", $"REINSTATED BY {user.Level}: {user.FirstName} {user.LastName}");
+            _db.Visitors.Update(visitor);
+
+            // change the number of checked-in tickets for this order number
+            await Order.Increment(visitor.OrderNumber, _db);
+
+            // log for admin
+            await _db.Logs.AddAsync(await Log.New("Visitor", $"Visitor(ID: {visitor.ID}) {visitor.Name} {visitor.Last} was REINSTATED.", _id, _db));
+
+            return RedirectToAction("ViewVisitor", "Admin", new {ID = visitor.ID});
         }
     }
 }

@@ -28,33 +28,46 @@ namespace GlobalEvent.Controllers
             _id = _userManager.GetUserId(http.HttpContext.User);
         }
 
-        // GET ADD
+        //
+        // GET: Issue/Add
         [HttpGet]
         public IActionResult Add(int? ID, int? EID)
         {
-            Issue i = new Issue();
-            i.InitiateDescription(ID, EID); // based on the info provided
+            Issue issue = new Issue();
+            
+            // create description
+            issue.InitiateDescription(ID, EID); 
+
+            // list of types for <select> tag
             ViewBag.List = Issue.GenerateTypes();
-            return View(i);
+            return View(issue);
         }
         
-        /// POST ADD
+        //
+        // POST: Issue/Add
         [HttpPost]
         [AutoValidateAntiforgeryToken]
-        public async Task<IActionResult> Add (Issue i)
+        public async Task<IActionResult> Add (Issue issue)
         {
+            // default message
             var result = "Could't add Issue record.";
-            if (!string.IsNullOrEmpty(i.Description))
+
+            if (!string.IsNullOrEmpty(issue.Description))
             {
-                i.Complete(await _userManager.GetUserAsync(User));
-                await _db.Issues.AddAsync(i);   
-                await _db.Logs.AddAsync(await Log.New("Issue", $"Issue: \"{i.Description}\", was CREATED", _id, _db));
-                result = $"Issue record \"{i.Description}\" was created.";
+                // complete the model and add to db
+                issue.Complete(await _userManager.GetUserAsync(User));
+                await _db.Issues.AddAsync(issue);   
+                
+                // log for admin
+                await _db.Logs.AddAsync(await Log.New("Issue", $"Issue: \"{issue.Description}\", was CREATED", _id, _db));
+
+                result = $"Issue record \"{issue.Description}\" was created.";
             }
             return RedirectToAction("Dashboard", "Admin", new {message = result});
         }
 
-        // GET EDIT
+        //
+        // GET: Issue/Edit
         [HttpGet]
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Edit (int? ID)
@@ -64,39 +77,56 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin", new {message = $"Could't access Issue record."});
             }
             
+             // list of types for <select> tag
             ViewBag.List = Issue.GenerateTypes();
-            Issue i = await _db.Issues.SingleOrDefaultAsync(x => x.ID == ID);
-            return View(i);
+            Issue issue = await _db.Issues.SingleOrDefaultAsync(x => x.ID == ID);
+
+            return View(issue);
         }
         
-        // POST EDIT
+        //
+        // POST: Issue/Edit
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         public async Task<IActionResult> Edit (Issue i)
         {
+            // default message
             var result = "Could't edit Issue record.";
+
             if (ModelState.IsValid)
             {
-                Issue oldI = await _db.Issues.FirstOrDefaultAsync(x => x.ID == i.ID);
-                oldI.CopyInfo(i);
-                _db.Issues.Update(oldI);
+                // update issue 
+                Issue issueToUpdate = await _db.Issues.FirstOrDefaultAsync(x => x.ID == i.ID);
+                issueToUpdate.CopyInfo(i);
+                _db.Issues.Update(issueToUpdate);
+
+                // log for admin
                 await _db.Logs.AddAsync(await Log.New("Issue", $"Issue: \"{i.Description}\", was EDITED", _id, _db));
+
                 result = $"Issue record was edited.";
             }
+
             return RedirectToAction("Dashboard", "Admin", new {message = result});
         }
 
-        // GET DELETE
+        //
+        // GET: Issue/Delete
         [HttpGet]
         public async Task<IActionResult> Delete (int? ID)
         {
+            // default message
             var result = "Could't delete Issue record.";
+
             if (ID != null) 
             {
-                Issue i = await _db.Issues.SingleOrDefaultAsync(x => x.ID == ID);
-                _db.Issues.Remove(i);
-                await _db.Logs.AddAsync(await Log.New("Issue", $"Issue: \"{i.Description}\", was DELETED", _id, _db));
-                result = $"Issue record \"{i.Description}\" was deleted.";
+                // find and delete
+                Issue issue = await _db.Issues.SingleOrDefaultAsync(x => x.ID == ID);
+                _db.Issues.Remove(issue);
+
+                // log for admin
+                await _db.Logs.AddAsync(await Log.New("Issue", $"Issue: \"{issue.Description}\", was DELETED", _id, _db));
+
+                result = $"Issue record \"{issue.Description}\" was deleted.";
             }
             
             return RedirectToAction("Dashboard", "Admin", new {message = result});
@@ -105,12 +135,18 @@ namespace GlobalEvent.Controllers
         [HttpGet]
         public async Task<IActionResult> Status (int? ID, string Name = null)
         {
+            // default message
             var result = $"Could't change \"{Name}\" value.";
+            
             if (ID != null && Name != null)
             {
+                // find and update
                 Issue i = await _db.Issues.FirstOrDefaultAsync(x => x.ID == ID);
                 i.UpdateValues(Name, _db);
+
+                // log for admin
                 await _db.Logs.AddAsync(await Log.New("Issue", $"Issue: \"{i.Description}\", feild {Name} was changed.", _id, _db));
+                
                 result = $"Value of \"{Name}\" was changed.";
             }
             return RedirectToAction("Dashboard", "Admin", new {message = result});

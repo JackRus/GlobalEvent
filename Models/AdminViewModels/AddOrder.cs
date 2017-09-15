@@ -92,7 +92,7 @@ namespace GlobalEvent.Models.AdminViewModels
 			int number = 0;
 			do
 			{
-				// min and max values for Random() are big enough (safe) to have 8 digits
+				// min and max values for Random() are big enough (safe)
 				// and are less than the min value for Order Number from Eventbrite
 				// this range gives us 23.3 million numbers, which we can use for OrderNumber 
 				number = new Random().Next(10000000, 33333333);
@@ -101,28 +101,32 @@ namespace GlobalEvent.Models.AdminViewModels
 			return number;
 		}
 
-		public async Task<bool> CheckDuplicates(ApplicationDbContext db, Order o)
+		public async Task<bool> CheckDuplicates(ApplicationDbContext db, Order order)
 		{
-			Order order;
-			if ((order = (await db.Orders.FirstOrDefaultAsync(x =>
+			// find dublicate
+			Order orderDublicate = await db.Orders.FirstOrDefaultAsync(x =>
 				x.Amount == this.Amount &&
 				x.EID == this.EID &&
 				x.OwnerName == this.OwnerName &&
 				x.OwnerEmail == this.OwnerEmail &&
 				x.OwnerPhone == this.OwnerPhone &&
 				x.VType == this.VType &&
-				x.TicketType == this.TicketType))) == null)
+				x.TicketType == this.TicketType);
+
+			if (orderDublicate  == null)
 			{
-				o.Number = await AddOrder.GenerateNumber(db);
-				this.CopyInfo(o);
+				// if no dublicates found
+				order.Number = await AddOrder.GenerateNumber(db);
+				this.CopyInfo(order);
 				return false;
-			}
+			} 
 			else
 			{
-				o.Number = order.Number;
-				o.Amount = order.Amount;
-				o.VType = order.VType;
-				o.TicketType = order.TicketType;
+				// if duplicate found
+				order.Number = orderDublicate.Number;
+				order.Amount = orderDublicate.Amount;
+				order.VType = orderDublicate.VType;
+				order.TicketType = orderDublicate.TicketType;
 				return true;
 			}
 		}

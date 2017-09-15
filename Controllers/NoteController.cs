@@ -26,6 +26,8 @@ namespace GlobalEvent.Controllers
             _id = _userManager.GetUserId(http.HttpContext.User);
         }
 
+        //
+        // GET: Note/Add
         [HttpGet]
         public async Task<IActionResult> Add(int? ID)
         {
@@ -38,27 +40,35 @@ namespace GlobalEvent.Controllers
             return View(new Note());
         }
         
+        //
+        // POST: Note/Add
         [HttpPost]
         [AutoValidateAntiforgeryToken]
-        public async Task<IActionResult> Add (Note n)
+        public async Task<IActionResult> Add (Note note)
         {
-            if (string.IsNullOrEmpty(n.Description) || n.VID == 0)
+            if (string.IsNullOrEmpty(note.Description) || note.VID == 0)
             {
                 return RedirectToAction("Dashboard", "Admin");
             }
             
+            // get admin
             ApplicationUser user = await _userManager.GetUserAsync(User);
-            n.AdminID = user.Id;
-            n.AdminName = $"{user.FirstName} {user.LastName}";
+            note.AdminID = user.Id;
+            note.AdminName = $"{user.FirstName} {user.LastName}";
 
-            Visitor v = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == n.VID);
-            v.Notes.Add(n);
-            _db.Visitors.Update(v);
-            await _db.Logs.AddAsync(await Log.New("Note", $"Note: \"{n.Description}\" for VID: {n.VID}, was CREATED", _id, _db));
+            // find visitor and add note
+            Visitor visitor = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == note.VID);
+            visitor.Notes.Add(note);
+            _db.Visitors.Update(visitor);
+
+            // log for admin
+            await _db.Logs.AddAsync(await Log.New("Note", $"Note: \"{note.Description}\" for VID: {note.VID}, was CREATED", _id, _db));
             
-            return RedirectToAction("ViewVisitor", "Admin", new {ID = n.VID});
+            return RedirectToAction("ViewVisitor", "Admin", new {ID = note.VID});
         }
 
+        //
+        // GET: Note/Edit
         [HttpGet]
         public async Task<IActionResult> Edit (int? ID)
         {
@@ -66,24 +76,36 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Index");
             }
-            ViewBag.Visitor = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == ID);
-            return View(await _db.Notes.FirstOrDefaultAsync(x => x.ID == ID));
+
+            // get note by id
+            Note note = await _db.Notes.FirstOrDefaultAsync(x => x.ID == ID);
+            ViewBag.Visitor = await _db.Visitors.SingleOrDefaultAsync(x => x.ID == note.VID);
+        
+            return View(note);
         }
 
+        //
+        // POST: Note/Edit
         [HttpPost]
         [AutoValidateAntiforgeryToken]
-        public async Task<IActionResult> Edit (Note n)
+        public async Task<IActionResult> Edit (Note note)
         {
-            if (string.IsNullOrEmpty(n.Description) || n.ID == 0)
+            if (string.IsNullOrEmpty(note.Description) || note.ID == 0)
             {
                 return RedirectToAction("Dashboard", "Admin");
             }
-            int VID = await n.CopyValues(_db);
-            await _db.Logs.AddAsync(await Log.New("Note", $"Note: \"{n.Description}\" for VID: {n.VID}, was EDITED", _id, _db));
+
+            // get visitor ID and copy values
+            int VID = await note.CopyValues(_db);
+
+            // log for admin
+            await _db.Logs.AddAsync(await Log.New("Note", $"Note: \"{note.Description}\" for VID: {note.VID}, was EDITED", _id, _db));
 
             return RedirectToAction("ViewVisitor", "Admin", new {ID = VID});
         }
 
+        //
+        // GET: Note/Delete
         [HttpGet]
         public async Task<IActionResult> Delete (int? ID)
         {
@@ -92,13 +114,18 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin");
             }
 
-            Note n = await _db.Notes.FirstOrDefaultAsync(x => x.ID == ID);
-            _db.Notes.Remove(n);
-            await _db.Logs.AddAsync(await Log.New("Note", $"Note: \"{n.Description}\" for VID: {n.VID}, was DELETED", _id, _db));
+            // find and delete note
+            Note note = await _db.Notes.FirstOrDefaultAsync(x => x.ID == ID);
+            _db.Notes.Remove(note);
 
-            return RedirectToAction("ViewVisitor", "Admin", new {ID = n.VID});
+            // log for admin
+            await _db.Logs.AddAsync(await Log.New("Note", $"Note: \"{note.Description}\" for VID: {note.VID}, was DELETED", _id, _db));
+
+            return RedirectToAction("ViewVisitor", "Admin", new {ID = note.VID});
         }
 
+        //
+        // GET: Note/Status
         [HttpGet]
         public async Task<IActionResult> Status (int? ID, string Name = null)
         {
@@ -107,11 +134,14 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Dashboard", "Admin");
             }
 
-            Note n = await _db.Notes.FirstOrDefaultAsync(x => x.ID == ID);
-            n.UpdateValues(Name, _db);
-            await _db.Logs.AddAsync(await Log.New("Note", $"Note: \"{n.Description}\" for VID: {n.VID}, feild {Name} was changed", _id, _db));
+            // find note and update status
+            Note note = await _db.Notes.FirstOrDefaultAsync(x => x.ID == ID);
+            note.UpdateValues(Name, _db);
 
-            return RedirectToAction("ViewVisitor", "Admin", new {ID = n.VID});
+            // Log for admin
+            await _db.Logs.AddAsync(await Log.New("Note", $"Note: \"{note.Description}\" for VID: {note.VID}, feild {Name} was changed", _id, _db));
+
+            return RedirectToAction("ViewVisitor", "Admin", new {ID = note.VID});
         }
 	}
 }

@@ -26,6 +26,8 @@ namespace GlobalEvent.Controllers
             _id = _userManager.GetUserId(http.HttpContext.User);
         }
 
+        //
+        // GET: Todo/Index
         [HttpGet]
         [Authorize(Policy="Todo Viewer")]
         public async Task<IActionResult> Index()
@@ -46,23 +48,30 @@ namespace GlobalEvent.Controllers
             return View();
         }
 
+        //
+        // POST: Todo/Add
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         [Authorize(Policy="Todo Creator")]
-        public async Task<IActionResult> Add (ToDo t, string url = "Owner") // from Main Menu
+        public async Task<IActionResult> Add (ToDo todo, string url = "Owner")
         {
             if (ModelState.IsValid)
             {
-                t.Created = DateTime.Now.ToString("yyyy-MM-dd");
-                await _db.ToDos.AddAsync(t);
-                await _db.Logs.AddAsync(await Log.New("ToDo", $"Task: {t.Task}, was CREATED", _id, _db));
+                todo.Created = DateTime.Now.ToString("yyyy-MM-dd");
+                await _db.ToDos.AddAsync(todo);
+                
+                // log for admin
+                await _db.Logs.AddAsync(await Log.New("ToDo", $"Task: {todo.Task}, was CREATED", _id, _db));
 
                 return RedirectToAction("Index", url);
             }
+
             return RedirectToAction("Index", "Owner", new { message = "Couldn't create ToDo item. Please try again."});
         }
         
 
+        //
+        // GET: Todo/AddFull
         [HttpGet]
         [Authorize(Policy="Todo Creator")]
         public async Task<IActionResult> AddFull() // from Todo/Index
@@ -71,6 +80,8 @@ namespace GlobalEvent.Controllers
             return View();
         }
 
+        //
+        // GET: Todo/Copy
         [HttpGet]
         [Authorize(Policy="Todo Creator")]
         public async Task<IActionResult> Copy (int? ID)
@@ -79,10 +90,15 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Index");
             }
+
             ViewBag.EventList = await ToDo.GenerateEventList(_db);
-            return View(await _db.ToDos.FirstOrDefaultAsync(x => x.ID == ID));
+            ToDo todo = await _db.ToDos.FirstOrDefaultAsync(x => x.ID == ID);
+
+            return View(todo);
         }
 
+        //
+        // GET: Todo/Edit
         [HttpGet]
         [Authorize(Policy="Todo EditorKiller")]
         public async Task<IActionResult> Edit (int? ID)
@@ -91,25 +107,34 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Index");
             }
+
             ViewBag.EventList = await ToDo.GenerateEventList(_db);
-            return View(await _db.ToDos.FirstOrDefaultAsync(x => x.ID == ID));
+            ToDo todo = await _db.ToDos.FirstOrDefaultAsync(x => x.ID == ID);
+
+            return View(todo);
         }
 
+        //
+        // POST: Todo/Edit
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         [Authorize(Policy="Todo EditorKiller")]
-        public async Task<IActionResult> Edit (ToDo t)
+        public async Task<IActionResult> Edit (ToDo model)
         {
             if (ModelState.IsValid)
             {
-                ToDo tOld = await _db.ToDos.FirstOrDefaultAsync(x => x.ID == t.ID);
-                tOld.CopyValues(t, _db);
-                await _db.Logs.AddAsync(await Log.New("ToDo", $"Task: {tOld.Task}, was EDITED", _id, _db));
+                ToDo todo = await _db.ToDos.SingleOrDefaultAsync(x => x.ID == model.ID);
+                todo.CopyValues(model, _db);
+                
+                // Log for admin
+                await _db.Logs.AddAsync(await Log.New("ToDo", $"Task: {todo.Task}, was EDITED", _id, _db));
             }
 
             return RedirectToAction("Index", "Todo");
         }
 
+        //
+        //
         [HttpGet]
         [Authorize(Policy="Todo EditorKiller")]
         public async Task<IActionResult> Delete (int? ID)

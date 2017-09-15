@@ -29,6 +29,8 @@ namespace GlobalEvent.Controllers
             _id = _userManager.GetUserId(http.HttpContext.User);
         }
 
+        //
+        // GET: Ticket/Index
         [HttpGet]
         [Authorize(Policy="Tickets Viewer")]
         public async Task<IActionResult> Index(int? ID) //displays all ticket
@@ -38,12 +40,17 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Events", "Owner");
             }
 
+            // update ticket types with Eventbrite
             await Ticket_Classes.UpdateEB(_db, (int)ID);
+
+            // get the current event with all ticket types
             ViewBag.Event = await _db.Events.Include(x => x.Tickets).SingleOrDefaultAsync(x => x.ID == ID);
 
             return View();
         }
 
+        //
+        // GET: Ticket/Add
         [HttpGet]
         [Authorize(Policy="Ticket Creator")]
         public async Task<IActionResult> Add(int? ID)
@@ -53,30 +60,41 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Events", "Owner");
             }
 
+            // get the current event
             ViewBag.Event = await _db.Events.SingleOrDefaultAsync(x => x.ID == ID);
+
             return View();
         }
 
 
+        //
+        // POST: Ticket/Add
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         [Authorize(Policy="Ticket Creator")]
-        public async Task<IActionResult> Add(Ticket t)
+        public async Task<IActionResult> Add(Ticket model)
         {
             if (ModelState.IsValid)
             {
-                Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == t.EID);
-                t.ID = 0; // reset the ID before adding to DB
-                e.Tickets.Add(t);
-                _db.Events.Update(e);
-                await _db.Logs.AddAsync(await Log.New("Ticket", $"Ticket: {t.Type}, was CREATED", _id, _db));
+                // reset the ID before adding to DB
+                model.ID = 0;
 
-                return RedirectToAction("Index", new { ID = t.EID });
+                // get the current event and add ticket
+                Event currentEvent = await _db.Events.FirstOrDefaultAsync(x => x.ID == model.EID);
+                currentEvent.Tickets.Add(model);
+                _db.Events.Update(currentEvent);
+
+                // log for admin
+                await _db.Logs.AddAsync(await Log.New("Ticket", $"Ticket: {model.Type}, was CREATED", _id, _db));
+
+                return RedirectToAction("Index", new { ID = model.EID });
             }
 
             return RedirectToAction("Events", "Owner");
         }
 
+        //
+        // GET: Ticket/Edit
         [HttpGet]
         [Authorize(Policy="Ticket Creator")]
         public async Task<IActionResult> Edit(int? ID)
@@ -85,28 +103,39 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Events", "Owner");
             }
-            Ticket t = await _db.Tickets.FirstOrDefaultAsync(x => x.ID == ID);
-            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == t.EID)).Name;
             
-            return View(t);
+            // get the ticket to edit
+            Ticket ticket = await _db.Tickets.FirstOrDefaultAsync(x => x.ID == ID);
+            
+            // get the event for the ticket
+            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ticket.EID)).Name;
+            
+            return View(ticket);
         }
 
+        //
+        // POST: Ticket/Edit
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         [Authorize(Policy="Ticket Creator")]
-        public async Task<IActionResult> Edit(Ticket t)
+        public async Task<IActionResult> Edit(Ticket model)
         {
             if (ModelState.IsValid)
             {
-                _db.Tickets.Update(t);
-                await _db.Logs.AddAsync(await Log.New("Ticket", $"Ticket: {t.Type}, was EDITED", _id, _db));
+                // update ticket in db
+                _db.Tickets.Update(model);
 
-                return RedirectToAction("Index", new { ID = t.EID });
+                // log for admin
+                await _db.Logs.AddAsync(await Log.New("Ticket", $"Ticket: {model.Type}, was EDITED", _id, _db));
+
+                return RedirectToAction("Index", new { ID = model.EID });
             }
 
             return RedirectToAction("Events", "Owner");
         }
 
+        //
+        // GET: Ticket/Copy
         [HttpGet]
         [Authorize(Policy="Ticket Creator")]
         public async Task<IActionResult> Copy (int? ID)
@@ -115,30 +144,43 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Events", "Owner");
             }
-            Ticket t = await _db.Tickets.SingleOrDefaultAsync(x => x.ID == ID);
-            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == t.EID)).Name;
-            return View(t);
+            
+            Ticket ticket = await _db.Tickets.SingleOrDefaultAsync(x => x.ID == ID);
+            JackLib.IfNull(ticket);
+
+            // get current event's name
+            ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == ticket.EID)).Name;
+
+            return View(ticket);
         }
 
+        // 
+        // POST: Ticket/Copy
         [HttpPost]
         [AutoValidateAntiforgeryToken]
         [Authorize(Policy="Ticket Creator")]
-        public async Task<IActionResult> Copy (Ticket t)
+        public async Task<IActionResult> Copy (Ticket ticket)
         { 
             if (ModelState.IsValid)
             {
-                Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == t.EID);
-                t.ID = 0; // reset ID beofre adding to db
-                e.Tickets.Add(t);
-                _db.Events.Update(e);
-                await _db.Logs.AddAsync(await Log.New("Ticket", $"Ticket: {t.Type}, was COPIED", _id, _db));
+                Event eventToUpdate = await _db.Events.FirstOrDefaultAsync(x => x.ID == ticket.EID);
 
-                return RedirectToAction("Index", new { ID = t.EID });
+                // reset ID beofre adding to db
+                ticket.ID = 0;
+                eventToUpdate.Tickets.Add(ticket);
+                _db.Events.Update(eventToUpdate);
+                
+                // log for admin
+                await _db.Logs.AddAsync(await Log.New("Ticket", $"Ticket: {ticket.Type}, was COPIED", _id, _db));
+
+                return RedirectToAction("Index", new { ID = ticket.EID });
             }
 
             return RedirectToAction("Events", "Owner");
         }
 
+        //
+        // GET: Ticket/Delete
         [HttpGet]
         [Authorize(Policy="Ticket Killer")]
         public async Task<IActionResult> Delete(int? ID)
@@ -147,10 +189,15 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Events", "Owner");
             }
+            
+            Ticket ticket = await _db.Tickets.FirstOrDefaultAsync(x => x.ID == ID);
+            JackLib.IfNull(ticket);
 
-            return View(await _db.Tickets.FirstOrDefaultAsync(x => x.ID == ID));
+            return View(ticket);
         }
 
+        //
+        // GET: Ticket/DeleteOk
         [HttpGet]
         [Authorize(Policy="Ticket Killer")]
         public async Task<IActionResult> DeleteOk(int? ID)
@@ -160,13 +207,17 @@ namespace GlobalEvent.Controllers
                 return RedirectToAction("Events", "Owner");
             }
 
-            Ticket t = await _db.Tickets.FirstOrDefaultAsync(x => x.ID == ID);
-            _db.Tickets.Remove(t);
-            await _db.Logs.AddAsync(await Log.New("Ticket", $"Ticket: {t.Type}, was DELETED", _id, _db));
+            Ticket ticket = await _db.Tickets.FirstOrDefaultAsync(x => x.ID == ID);
+            _db.Tickets.Remove(ticket);
 
-            return RedirectToAction("Index", new { ID = t.EID });
+            // log for admin
+            await _db.Logs.AddAsync(await Log.New("Ticket", $"Ticket: {ticket.Type}, was DELETED", _id, _db));
+
+            return RedirectToAction("Index", new { ID = ticket.EID });
         }
 
+        //
+        // GET: Ticket/DeleteAll
         [HttpGet]
         [Authorize(Policy="Is Owner")]
         public async Task<IActionResult> DeleteAll(int? ID)
@@ -175,11 +226,14 @@ namespace GlobalEvent.Controllers
             {
                 return RedirectToAction("Events", "Owner");
             }
-            Event e = await _db.Events.Include(x => x.Tickets).FirstOrDefaultAsync(x => x.ID == ID);
+            
+            Event eventToUpdate = await _db.Events.Include(x => x.Tickets).FirstOrDefaultAsync(x => x.ID == ID);
 
-            return View(e);
+            return View(eventToUpdate);
         }
 
+        // 
+        // Ticket/DeleteAllOk
         [HttpGet]
         [Authorize(Policy="Is Owner")]
         public async Task<IActionResult> DeleteAllOk(int? ID)
@@ -190,6 +244,8 @@ namespace GlobalEvent.Controllers
             }
 
             _db.Tickets.RemoveRange(_db.Tickets.Where(x => x.EID == ID));
+
+            // log for admmin
             await _db.Logs.AddAsync(await Log.New("Ticket", $"All Tickets for Event ID: {ID}, were DELETED", _id, _db));
 
             return RedirectToAction("Index", new { ID = ID });
