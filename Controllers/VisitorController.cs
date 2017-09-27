@@ -20,6 +20,9 @@ namespace GlobalEvent.Controllers
 			_db = context;
 		}
 
+		//
+		// GET: Visitor/CheckInConfirmation 
+		[HttpGet]
 		public IActionResult CheckInConfirmation(int? EID)
 		{
 			if (EID == null) 
@@ -27,9 +30,12 @@ namespace GlobalEvent.Controllers
 				return RedirectToAction("Welcome", "Home");
 			}
 			ViewBag.EID = (int)EID;
+
 			return View();
 		}
 
+		//
+		// GET: Visitor/PreCheckIn
 		[HttpGet]
 		public IActionResult PreCheckIn(int? EID)
 		{
@@ -41,34 +47,43 @@ namespace GlobalEvent.Controllers
 			return View(new Visitor(){EID = (int)EID});
 		}
 
+		//
+		// POST: Visitor/CheckIn
 		[HttpPost]
 		[AutoValidateAntiforgeryToken]
-		public async Task<IActionResult> CheckIn(Visitor v)
+		public async Task<IActionResult> CheckIn(Visitor model)
 		{
-			if (v.RegistrationNumber == null || v.EID == 0) 
+			if (model.RegistrationNumber == null || model.EID == 0) 
 			{
-				return RedirectToAction("Menu", "Home", new { EID = v.EID});
+				return RedirectToAction("Menu", "Home", new { EID = model.EID});
 			}
-			Visitor newV = await _db.Visitors.FirstOrDefaultAsync(x => x.RegistrationNumber == v.RegistrationNumber);
-			if (newV != null)
+
+			Visitor newVisitor = await _db.Visitors.SingleOrDefaultAsync(x => x.RegistrationNumber == model.RegistrationNumber);
+
+			if (newVisitor != null)
 			{
-				if (newV.CheckIned)
+				if (newVisitor.CheckIned)
 				{
 					ViewBag.Message = "This Registration number was already used for Check In and name tag was printed. If you would like to change some information displayed on the name tag, please refer to the administrator.";
-					ViewBag.EID = v.EID;
-					return View("PreCheckIn", v);
+					ViewBag.EID = model.EID;
+					return View("PreCheckIn", model);
 				}
-				ViewBag.Event = (await _db.Events.FirstOrDefaultAsync(x => x.ID == v.EID)).Name;
-				newV.AddLog("Check In", "Check-In Started", true);
+
+				ViewBag.Event = (await _db.Events.SingleOrDefaultAsync(x => x.ID == model.EID)).Name;
+				
+				// add lof for visitor
+				newVisitor.AddLog("Check In", "Check-In Started", true);
 				await _db.SaveChangesAsync();
 
-				return View(newV);
+				return View(newVisitor);
 			}
 			ViewBag.Message = "This Registration number isn't correct. Please try again.";
 
-            return View("PreCheckIn", v);
+            return View("PreCheckIn", model);
 		}
 
+		//
+		// GET: Visitor/CheckInOk
 		[HttpGet]
 		public async Task<IActionResult> CheckInOk (string number, int? EID)
 		{
@@ -77,53 +92,65 @@ namespace GlobalEvent.Controllers
 				return RedirectToAction("Welcome", "Home");
 			}
 			
-			Visitor v = await _db.Visitors.FirstOrDefaultAsync(x => x.RegistrationNumber == number);
-			if (v == null || v.CheckIned)
+			Visitor visitor = await _db.Visitors.SingleOrDefaultAsync(x => x.RegistrationNumber == number);
+
+			if (visitor == null || visitor.CheckIned)
 			{
 				ViewBag.Message = "Something went wrong. Please try again.";
 				return RedirectToAction("Menu", "Home", new { EID = EID });
 			}
 			
-			v.CompleteCheckIn();
-			v.AddLog("Check In", "Check-In Completed. Tag Printed", true);
-			_db.Visitors.Update(v);
+			visitor.CompleteCheckIn();
+			
+			// add log for visitor
+			visitor.AddLog("Check In", "Check-In Completed. Tag Printed", true);
+			_db.Visitors.Update(visitor);
 			await _db.SaveChangesAsync();
 
 			return View();
 		}
 
+		//
+		// GET: Visitor/Edit
 		[HttpGet]
 		public async Task<IActionResult> Edit (string number)
 		{
-			Visitor v = await _db.Visitors.FirstOrDefaultAsync(x => x.RegistrationNumber == number); 
-			if (number == null || v == null || v.CheckIned)
+			Visitor visitor = await _db.Visitors.FirstOrDefaultAsync(x => x.RegistrationNumber == number); 
+			if (number == null || visitor == null || visitor.CheckIned)
 			{
 				return RedirectToAction("Welcome", "Home");
 			}
 
-			v.AddLog("Check In", "Edition Started", true);
-			_db.Visitors.Update(v);
+			// add log for visitor
+			visitor.AddLog("Check In", "Edition Started", true);
+			_db.Visitors.Update(visitor);
 			await _db.SaveChangesAsync();
 
-			return View(v);
+			return View(visitor);
 		}
 
+		//
+		// POST: Visitor/Post
 		[HttpPost]
 		[AutoValidateAntiforgeryToken]
-		public async Task<IActionResult> EditOk(Visitor v)
+		public async Task<IActionResult> EditOk(Visitor model)
 		{
 			if (!ModelState.IsValid) 
 			{
-				return RedirectToAction("Menu", "Home", new {EID = v.EID});
+				return RedirectToAction("Menu", "Home", new {EID = model.EID});
 			}
-			Visitor oldV = await v.CopyValues(_db);
-			oldV.AddLog("Check In", "Edition Completed", true);
-			_db.Visitors.Update(oldV);
+			Visitor oldVisitor = await model.CopyValues(_db);
+			
+			// add log for visitor
+			oldVisitor.AddLog("Check In", "Edition Completed", true);
+			_db.Visitors.Update(oldVisitor);
 			await _db.SaveChangesAsync();
 
-			return View(oldV);
+			return View(oldVisitor);
 		}
 
+		//
+		// GET: Visitor/PreRegister
 		[HttpGet]
 		public async Task<IActionResult> PreRegister(int? EID)
 		{
@@ -138,67 +165,76 @@ namespace GlobalEvent.Controllers
 			return View();
 		}
 
+		//
+		// POST: Visitor/Register
 		[HttpPost]
 		[AutoValidateAntiforgeryToken]
-		public async Task <IActionResult> Register(Visitor v)
+		public async Task <IActionResult> Register(Visitor model)
 		{
-			if (v.OrderNumber == null || v.EID == 0) 
+			if (model.OrderNumber == null || model.EID == 0) 
 			{
 				return RedirectToAction("Welcome", "Home");
 			}
 
-			Order order = await _db.Orders.SingleOrDefaultAsync(x => x.Number.ToString() == v.OrderNumber);
+			Order order = await _db.Orders.SingleOrDefaultAsync(x => x.Number.ToString() == model.OrderNumber);
+
 			if (order != null)
             {
 				if (order.Full)
 				{
 					ViewBag.Message = "All visitors with this ORDER number were registered. Please use another ORDER number or purchase a ticket.";
-					ViewBag.EID = v.EID;
+					ViewBag.EID = model.EID;
 					return View("PreRegister");
 				}
 				else if (order.Cancelled)
 				{
 					ViewBag.Message = "This Order was cancelled.";
-					ViewBag.EID = v.EID;
+					ViewBag.EID = model.EID;
 					return View("PreRegister");
 				}
 
-				v.TicketType = order.TicketType;
-				v.Type = order.VType;
-				return View(v);
+				model.TicketType = order.TicketType;
+				model.Type = order.VType;
+				return View(model);
 			}
 
             ViewBag.Message = "This ORDER number isn't correct.  Please try again.";
-			ViewBag.EID = v.EID;
+			ViewBag.EID = model.EID;
+
             return View("PreRegister");
 		}
 
+		//
+		// POST: Visitor/RegisterOk
 		[HttpPost]
 		[AutoValidateAntiforgeryToken]
-		public async Task<IActionResult> RegisterOk(Visitor v)
+		public async Task<IActionResult> RegisterOk(Visitor model)
 		{
 			if (!ModelState.IsValid) 
 			{
-				return RedirectToAction("Menu", "Home", new {EID = v.EID});
+				return RedirectToAction("Menu", "Home", new {EID = model.EID});
 			}
 
 			// if dublicate found/already registered
 			if (await _db.Visitors.AnyAsync(x => 
-				x.OrderNumber == v.OrderNumber 
-				&& x.Name == v.Name && x.Last == v.Last))
+				x.OrderNumber == model.OrderNumber 
+				&& x.Name == model.Name && x.Last == model.Last))
 			{
 				ViewBag.Message = "Record for this attendee already exist. If you have any questions please refer to one of the representative.";
-				return View("Register", v);
+				return View("Register", model);
 			}
 
-			await v.CompleteRegistration(_db);
-			Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == v.EID);
-			v.AddLog("Registration", "Initial", true);
-			e.Visitors.Add(v);
-			await Order.Increment(v.OrderNumber, _db);
+			await model.CompleteRegistration(_db);
+			Event e = await _db.Events.FirstOrDefaultAsync(x => x.ID == model.EID);
+			
+			// add log for visitor
+			model.AddLog("Registration", "Initial", true);
+			e.Visitors.Add(model);
+
+			await Order.Increment(model.OrderNumber, _db);
 			await _db.SaveChangesAsync();
 
-			return View(v);
+			return View(model);
 		}
 	}
 }
