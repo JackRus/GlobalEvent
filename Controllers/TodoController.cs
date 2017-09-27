@@ -134,21 +134,25 @@ namespace GlobalEvent.Controllers
         }
 
         //
-        //
+        // GET: Todo/Delete
         [HttpGet]
         [Authorize(Policy="Todo EditorKiller")]
         public async Task<IActionResult> Delete (int? ID)
         {
             if (ID != null) 
             {
-                ToDo t = await _db.ToDos.FirstOrDefaultAsync(x => x.ID == ID);
-                _db.ToDos.Remove(t);
-                await _db.Logs.AddAsync(await Log.New("ToDo", $"Task: {t.Task}, was DELETED", _id, _db));
+                ToDo todo = await _db.ToDos.SingleOrDefaultAsync(x => x.ID == ID);
+                _db.ToDos.Remove(todo);
+                
+                // log for admin
+                await _db.Logs.AddAsync(await Log.New("ToDo", $"Task: {todo.Task}, was DELETED", _id, _db));
             }
 
             return RedirectToAction("index", "Todo");
         }
 
+        //
+        // GET: Todo/DeleteAll    
         [HttpGet]
         [Authorize(Policy="Is Owner")]
         public async Task<IActionResult> DeleteAll ()
@@ -157,27 +161,35 @@ namespace GlobalEvent.Controllers
             return View();
         }
 
+        //
+        // GET: Todo/DeleteAllOk
         [HttpGet]
         [Authorize(Policy="Is Owner")]
         public async Task<IActionResult> DeleteAllOk ()
         {
-            var t = await _db.ToDos.ToArrayAsync();
-            _db.ToDos.RemoveRange(t);
+            var todoList = await _db.ToDos.ToArrayAsync();
+            _db.ToDos.RemoveRange(todoList);
+            
+            // log for admin
             await _db.Logs.AddAsync(await Log.New("ToDo", $"All Tasks were DELETED", _id, _db));
 
             return RedirectToAction("Index", "Todo");
         }
 
+        //
+        // GET: Todo/Done
         [HttpGet]
         [Authorize(Policy="Todo EditorKiller")]
         public async Task<IActionResult> Done (int? ID)
         {
             if (ID != null) 
             {
-                ToDo t = await _db.ToDos.SingleOrDefaultAsync(x => x.ID == ID);
-                t.Done = true;
-                _db.ToDos.Update(t);
-                await _db.Logs.AddAsync(await Log.New("ToDo", $"Task: {t.Task}, was marked as DONE", _id, _db));
+                ToDo todo = await _db.ToDos.SingleOrDefaultAsync(x => x.ID == ID);
+                todo.Done = true;
+                _db.ToDos.Update(todo);
+                
+                // log for admin
+                await _db.Logs.AddAsync(await Log.New("ToDo", $"Task: {todo.Task}, was marked as DONE", _id, _db));
             }
 
             return RedirectToAction("Index", "Todo");
